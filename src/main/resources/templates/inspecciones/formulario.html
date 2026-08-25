@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Formulario de Inspección - SafeWork</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+</head>
+
+
+<body class="bg-light">
+
+
+    <!-- Barra de navegación -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+
+    <div class="container py-5">
+
+
+        <div
+            class="card shadow-sm mx-auto"
+            style="max-width: 750px;">
+
+
+            <div class="card-body p-4">
+
+
+                <!--
+                    El título cambia dependiendo
+                    de si estamos creando o editando.
+                -->
+                <h2
+                    class="fw-bold mb-4"
+                    th:text="${inspeccion.id == null
+                        ? 'Registrar Nueva Inspección'
+                        : 'Editar Inspección'}">
+
+                    Registrar Nueva Inspección
+
+                </h2>
+
+
+                <!-- ============================== -->
+                <!-- FORMULARIO -->
+                <!-- ============================== -->
+
+                <form
+                    th:action="@{/inspecciones/guardar}"
+                    th:object="${inspeccion}"
+                    method="post">
+
+
+                    <!--
+                        Mensaje general de errores.
+
+                        Debe permanecer dentro del formulario
+                        porque utiliza #fields.
+                    -->
+                    <div
+                        class="alert alert-danger"
+                        role="alert"
+                        th:if="${#fields.hasAnyErrors()}">
+
+                        <strong>
+                            Hay errores en el formulario.
+                        </strong>
+
+                        Por favor, corrige los datos
+                        antes de continuar.
+
+                    </div>
+
+
+                    <!-- ID interno oculto -->
+                    <input
+                        type="hidden"
+                        th:field="*{id}">
+
+
+                    <!-- ============================== -->
+                    <!-- FECHA -->
+                    <!-- ============================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="fecha"
+                            class="form-label">
+
+                            Fecha
+
+                        </label>
+
+
+                        <input
+                            type="date"
+                            id="fecha"
+                            class="form-control"
+                            th:field="*{fecha}">
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('fecha')}"
+                            th:errors="*{fecha}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================== -->
+                    <!-- TIPO -->
+                    <!-- ============================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="tipo"
+                            class="form-label">
+
+                            Tipo de Inspección
+
+                        </label>
+
+
+                        <select
+                            id="tipo"
+                            class="form-select"
+                            th:field="*{tipo}">
+
+
+                            <option value="">
+                                Seleccione un tipo
+                            </option>
+
+
+                            <option value="Inspección de seguridad">
+                                Inspección de seguridad
+                            </option>
+
+
+                            <option value="Inspección de equipos">
+                                Inspección de equipos
+                            </option>
+
+
+                            <option value="Inspección de orden y limpieza">
+                                Inspección de orden y limpieza
+                            </option>
+
+
+                        </select>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('tipo')}"
+                            th:errors="*{tipo}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================== -->
+                    <!-- ÁREA -->
+                    <!-- ============================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="area"
+                            class="form-label">
+
+                            Área
+
+                        </label>
+
+
+                        <select
+                            id="area"
+                            class="form-select"
+                            th:field="*{area}">
+
+
+                            <option value="">
+                                Seleccione un área
+                            </option>
+
+
+                            <!--
+                                Las áreas vienen desde
+                                AreaService.
+                            -->
+                            <option
+                                th:each="area : ${areas}"
+                                th:value="${area.id}"
+                                th:text="${area.nombre}">
+                            </option>
+
+
+                        </select>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('area')}"
+                            th:errors="*{area}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================== -->
+                    <!-- RESPONSABLE -->
+                    <!-- ============================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="responsable"
+                            class="form-label">
+
+                            Responsable
+
+                        </label>
+
+
+                        <select
+                            id="responsable"
+                            class="form-select"
+                            th:field="*{responsable}">
+
+
+                            <option value="">
+                                Seleccione un responsable
+                            </option>
+
+
+                            <!--
+                                Los trabajadores vienen desde
+                                TrabajadorService.
+                            -->
+                            <option
+                                th:each="trabajador : ${trabajadores}"
+                                th:value="${trabajador.id}"
+                                th:text="${trabajador.nombres
+                                    + ' '
+                                    + trabajador.apellidos}">
+                            </option>
+
+
+                        </select>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('responsable')}"
+                            th:errors="*{responsable}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================== -->
+                    <!-- ESTADO -->
+                    <!-- ============================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="estado"
+                            class="form-label">
+
+                            Estado
+
+                        </label>
+
+
+                        <select
+                            id="estado"
+                            class="form-select"
+                            th:field="*{estado}">
+
+
+                            <option value="">
+                                Seleccione un estado
+                            </option>
+
+
+                            <option value="Programada">
+                                Programada
+                            </option>
+
+
+                            <option value="Realizada">
+                                Realizada
+                            </option>
+
+
+                            <option value="Cerrada">
+                                Cerrada
+                            </option>
+
+
+                        </select>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('estado')}"
+                            th:errors="*{estado}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================== -->
+                    <!-- OBSERVACIONES -->
+                    <!-- ============================== -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="observaciones"
+                            class="form-label">
+
+                            Observaciones
+
+                        </label>
+
+
+                        <textarea
+                            id="observaciones"
+                            class="form-control"
+                            th:field="*{observaciones}"
+                            maxlength="500"
+                            rows="4"
+                            placeholder="Escriba las observaciones de la inspección">
+                        </textarea>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('observaciones')}"
+                            th:errors="*{observaciones}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ============================== -->
+                    <!-- BOTONES -->
+                    <!-- ============================== -->
+
+                    <div class="d-flex gap-2">
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary">
+
+                            Guardar
+
+                        </button>
+
+
+                        <a
+                            th:href="@{/inspecciones}"
+                            class="btn btn-outline-secondary">
+
+                            Cancelar
+
+                        </a>
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>
