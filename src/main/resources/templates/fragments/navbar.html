@@ -1,10 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
-
-<body>
-
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <body>
     <!--
         Fragmento reutilizable de navegación.
 
@@ -13,51 +10,55 @@
         páginas HTML de SafeWork.
     -->
     <nav
-        class="navbar navbar-expand-lg bg-dark navbar-dark"
-        th:fragment="navbar">
+      class="navbar navbar-expand-lg bg-dark navbar-dark"
+      th:fragment="navbar"
+    >
+      <div class="container">
+        <!--
+                Nombre principal del sistema.
 
-        <div class="container">
+                Por ahora dirige al módulo de áreas.
+                Más adelante podremos crear una página
+                de inicio general para SafeWork.
+            -->
+        <a class="navbar-brand fw-bold" th:href="@{/areas}"> SafeWork </a>
 
-            <!-- Nombre principal del sistema -->
-            <a
-                class="navbar-brand fw-bold"
-                th:href="@{/areas}">
+        <!-- Navegación principal -->
+        <div class="navbar-nav">
+          <!-- ====================== -->
+          <!-- MÓDULO ÁREAS -->
+          <!-- ====================== -->
 
-                SafeWork
+          <a class="nav-link" th:href="@{/areas}"> Áreas </a>
 
-            </a>
+          <!-- ====================== -->
+          <!-- MÓDULO TRABAJADORES -->
+          <!-- ====================== -->
 
-            <!-- Navegación principal -->
-            <div class="navbar-nav">
+          <!--
+                    Este módulo ya está disponible,
+                    por eso ahora utilizamos un enlace <a>
+                    en lugar de un span deshabilitado.
+                -->
+          <a class="nav-link" th:href="@{/trabajadores}"> Trabajadores </a>
 
-                <!-- Módulo Áreas -->
-                <a
-                    class="nav-link"
-                    th:href="@{/areas}">
+          <!-- ====================== -->
+          <!-- MÓDULOS FUTUROS -->
+          <!-- ====================== -->
 
-                    Áreas
+          <!--
+                    Riesgos todavía no está desarrollado,
+                    por eso permanece deshabilitado.
+                -->
+          <span class="nav-link disabled"> Riesgos </span>
 
-                </a>
-
-                <!-- Módulos futuros -->
-                <span class="nav-link disabled">
-                    Trabajadores
-                </span>
-
-                <span class="nav-link disabled">
-                    Riesgos
-                </span>
-
-                <span class="nav-link disabled">
-                    Inspecciones
-                </span>
-
-            </div>
-
+          <!--
+                    Inspecciones todavía no está desarrollado,
+                    por eso permanece deshabilitado.
+                -->
+          <span class="nav-link disabled"> Inspecciones </span>
         </div>
-
+      </div>
     </nav>
-
-</body>
-
+  </body>
 </html>
