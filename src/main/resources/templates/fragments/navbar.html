@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <!--
+        Fragmento reutilizable de navegación.
+
+        th:fragment="navbar"
+        permite insertar esta barra en otras
+        páginas HTML de SafeWork.
+    -->
+    <nav
+        class="navbar navbar-expand-lg bg-dark navbar-dark"
+        th:fragment="navbar">
+
+        <div class="container">
+
+            <!-- Nombre principal del sistema -->
+            <a
+                class="navbar-brand fw-bold"
+                th:href="@{/areas}">
+
+                SafeWork
+
+            </a>
+
+            <!-- Navegación principal -->
+            <div class="navbar-nav">
+
+                <!-- Módulo Áreas -->
+                <a
+                    class="nav-link"
+                    th:href="@{/areas}">
+
+                    Áreas
+
+                </a>
+
+                <!-- Módulos futuros -->
+                <span class="nav-link disabled">
+                    Trabajadores
+                </span>
+
+                <span class="nav-link disabled">
+                    Riesgos
+                </span>
+
+                <span class="nav-link disabled">
+                    Inspecciones
+                </span>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+</body>
+
+</html>
