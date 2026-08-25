@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Áreas - SafeWork</title>
+  </head>
+
+  <body>
+    <h1>Gestión de Áreas</h1>
+    <!-- Enlace para ir al formulario de registro -->
+    <a th:href="@{/areas/nueva}"> Nueva Área </a>
+
+    <br />
+    <br />
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="area : ${areas}">
+          <td th:text="${area.id}"></td>
+
+          <td th:text="${area.nombre}"></td>
+
+          <td th:text="${area.descripcion}"></td>
+          <td>
+            <a th:href="@{/areas/editar/{id}(id=${area.id})}"> Editar </a>
+            |
+            <a th:href="@{/areas/eliminar/{id}(id=${area.id})}"> Eliminar </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Área - SafeWork</title>
+  </head>
+
+  <body>
+    <!--
+        El título cambia dependiendo de si estamos
+        registrando o editando un área.
+
+        Si area.id es null:
+        Registrar Nueva Área
+
+        Si area.id tiene un valor:
+        Editar Área
+    -->
+    <h1 th:text="${area.id == null ? 'Registrar Nueva Área' : 'Editar Área'}">
+      Área
+    </h1>
+
+    <!--
+        Formulario utilizado tanto para registrar
+        como para editar un área.
+
+        th:action:
+        indica la ruta donde se enviarán los datos.
+
+        th:object:
+        relaciona el formulario con el objeto Area
+        enviado desde el Controller.
+
+        method="post":
+        indica que enviaremos información al servidor.
+    -->
+    <form th:action="@{/areas/guardar}" th:object="${area}" method="post">
+      <!--
+            Campo oculto utilizado para conservar el ID.
+
+            Cuando registramos:
+            id = null
+
+            Cuando editamos:
+            id = 1, 2, 3, etc.
+
+            Gracias a esto save() puede distinguir
+            entre INSERT y UPDATE.
+        -->
+      <input type="hidden" th:field="*{id}" />
+
+      <!-- Campo para el nombre del área -->
+      <div>
+        <label for="nombre"> Nombre: </label>
+
+        <!--
+                Se conecta con el atributo nombre
+                de la entidad Area.
+            -->
+        <input type="text" id="nombre" th:field="*{nombre}" />
+      </div>
+
+      <br />
+
+      <!-- Campo para la descripción del área -->
+      <div>
+        <label for="descripcion"> Descripción: </label>
+
+        <!--
+                Se conecta con el atributo descripcion
+                de la entidad Area.
+            -->
+        <textarea id="descripcion" th:field="*{descripcion}"> </textarea>
+      </div>
+
+      <br />
+
+      <!-- Envía los datos al Controller -->
+      <button type="submit">Guardar</button>
+    </form>
+
+    <br />
+
+    <!-- Regresa al listado de áreas -->
+    <a th:href="@{/areas}"> Volver al listado </a>
+  </body>
+</html>
