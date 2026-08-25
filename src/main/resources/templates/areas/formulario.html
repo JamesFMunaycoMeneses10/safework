@@ -62,6 +62,11 @@
                 de la entidad Area.
             -->
         <input type="text" id="nombre" th:field="*{nombre}" />
+        <!--
+    Muestra el mensaje de error relacionado
+    con el atributo nombre.
+-->
+        <p th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></p>
       </div>
 
       <br />
@@ -75,6 +80,11 @@
                 de la entidad Area.
             -->
         <textarea id="descripcion" th:field="*{descripcion}"> </textarea>
+        <!-- Error de validación de la descripción -->
+        <p
+          th:if="${#fields.hasErrors('descripcion')}"
+          th:errors="*{descripcion}"
+        ></p>
       </div>
 
       <br />

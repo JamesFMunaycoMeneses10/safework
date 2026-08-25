@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.safework.safework.model.Area;
 import com.safework.safework.service.AreaService;
-
+import org.springframework.validation.BindingResult;
+import jakarta.validation.Valid;
 /*
  * Controller encargado de gestionar las solicitudes web
  * relacionadas con el módulo de áreas.
@@ -106,30 +107,51 @@ public class AreaController {
  * Ejemplo:
  * http://localhost:8080/areas/eliminar/1
  */
-@GetMapping("/areas/eliminar/{id}")
+/*
+ * Elimina un área utilizando su identificador.
+ *
+ * Utilizamos POST porque eliminar modifica
+ * la información almacenada en el sistema.
+ */
+@PostMapping("/areas/eliminar/{id}")
 public String eliminarArea(@PathVariable Long id) {
 
     // Eliminamos el área mediante la capa Service.
     areaService.eliminarPorId(id);
 
-    // Después de eliminar, regresamos al listado.
+    // Después regresamos al listado.
     return "redirect:/areas";
 }
     /*
      * Recibe los datos enviados por el formulario
      * y guarda el área.
      */
-    @PostMapping("/areas/guardar")
-    public String guardarArea(@ModelAttribute Area area) {
+   /*
+ * Recibe los datos enviados desde el formulario
+ * y valida el objeto Area antes de guardarlo.
+ */
+@PostMapping("/areas/guardar")
+public String guardarArea(
+        @Valid @ModelAttribute Area area,
+        BindingResult resultado) {
 
-        // Guardamos el área mediante la capa Service.
-        areaService.guardar(area);
-
-        /*
-         * Después de guardar hacemos una nueva solicitud
-         * hacia /areas para mostrar el listado actualizado.
-         */
-        return "redirect:/areas";
+    /*
+     * Si alguna validación de Area falla,
+     * regresamos al formulario.
+     *
+     * Por ejemplo:
+     * - nombre vacío
+     * - nombre mayor a 100 caracteres
+     * - descripción mayor a 255 caracteres
+     */
+    if (resultado.hasErrors()) {
+        return "areas/formulario";
     }
 
+    // Si no existen errores, guardamos el área.
+    areaService.guardar(area);
+
+    // Después regresamos al listado.
+    return "redirect:/areas";
+}
 }
