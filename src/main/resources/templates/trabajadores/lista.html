@@ -43,8 +43,7 @@
             <table class="table table-hover align-middle mb-0">
               <thead class="table-light">
                 <tr>
-                  <th>ID</th>
-
+                
                   <th>DNI</th>
 
                   <th>Nombres</th>
@@ -65,8 +64,7 @@
                                 enviada desde TrabajadorController.
                             -->
                 <tr th:each="trabajador : ${trabajadores}">
-                  <td th:text="${trabajador.id}"></td>
-
+                
                   <td th:text="${trabajador.dni}"></td>
 
                   <td th:text="${trabajador.nombres}"></td>
