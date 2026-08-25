@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Formulario de Riesgo - SafeWork</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+</head>
+
+
+<body class="bg-light">
+
+
+    <!-- Barra de navegación -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+
+    <div class="container py-5">
+
+
+        <div
+            class="card shadow-sm mx-auto"
+            style="max-width: 750px;">
+
+
+            <div class="card-body p-4">
+
+
+                <!--
+                    El título cambia automáticamente.
+
+                    Si id es null:
+                    Registrar Nuevo Riesgo
+
+                    Si id existe:
+                    Editar Riesgo
+                -->
+                <h2
+                    class="fw-bold mb-4"
+                    th:text="${riesgo.id == null
+                        ? 'Registrar Nuevo Riesgo'
+                        : 'Editar Riesgo'}">
+
+                    Registrar Nuevo Riesgo
+
+                </h2>
+
+
+                <!-- Formulario -->
+                <form
+                    th:action="@{/riesgos/guardar}"
+                    th:object="${riesgo}"
+                    method="post">
+
+
+                    <!--
+                        Mensaje general de validación.
+
+                        IMPORTANTE:
+                        Está dentro del formulario porque
+                        utiliza #fields.
+                    -->
+                    <div
+                        class="alert alert-danger"
+                        role="alert"
+                        th:if="${#fields.hasAnyErrors()}">
+
+                        <strong>
+                            Hay errores en el formulario.
+                        </strong>
+
+                        Por favor, corrige los datos
+                        antes de continuar.
+
+                    </div>
+
+
+                    <!-- ID oculto -->
+                    <input
+                        type="hidden"
+                        th:field="*{id}">
+
+
+                    <!-- ====================== -->
+                    <!-- PELIGRO -->
+                    <!-- ====================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="peligro"
+                            class="form-label">
+
+                            Peligro
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            id="peligro"
+                            class="form-control"
+                            th:field="*{peligro}"
+                            maxlength="150"
+                            placeholder="Ejemplo: Piso mojado">
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('peligro')}"
+                            th:errors="*{peligro}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ====================== -->
+                    <!-- DESCRIPCIÓN -->
+                    <!-- ====================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="descripcion"
+                            class="form-label">
+
+                            Descripción
+
+                        </label>
+
+
+                        <textarea
+                            id="descripcion"
+                            class="form-control"
+                            th:field="*{descripcion}"
+                            maxlength="255"
+                            rows="3"
+                            placeholder="Describe el riesgo identificado">
+                        </textarea>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('descripcion')}"
+                            th:errors="*{descripcion}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- ====================== -->
+                    <!-- ÁREA -->
+                    <!-- ====================== -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="area"
+                            class="form-label">
+
+                            Área
+
+                        </label>
+
+
+                        <select
+                            id="area"
+                            class="form-select"
+                            th:field="*{area}">
+
+
+                            <option value="">
+                                Seleccione un área
+                            </option>
+
+
+                            <!--
+                                Las áreas vienen desde
+                                AreaService a través
+                                de RiesgoController.
+                            -->
+                            <option
+                                th:each="area : ${areas}"
+                                th:value="${area.id}"
+                                th:text="${area.nombre}">
+                            </option>
+
+                        </select>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('area')}"
+                            th:errors="*{area}">
+                        </div>
+
+                    </div>
+
+
+                    <!--
+                        Probabilidad y severidad
+                        se muestran en la misma fila.
+                    -->
+                    <div class="row">
+
+
+                        <!-- ====================== -->
+                        <!-- PROBABILIDAD -->
+                        <!-- ====================== -->
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                for="probabilidad"
+                                class="form-label">
+
+                                Probabilidad
+
+                            </label>
+
+
+                            <select
+                                id="probabilidad"
+                                class="form-select"
+                                th:field="*{probabilidad}">
+
+
+                                <option value="">
+                                    Seleccione
+                                </option>
+
+                                <option value="1">
+                                    1
+                                </option>
+
+                                <option value="2">
+                                    2
+                                </option>
+
+                                <option value="3">
+                                    3
+                                </option>
+
+                                <option value="4">
+                                    4
+                                </option>
+
+                                <option value="5">
+                                    5
+                                </option>
+
+                            </select>
+
+
+                            <div
+                                class="text-danger mt-1"
+                                th:if="${#fields.hasErrors('probabilidad')}"
+                                th:errors="*{probabilidad}">
+                            </div>
+
+                        </div>
+
+
+                        <!-- ====================== -->
+                        <!-- SEVERIDAD -->
+                        <!-- ====================== -->
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                for="severidad"
+                                class="form-label">
+
+                                Severidad
+
+                            </label>
+
+
+                            <select
+                                id="severidad"
+                                class="form-select"
+                                th:field="*{severidad}">
+
+
+                                <option value="">
+                                    Seleccione
+                                </option>
+
+                                <option value="1">
+                                    1
+                                </option>
+
+                                <option value="2">
+                                    2
+                                </option>
+
+                                <option value="3">
+                                    3
+                                </option>
+
+                                <option value="4">
+                                    4
+                                </option>
+
+                                <option value="5">
+                                    5
+                                </option>
+
+                            </select>
+
+
+                            <div
+                                class="text-danger mt-1"
+                                th:if="${#fields.hasErrors('severidad')}"
+                                th:errors="*{severidad}">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!--
+                        IMPORTANTE:
+
+                        No colocamos un campo para
+                        nivelRiesgo.
+
+                        El usuario no debe calcularlo
+                        ni ingresarlo manualmente.
+
+                        RiesgoService realizará:
+
+                        probabilidad × severidad
+                    -->
+
+
+                    <!-- ====================== -->
+                    <!-- MEDIDA DE CONTROL -->
+                    <!-- ====================== -->
+
+                    <div class="mb-4">
+
+                        <label
+                            for="medidaControl"
+                            class="form-label">
+
+                            Medida de Control
+
+                        </label>
+
+
+                        <textarea
+                            id="medidaControl"
+                            class="form-control"
+                            th:field="*{medidaControl}"
+                            maxlength="255"
+                            rows="3"
+                            placeholder="Ejemplo: Señalizar el área y secar inmediatamente el piso">
+                        </textarea>
+
+
+                        <div
+                            class="text-danger mt-1"
+                            th:if="${#fields.hasErrors('medidaControl')}"
+                            th:errors="*{medidaControl}">
+                        </div>
+
+                    </div>
+
+
+                    <!-- Botones -->
+                    <div class="d-flex gap-2">
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary">
+
+                            Guardar
+
+                        </button>
+
+
+                        <a
+                            th:href="@{/riesgos}"
+                            class="btn btn-outline-secondary">
+
+                            Cancelar
+
+                        </a>
+
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>
