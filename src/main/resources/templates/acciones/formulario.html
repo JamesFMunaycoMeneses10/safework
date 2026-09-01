@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Formulario Acción Correctiva - SafeWork
+    </title>
+
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    />
+
+</head>
+
+
+<body class="bg-light">
+
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+
+
+    <div class="container py-5">
+
+
+        <div class="card shadow-sm mx-auto"
+             style="max-width:750px">
+
+
+            <div class="card-body">
+
+
+                <h1 class="fw-bold mb-4"
+                    th:text="${accion.id == null 
+                    ? 'Registrar Acción Correctiva' 
+                    : 'Editar Acción Correctiva'}">
+
+                    Registrar Acción Correctiva
+
+                </h1>
+
+
+
+
+                <form
+                    th:action="@{/acciones/guardar}"
+                    th:object="${accion}"
+                    method="post"
+                >
+
+
+                    <!-- Mantiene el ID para actualizar -->
+                    <input 
+                        type="hidden"
+                        th:field="*{id}"
+                    />
+
+
+
+
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Descripción
+                        </label>
+
+
+
+                        <textarea
+                            class="form-control"
+                            rows="3"
+                            th:field="*{descripcion}"
+                            placeholder="Describa la acción correctiva">
+                        </textarea>
+
+
+
+                        <div
+                            class="text-danger"
+                            th:if="${#fields.hasErrors('descripcion')}"
+                            th:errors="*{descripcion}">
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <!-- FECHA REGISTRO -->
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Fecha de registro
+                        </label>
+
+
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            name="fechaRegistro"
+                            th:value="${accion.fechaRegistro}"
+                        />
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <!-- FECHA LIMITE -->
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Fecha límite
+                        </label>
+
+
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            name="fechaLimite"
+                            th:value="${accion.fechaLimite}"
+                        />
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <!-- RESPONSABLE -->
+
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Responsable
+                        </label>
+
+
+
+                        <select
+                            class="form-select"
+                            th:field="*{responsable}"
+                        >
+
+
+                            <option value="">
+                                Seleccione responsable
+                            </option>
+
+
+
+                            <option
+                                th:each="trabajador : ${trabajadores}"
+                                th:value="${trabajador.id}"
+                                th:text="${trabajador.nombres + ' ' + trabajador.apellidos}">
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <!-- RIESGO -->
+
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Riesgo asociado
+                        </label>
+
+
+
+                        <select
+                            class="form-select"
+                            th:field="*{riesgo}"
+                        >
+
+
+                            <option value="">
+                                Seleccione riesgo
+                            </option>
+
+
+
+                            <option
+                                th:each="riesgo : ${riesgos}"
+                                th:value="${riesgo.id}"
+                                th:text="${riesgo.peligro}">
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <!-- INCIDENTE -->
+
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Incidente relacionado
+                        </label>
+
+
+
+                        <select
+                            class="form-select"
+                            th:field="*{incidente}"
+                        >
+
+
+                            <option value="">
+                                Seleccione incidente
+                            </option>
+
+
+
+                            <option
+                                th:each="incidente : ${incidentes}"
+                                th:value="${incidente.id}"
+                                th:text="${incidente.descripcion}">
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <!-- PRIORIDAD -->
+
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Prioridad
+                        </label>
+
+
+
+                        <select
+                            class="form-select"
+                            th:field="*{prioridad}"
+                        >
+
+
+                            <option value="">
+                                Seleccione prioridad
+                            </option>
+
+
+
+                            <option value="Baja">
+                                Baja
+                            </option>
+
+
+                            <option value="Media">
+                                Media
+                            </option>
+
+
+                            <option value="Alta">
+                                Alta
+                            </option>
+
+
+                            <option value="Crítica">
+                                Crítica
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <!-- ESTADO -->
+
+
+                    <div class="mb-3">
+
+
+                        <label class="form-label">
+                            Estado
+                        </label>
+
+
+
+                        <select
+                            class="form-select"
+                            th:field="*{estado}"
+                        >
+
+
+                            <option value="">
+                                Seleccione estado
+                            </option>
+
+
+
+                            <option value="Pendiente">
+                                Pendiente
+                            </option>
+
+
+                            <option value="En proceso">
+                                En proceso
+                            </option>
+
+
+                            <option value="Completada">
+                                Completada
+                            </option>
+
+
+                            <option value="Cancelada">
+                                Cancelada
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <!-- BOTONES -->
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Guardar
+                    </button>
+
+
+
+                    <a
+                        th:href="@{/acciones}"
+                        class="btn btn-secondary"
+                    >
+                        Cancelar
+                    </a>
+
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+</body>
+
+
+</html>

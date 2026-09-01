@@ -1,0 +1,175 @@
+<!doctype html>
+
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Formulario de Incidente - SafeWork</title>
+
+    <!-- Bootstrap -->
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="bg-light">
+    <!-- Navbar -->
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container py-5">
+      <div class="card shadow-sm mx-auto" style="max-width: 750px">
+        <div class="card-body">
+          <h1
+            class="fw-bold mb-4"
+            th:text="${incidente.id == null ? 
+                'Registrar Nuevo Incidente' : 
+                'Editar Incidente'}"
+          >
+            Registrar Nuevo Incidente
+          </h1>
+
+          <!-- Formulario -->
+
+          <form
+            th:action="@{/incidentes/guardar}"
+            th:object="${incidente}"
+            method="post"
+          >
+            <!-- ID oculto para edición -->
+
+            <input type="hidden" th:field="*{id}" />
+
+            <!-- Fecha y hora -->
+
+            <div class="mb-3">
+              <label class="form-label"> Fecha y hora </label>
+
+              <input
+                type="datetime-local"
+                class="form-control"
+                th:field="*{fechaHora}"
+              />
+
+              <div class="text-danger" th:errors="*{fechaHora}"></div>
+            </div>
+
+            <!-- Tipo -->
+
+            <div class="mb-3">
+              <label class="form-label"> Tipo de evento </label>
+
+              <select class="form-select" th:field="*{tipo}">
+                <option value="">Seleccione un tipo</option>
+
+                <option value="Incidente">Incidente</option>
+
+                <option value="Accidente">Accidente</option>
+              </select>
+
+              <div class="text-danger" th:errors="*{tipo}"></div>
+            </div>
+
+            <!-- Área -->
+
+            <div class="mb-3">
+              <label class="form-label"> Área </label>
+
+              <select class="form-select" th:field="*{area}">
+                <option value="">Seleccione un área</option>
+
+                <option
+                  th:each="area : ${areas}"
+                  th:value="${area.id}"
+                  th:text="${area.nombre}"
+                ></option>
+              </select>
+
+              <div class="text-danger" th:errors="*{area}"></div>
+            </div>
+
+            <!-- Trabajador -->
+
+            <div class="mb-3">
+              <label class="form-label"> Trabajador involucrado </label>
+
+              <select class="form-select" th:field="*{trabajador}">
+                <option value="">Seleccione un trabajador</option>
+
+                <option
+                  th:each="trabajador : ${trabajadores}"
+                  th:value="${trabajador.id}"
+                  th:text="${trabajador.nombres + ' ' + trabajador.apellidos}"
+                ></option>
+              </select>
+
+              <div class="text-danger" th:errors="*{trabajador}"></div>
+            </div>
+
+            <!-- Descripción -->
+
+            <div class="mb-3">
+              <label class="form-label"> Descripción </label>
+
+              <textarea
+                class="form-control"
+                rows="4"
+                placeholder="Describa lo ocurrido"
+                th:field="*{descripcion}"
+              >
+              </textarea>
+
+              <div class="text-danger" th:errors="*{descripcion}"></div>
+            </div>
+
+            <!-- Gravedad -->
+
+            <div class="mb-3">
+              <label class="form-label"> Gravedad </label>
+
+              <select class="form-select" th:field="*{gravedad}">
+                <option value="">Seleccione gravedad</option>
+
+                <option value="Leve">Leve</option>
+
+                <option value="Moderada">Moderada</option>
+
+                <option value="Grave">Grave</option>
+              </select>
+
+              <div class="text-danger" th:errors="*{gravedad}"></div>
+            </div>
+
+            <!-- Estado -->
+
+            <div class="mb-3">
+              <label class="form-label"> Estado </label>
+
+              <select class="form-select" th:field="*{estado}">
+                <option value="">Seleccione estado</option>
+
+                <option value="Reportado">Reportado</option>
+
+                <option value="En investigación">En investigación</option>
+
+                <option value="Cerrado">Cerrado</option>
+              </select>
+
+              <div class="text-danger" th:errors="*{estado}"></div>
+            </div>
+
+            <!-- Botones -->
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+
+            <a th:href="@{/incidentes}" class="btn btn-secondary"> Cancelar </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

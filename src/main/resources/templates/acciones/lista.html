@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Acciones Correctivas - SafeWork</title>
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="bg-light">
+    <!-- Navbar -->
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container py-5">
+      <!-- Encabezado -->
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="fw-bold">Gestión de Acciones Correctivas</h1>
+
+          <p class="text-muted">
+            Registro y seguimiento de medidas correctivas para riesgos e
+            incidentes laborales.
+          </p>
+        </div>
+
+        <a th:href="@{/acciones/nueva}" class="btn btn-primary">
+          + Nueva Acción
+        </a>
+      </div>
+
+      <!-- Tabla -->
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+
+                  <th>Responsable</th>
+
+                  <th>Prioridad</th>
+
+                  <th>Estado</th>
+
+                  <th>Fecha límite</th>
+
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="accion : ${acciones}">
+                  <!-- Descripción -->
+
+                  <td th:text="${accion.descripcion}"></td>
+
+                  <!-- Responsable -->
+
+                  <td
+                    th:text="${accion.responsable != null 
+        ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
+        : 'Sin asignar'}"
+                  ></td>
+
+                  <!-- Prioridad -->
+
+                  <td>
+                    <span
+                      th:if="${accion.prioridad == 'Baja'}"
+                      class="badge text-bg-success"
+                    >
+                      Baja
+                    </span>
+
+                    <span
+                      th:if="${accion.prioridad == 'Media'}"
+                      class="badge text-bg-warning"
+                    >
+                      Media
+                    </span>
+
+                    <span
+                      th:if="${accion.prioridad == 'Alta'}"
+                      class="badge text-bg-danger"
+                    >
+                      Alta
+                    </span>
+
+                    <span
+                      th:if="${accion.prioridad == 'Crítica'}"
+                      class="badge text-bg-dark"
+                    >
+                      Crítica
+                    </span>
+                  </td>
+
+                  <!-- Estado -->
+
+                  <td>
+                    <span
+                      th:if="${accion.estado == 'Pendiente'}"
+                      class="badge text-bg-secondary"
+                    >
+                      Pendiente
+                    </span>
+
+                    <span
+                      th:if="${accion.estado == 'En proceso'}"
+                      class="badge text-bg-warning"
+                    >
+                      En proceso
+                    </span>
+
+                    <span
+                      th:if="${accion.estado == 'Completada'}"
+                      class="badge text-bg-success"
+                    >
+                      Completada
+                    </span>
+
+                    <span
+                      th:if="${accion.estado == 'Cancelada'}"
+                      class="badge text-bg-dark"
+                    >
+                      Cancelada
+                    </span>
+                  </td>
+
+                  <!-- Fecha límite -->
+
+                  <td th:text="${accion.fechaLimite}"></td>
+
+                  <!-- Acciones -->
+
+                  <td>
+                    <a
+                      th:href="@{/acciones/editar/{id}(id=${accion.id})}"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      Editar
+                    </a>
+
+                    <form
+                      th:action="@{/acciones/eliminar/{id}(id=${accion.id})}"
+                      method="post"
+                      class="d-inline"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="
+                          return confirm('¿Eliminar acción correctiva?');
+                        "
+                      >
+                        Eliminar
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

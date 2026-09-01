@@ -1,0 +1,79 @@
+package com.safework.safework.service;
+
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.safework.safework.model.AccionCorrectiva;
+import com.safework.safework.repository.AccionCorrectivaRepository;
+
+
+
+/**
+ * Capa de servicios encargada
+ * de la lógica de negocio
+ * de las acciones correctivas.
+ */
+@Service
+public class AccionCorrectivaService {
+
+
+    private final AccionCorrectivaRepository accionRepository;
+
+
+
+    /**
+     * Inyección de dependencia.
+     */
+    public AccionCorrectivaService(
+            AccionCorrectivaRepository accionRepository) {
+
+        this.accionRepository = accionRepository;
+    }
+
+
+
+    /**
+     * Lista todas las acciones correctivas.
+     */
+    public List<AccionCorrectiva> listarTodas() {
+
+        return accionRepository.findAll();
+    }
+
+
+
+    /**
+     * Guarda una nueva acción
+     * o actualiza una existente.
+     */
+    public AccionCorrectiva guardar(
+            AccionCorrectiva accion) {
+
+        return accionRepository.save(accion);
+    }
+
+
+
+    /**
+     * Busca una acción por id.
+     */
+    public Optional<AccionCorrectiva> buscarPorId(
+            Long id) {
+
+        return accionRepository.findById(id);
+    }
+
+
+
+    /**
+     * Elimina una acción.
+     */
+    public void eliminarPorId(Long id) {
+
+        accionRepository.deleteById(id);
+    }
+
+}
