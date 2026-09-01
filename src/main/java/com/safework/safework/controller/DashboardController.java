@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+
 import com.safework.safework.service.TrabajadorService;
 import com.safework.safework.service.RiesgoService;
 import com.safework.safework.service.IncidenteService;
@@ -33,6 +34,7 @@ public class DashboardController {
             RiesgoService riesgoService,
             IncidenteService incidenteService,
             AccionCorrectivaService accionService) {
+
 
         this.trabajadorService = trabajadorService;
         this.riesgoService = riesgoService;
@@ -74,6 +76,15 @@ public class DashboardController {
         model.addAttribute(
                 "totalAcciones",
                 accionService.listarTodas().size()
+        );
+
+
+
+        // Últimas acciones correctivas
+
+        model.addAttribute(
+                "acciones",
+                accionService.listarTodas()
         );
 
 
