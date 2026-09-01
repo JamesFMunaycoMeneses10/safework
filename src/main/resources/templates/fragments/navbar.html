@@ -1,68 +1,126 @@
 <!doctype html>
-
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <body>
-    <!--
-        Fragmento reutilizable de navegación.
 
-        th:fragment="navbar"
-        permite insertar esta barra en otras
-        páginas HTML de SafeWork.
-    -->
-    <nav
-      class="navbar navbar-expand-lg bg-dark navbar-dark"
-      th:fragment="navbar"
-    >
-      <div class="container">
-        <!--
-                Nombre principal del sistema.
+<body>
 
-                Por ahora dirige al módulo de áreas.
-                Más adelante podremos crear una página
-                de inicio general para SafeWork.
-            -->
-        <a class="navbar-brand fw-bold" th:href="@{/areas}"> SafeWork </a>
+
+<nav
+    class="navbar navbar-expand-lg bg-dark navbar-dark"
+    th:fragment="navbar"
+>
+
+
+    <div class="container">
+
+
+        <!-- Logo / Inicio -->
+        <a 
+            class="navbar-brand fw-bold"
+            th:href="@{/dashboard}">
+            SafeWork
+        </a>
+
+
+
+
 
         <!-- Navegación principal -->
+
         <div class="navbar-nav">
-          <!-- ====================== -->
-          <!-- MÓDULO ÁREAS -->
-          <!-- ====================== -->
 
-          <a class="nav-link" th:href="@{/areas}"> Áreas </a>
 
-          <!-- ====================== -->
-          <!-- MÓDULO TRABAJADORES -->
-          <!-- ====================== -->
+            <!-- DASHBOARD -->
 
-          <a class="nav-link" th:href="@{/trabajadores}"> Trabajadores </a>
+            <a 
+                class="nav-link"
+                th:href="@{/dashboard}">
+                Dashboard
+            </a>
 
-          <!-- ====================== -->
-          <!-- MÓDULO RIESGOS -->
-          <!-- ====================== -->
 
-          <!--
-                    Este módulo ya   está disponible,
-                    por eso ahora utilizamos un enlace.
-                -->
-          <a class="nav-link" th:href="@{/riesgos}"> Riesgos </a>
 
-          <!-- ====================== -->
-          <!-- MÓDULOS FUTUROS -->
-          <!-- ====================== -->
-    <a class="nav-link" th:href="@{/incidentes}">
-        Incidentes
-    </a>
 
-          <!--
-                    Inspecciones todavía no está desarrollado,
-                    por eso permanece deshabilitado.
-                -->
-          <a class="nav-link" th:href="@{/inspecciones}"> Inspecciones </a>
 
-          <a class="nav-link" th:href="@{/acciones}"> Acciones Correctivas </a>
+            <!-- ÁREAS -->
+
+            <a 
+                class="nav-link"
+                th:href="@{/areas}">
+                Áreas
+            </a>
+
+
+
+
+
+            <!-- TRABAJADORES -->
+
+            <a 
+                class="nav-link"
+                th:href="@{/trabajadores}">
+                Trabajadores
+            </a>
+
+
+
+
+
+            <!-- RIESGOS -->
+
+            <a 
+                class="nav-link"
+                th:href="@{/riesgos}">
+                Riesgos
+            </a>
+
+
+
+
+
+            <!-- INCIDENTES -->
+
+            <a 
+                class="nav-link"
+                th:href="@{/incidentes}">
+                Incidentes
+            </a>
+
+
+
+
+
+            <!-- INSPECCIONES -->
+            <!-- Módulo pendiente de desarrollo -->
+
+            <a 
+                class="nav-link"
+                th:href="@{/inspecciones}">
+                Inspecciones
+            </a>
+
+
+
+
+
+            <!-- ACCIONES CORRECTIVAS -->
+
+            <a 
+                class="nav-link"
+                th:href="@{/acciones}">
+                Acciones Correctivas
+            </a>
+
+
+
         </div>
-      </div>
-    </nav>
-  </body>
+
+
+    </div>
+
+
+</nav>
+
+
+</body>
+
 </html>
