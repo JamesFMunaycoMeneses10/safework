@@ -1,15 +1,12 @@
 package com.safework.safework.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
 
 import com.safework.safework.model.AccionCorrectiva;
 
@@ -18,315 +15,209 @@ import com.safework.safework.service.RiesgoService;
 import com.safework.safework.service.IncidenteService;
 import com.safework.safework.service.AccionCorrectivaService;
 
-
-
 @Controller
 public class DashboardController {
 
+        private final TrabajadorService trabajadorService;
 
+        private final RiesgoService riesgoService;
 
-    private final TrabajadorService trabajadorService;
+        private final IncidenteService incidenteService;
 
-    private final RiesgoService riesgoService;
+        private final AccionCorrectivaService accionService;
 
-    private final IncidenteService incidenteService;
+        public DashboardController(
 
-    private final AccionCorrectivaService accionService;
+                        TrabajadorService trabajadorService,
 
+                        RiesgoService riesgoService,
 
+                        IncidenteService incidenteService,
 
+                        AccionCorrectivaService accionService) {
 
+                this.trabajadorService = trabajadorService;
 
-    public DashboardController(
+                this.riesgoService = riesgoService;
 
-            TrabajadorService trabajadorService,
+                this.incidenteService = incidenteService;
 
-            RiesgoService riesgoService,
+                this.accionService = accionService;
 
-            IncidenteService incidenteService,
+        }
 
-            AccionCorrectivaService accionService) {
+        @GetMapping("/dashboard")
 
+        public String dashboard(Model model) {
 
-        this.trabajadorService = trabajadorService;
+                // ==========================
+                // Indicadores generales
+                // ==========================
 
-        this.riesgoService = riesgoService;
+                model.addAttribute(
 
-        this.incidenteService = incidenteService;
+                                "totalTrabajadores",
 
-        this.accionService = accionService;
+                                trabajadorService.listarTodos().size()
 
-    }
+                );
 
+                model.addAttribute(
 
+                                "totalRiesgos",
 
+                                riesgoService.listarTodos().size()
 
+                );
 
+                model.addAttribute(
 
+                                "totalIncidentes",
 
+                                incidenteService.listarTodos().size()
 
+                );
 
-    @GetMapping("/dashboard")
+                List<AccionCorrectiva> acciones =
 
-    public String dashboard(Model model) {
+                                accionService.listarTodas();
 
+                model.addAttribute(
 
+                                "totalAcciones",
 
-        // ==========================
-        // Indicadores generales
-        // ==========================
+                                acciones.size()
 
+                );
 
-        model.addAttribute(
+                // ==========================
+                // Estado acciones correctivas
+                // ==========================
 
-                "totalTrabajadores",
+                long accionesPendientes =
 
-                trabajadorService.listarTodos().size()
+                                acciones.stream()
 
-        );
+                                                .filter(a -> a.getEstado().equals("Pendiente"))
 
+                                                .count();
 
+                long accionesProceso =
 
-        model.addAttribute(
+                                acciones.stream()
 
-                "totalRiesgos",
+                                                .filter(a -> a.getEstado().equals("En proceso"))
 
-                riesgoService.listarTodos().size()
+                                                .count();
 
-        );
+                long accionesCompletadas =
 
+                                acciones.stream()
 
+                                                .filter(a -> a.getEstado().equals("Completada"))
 
-        model.addAttribute(
+                                                .count();
 
-                "totalIncidentes",
+                model.addAttribute(
 
-                incidenteService.listarTodos().size()
+                                "accionesPendientes",
 
-        );
+                                accionesPendientes
 
+                );
 
+                model.addAttribute(
 
+                                "accionesProceso",
 
+                                accionesProceso
 
-        List<AccionCorrectiva> acciones =
+                );
 
-                accionService.listarTodas();
+                model.addAttribute(
 
+                                "accionesCompletadas",
 
+                                accionesCompletadas
 
+                );
 
+                // ==========================
+                // Alertas SST
+                // ==========================
 
-        model.addAttribute(
+                LocalDate hoy = LocalDate.now();
 
-                "totalAcciones",
+                long accionesVencidas =
 
-                acciones.size()
+                                acciones.stream()
 
-        );
+                                                .filter(a ->
 
+                                                a.getFechaLimite().isBefore(hoy)
 
+                                                                &&
 
+                                                                !a.getEstado().equals("Completada")
 
+                                                )
 
+                                                .count();
 
+                long accionesProximas =
 
+                                acciones.stream()
 
+                                                .filter(a -> {
 
-        // ==========================
-        // Estado acciones correctivas
-        // ==========================
+                                                        long dias = ChronoUnit.DAYS.between(
 
+                                                                        hoy,
 
-        long accionesPendientes =
+                                                                        a.getFechaLimite()
 
-                acciones.stream()
+                                                );
 
-                .filter(a -> a.getEstado().equals("Pendiente"))
+                                                        return dias >= 0
 
-                .count();
+                                                                        && dias <= 7
 
+                                                                        && !a.getEstado().equals("Completada");
 
+                                                })
 
+                                                .count();
 
+                model.addAttribute(
 
-        long accionesProceso =
+                                "accionesVencidas",
 
-                acciones.stream()
+                                accionesVencidas
 
-                .filter(a -> a.getEstado().equals("En proceso"))
+                );
 
-                .count();
+                model.addAttribute(
 
+                                "accionesProximas",
 
+                                accionesProximas
 
+                );
 
+                // ==========================
+                // Últimas acciones
+                // ==========================
 
-        long accionesCompletadas =
+                model.addAttribute(
 
-                acciones.stream()
+                                "acciones",
 
-                .filter(a -> a.getEstado().equals("Completada"))
+                                acciones
 
-                .count();
+                );
 
+                return "dashboard";
 
-
-
-
-
-
-        model.addAttribute(
-
-                "accionesPendientes",
-
-                accionesPendientes
-
-        );
-
-
-
-        model.addAttribute(
-
-                "accionesProceso",
-
-                accionesProceso
-
-        );
-
-
-
-        model.addAttribute(
-
-                "accionesCompletadas",
-
-                accionesCompletadas
-
-        );
-
-
-
-
-
-
-
-
-
-        // ==========================
-        // Alertas SST
-        // ==========================
-
-
-        LocalDate hoy = LocalDate.now();
-
-
-
-
-
-        long accionesVencidas =
-
-                acciones.stream()
-
-                .filter(a ->
-
-                        a.getFechaLimite().isBefore(hoy)
-
-                        &&
-
-                        !a.getEstado().equals("Completada")
-
-                )
-
-                .count();
-
-
-
-
-
-
-
-
-        long accionesProximas =
-
-                acciones.stream()
-
-                .filter(a -> {
-
-
-                    long dias = ChronoUnit.DAYS.between(
-
-                            hoy,
-
-                            a.getFechaLimite()
-
-                    );
-
-
-                    return dias >= 0
-
-                            && dias <= 7
-
-                            && !a.getEstado().equals("Completada");
-
-
-                })
-
-                .count();
-
-
-
-
-
-
-
-
-        model.addAttribute(
-
-                "accionesVencidas",
-
-                accionesVencidas
-
-        );
-
-
-
-
-        model.addAttribute(
-
-                "accionesProximas",
-
-                accionesProximas
-
-        );
-
-
-
-
-
-
-
-
-
-        // ==========================
-        // Últimas acciones
-        // ==========================
-
-
-        model.addAttribute(
-
-                "acciones",
-
-                acciones
-
-        );
-
-
-
-
-
-        return "dashboard";
-
-    }
-
+        }
 
 }
