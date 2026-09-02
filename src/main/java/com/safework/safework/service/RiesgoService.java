@@ -2,8 +2,6 @@ package com.safework.safework.service;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.safework.safework.model.Riesgo;
