@@ -1,126 +1,47 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<body>
-
-
-<nav
-    class="navbar navbar-expand-lg bg-dark navbar-dark"
-    th:fragment="navbar"
->
-
-
-    <div class="container">
-
-
+  <body>
+    <nav
+      class="navbar navbar-expand-lg bg-dark navbar-dark"
+      th:fragment="navbar"
+    >
+      <div class="container">
         <!-- Logo / Inicio -->
-        <a 
-            class="navbar-brand fw-bold"
-            th:href="@{/dashboard}">
-            SafeWork
-        </a>
-
-
-
-
+        <a class="navbar-brand fw-bold" th:href="@{/dashboard}"> SafeWork </a>
 
         <!-- Navegación principal -->
 
         <div class="navbar-nav">
+          <!-- DASHBOARD -->
 
+          <a class="nav-link" th:href="@{/dashboard}"> Dashboard </a>
 
-            <!-- DASHBOARD -->
+          <!-- ÁREAS -->
 
-            <a 
-                class="nav-link"
-                th:href="@{/dashboard}">
-                Dashboard
-            </a>
+          <a class="nav-link" th:href="@{/areas}"> Áreas </a>
 
+          <!-- TRABAJADORES -->
 
+          <a class="nav-link" th:href="@{/trabajadores}"> Trabajadores </a>
 
+          <!-- RIESGOS -->
 
+          <a class="nav-link" th:href="@{/riesgos}"> Riesgos </a>
 
-            <!-- ÁREAS -->
+          <!-- INCIDENTES -->
 
-            <a 
-                class="nav-link"
-                th:href="@{/areas}">
-                Áreas
-            </a>
+          <a class="nav-link" th:href="@{/incidentes}"> Incidentes </a>
 
+          <!-- INSPECCIONES -->
+          <!-- Módulo pendiente de desarrollo -->
 
+          <a class="nav-link" th:href="@{/inspecciones}"> Inspecciones </a>
 
+          <!-- ACCIONES CORRECTIVAS -->
 
-
-            <!-- TRABAJADORES -->
-
-            <a 
-                class="nav-link"
-                th:href="@{/trabajadores}">
-                Trabajadores
-            </a>
-
-
-
-
-
-            <!-- RIESGOS -->
-
-            <a 
-                class="nav-link"
-                th:href="@{/riesgos}">
-                Riesgos
-            </a>
-
-
-
-
-
-            <!-- INCIDENTES -->
-
-            <a 
-                class="nav-link"
-                th:href="@{/incidentes}">
-                Incidentes
-            </a>
-
-
-
-
-
-            <!-- INSPECCIONES -->
-            <!-- Módulo pendiente de desarrollo -->
-
-            <a 
-                class="nav-link"
-                th:href="@{/inspecciones}">
-                Inspecciones
-            </a>
-
-
-
-
-
-            <!-- ACCIONES CORRECTIVAS -->
-
-            <a 
-                class="nav-link"
-                th:href="@{/acciones}">
-                Acciones Correctivas
-            </a>
-
-
-
+          <a class="nav-link" th:href="@{/acciones}"> Acciones Correctivas </a>
         </div>
-
-
-    </div>
-
-
-</nav>
-
-
-</body>
-
+      </div>
+    </nav>
+  </body>
 </html>

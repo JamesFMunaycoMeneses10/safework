@@ -1,629 +1,322 @@
 <!doctype html>
 
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-
-<head>
-
+  <head>
     <meta charset="UTF-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Dashboard SafeWork</title>
-
-
     <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
     />
 
-</head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
 
+  <body class="bg-light">
+    <!-- Navbar -->
 
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<body class="bg-light">
+    <div class="container py-5">
+      <h1 class="fw-bold">Dashboard SafeWork</h1>
 
-
-
-<!-- Navbar -->
-
-<div th:replace="~{fragments/navbar :: navbar}"></div>
-
-
-
-
-
-<div class="container py-5">
-
-
-
-    <h1 class="fw-bold">
-        Dashboard SafeWork
-    </h1>
-
-
-    <p class="text-muted">
+      <p class="text-muted">
         Resumen general de Seguridad y Salud en el Trabajo.
-    </p>
+      </p>
 
-
-
-
-
-    <!-- ======================
+      <!-- ======================
          INDICADORES GENERALES
     ======================= -->
 
-
-    <div class="row g-4 mt-3">
-
-
-
+      <div class="row g-4 mt-3">
         <div class="col-md-3">
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <h5>👷 Trabajadores</h5>
 
-            <div class="card shadow-sm text-center">
+              <h1 class="fw-bold" th:text="${totalTrabajadores}">0</h1>
 
-                <div class="card-body">
-
-
-                    <h5>
-                        👷 Trabajadores
-                    </h5>
-
-
-                    <h1 class="fw-bold"
-                        th:text="${totalTrabajadores}">
-                        0
-                    </h1>
-
-
-                    <small class="text-muted">
-                        Personal registrado
-                    </small>
-
-
-                </div>
-
+              <small class="text-muted"> Personal registrado </small>
             </div>
-
+          </div>
         </div>
 
-
-
-
-
         <div class="col-md-3">
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <h5>⚠️ Riesgos</h5>
 
+              <h1 class="fw-bold" th:text="${totalRiesgos}">0</h1>
 
-            <div class="card shadow-sm text-center">
-
-                <div class="card-body">
-
-
-                    <h5>
-                        ⚠️ Riesgos
-                    </h5>
-
-
-                    <h1 class="fw-bold"
-                        th:text="${totalRiesgos}">
-                        0
-                    </h1>
-
-
-                    <small class="text-muted">
-                        Riesgos identificados
-                    </small>
-
-
-                </div>
-
+              <small class="text-muted"> Riesgos identificados </small>
             </div>
-
-
+          </div>
         </div>
 
-
-
-
-
-
         <div class="col-md-3">
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <h5>🚨 Incidentes</h5>
 
+              <h1 class="fw-bold" th:text="${totalIncidentes}">0</h1>
 
-            <div class="card shadow-sm text-center">
-
-                <div class="card-body">
-
-
-                    <h5>
-                        🚨 Incidentes
-                    </h5>
-
-
-                    <h1 class="fw-bold"
-                        th:text="${totalIncidentes}">
-                        0
-                    </h1>
-
-
-                    <small class="text-muted">
-                        Eventos registrados
-                    </small>
-
-
-                </div>
-
-
+              <small class="text-muted"> Eventos registrados </small>
             </div>
-
-
+          </div>
         </div>
 
-
-
-
-
-
-
         <div class="col-md-3">
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <h5>🛠 Acciones</h5>
 
+              <h1 class="fw-bold" th:text="${totalAcciones}">0</h1>
 
-            <div class="card shadow-sm text-center">
-
-                <div class="card-body">
-
-
-                    <h5>
-                        🛠 Acciones
-                    </h5>
-
-
-                    <h1 class="fw-bold"
-                        th:text="${totalAcciones}">
-                        0
-                    </h1>
-
-
-                    <small class="text-muted">
-                        Medidas correctivas
-                    </small>
-
-
-                </div>
-
+              <small class="text-muted"> Medidas correctivas </small>
             </div>
-
-
+          </div>
         </div>
+      </div>
 
-
-
-    </div>
-
-
-
-
-
-
-
-
-
-    <!-- ======================
+      <!-- ======================
          SEGUIMIENTO ACCIONES
     ======================= -->
 
-
-    <div class="card shadow-sm mt-5">
-
-
+      <div class="card shadow-sm mt-5">
         <div class="card-body">
+          <h4 class="fw-bold">Seguimiento de acciones correctivas</h4>
 
+          <div class="row mt-4">
+            <div class="col-md-4">
+              <div class="card border-warning text-center">
+                <div class="card-body">
+                  <h5>🟡 Pendientes</h5>
 
-            <h4 class="fw-bold">
-                Seguimiento de acciones correctivas
-            </h4>
-
-
-
-            <div class="row mt-4">
-
-
-
-                <div class="col-md-4">
-
-
-                    <div class="card border-warning text-center">
-
-
-                        <div class="card-body">
-
-
-                            <h5>
-                                🟡 Pendientes
-                            </h5>
-
-
-                            <h2 class="fw-bold"
-                                th:text="${accionesPendientes}">
-                                0
-                            </h2>
-
-
-                        </div>
-
-
-                    </div>
-
-
+                  <h2 class="fw-bold" th:text="${accionesPendientes}">0</h2>
                 </div>
-
-
-
-
-
-
-                <div class="col-md-4">
-
-
-                    <div class="card border-primary text-center">
-
-
-                        <div class="card-body">
-
-
-                            <h5>
-                                🔵 En proceso
-                            </h5>
-
-
-                            <h2 class="fw-bold"
-                                th:text="${accionesProceso}">
-                                0
-                            </h2>
-
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-
-
-
-                <div class="col-md-4">
-
-
-                    <div class="card border-success text-center">
-
-
-                        <div class="card-body">
-
-
-                            <h5>
-                                🟢 Completadas
-                            </h5>
-
-
-                            <h2 class="fw-bold"
-                                th:text="${accionesCompletadas}">
-                                0
-                            </h2>
-
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-
+              </div>
             </div>
 
+            <div class="col-md-4">
+              <div class="card border-primary text-center">
+                <div class="card-body">
+                  <h5>🔵 En proceso</h5>
 
+                  <h2 class="fw-bold" th:text="${accionesProceso}">0</h2>
+                </div>
+              </div>
+            </div>
 
+            <div class="col-md-4">
+              <div class="card border-success text-center">
+                <div class="card-body">
+                  <h5>🟢 Completadas</h5>
+
+                  <h2 class="fw-bold" th:text="${accionesCompletadas}">0</h2>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-
-    </div>
-
-
-
-
-
-
-
-
-
-    <!-- ======================
+      <!-- ======================
          ALERTAS SST
     ======================= -->
 
-
-    <div class="card shadow-sm mt-5">
-
-
+      <div class="card shadow-sm mt-5">
         <div class="card-body">
+          <h4 class="fw-bold">🚨 Alertas SST</h4>
 
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="card border-danger text-center">
+                <div class="card-body">
+                  <h5>🔴 Acciones vencidas</h5>
 
-            <h4 class="fw-bold">
-                🚨 Alertas SST
-            </h4>
+                  <h2 class="fw-bold text-danger" th:text="${accionesVencidas}">
+                    0
+                  </h2>
 
-
-
-            <div class="row mt-4">
-
-
-
-                <!-- Vencidas -->
-
-
-                <div class="col-md-6">
-
-
-                    <div class="card border-danger text-center">
-
-
-                        <div class="card-body">
-
-
-                            <h5>
-                                🔴 Acciones vencidas
-                            </h5>
-
-
-                            <h2 class="fw-bold text-danger"
-                                th:text="${accionesVencidas}">
-                                0
-                            </h2>
-
-
-                            <small class="text-muted">
-                                Requieren atención inmediata
-                            </small>
-
-
-                        </div>
-
-
-                    </div>
-
-
+                  <small class="text-muted">
+                    Requieren atención inmediata
+                  </small>
                 </div>
-
-
-
-
-
-
-
-                <!-- Próximas -->
-
-
-                <div class="col-md-6">
-
-
-                    <div class="card border-warning text-center">
-
-
-                        <div class="card-body">
-
-
-                            <h5>
-                                🟡 Próximas a vencer
-                            </h5>
-
-
-                            <h2 class="fw-bold text-warning"
-                                th:text="${accionesProximas}">
-                                0
-                            </h2>
-
-
-                            <small class="text-muted">
-                                Vencen dentro de los próximos 7 días
-                            </small>
-
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-
+              </div>
             </div>
 
+            <div class="col-md-6">
+              <div class="card border-warning text-center">
+                <div class="card-body">
+                  <h5>🟡 Próximas a vencer</h5>
 
+                  <h2
+                    class="fw-bold text-warning"
+                    th:text="${accionesProximas}"
+                  >
+                    0
+                  </h2>
 
+                  <small class="text-muted">
+                    Vencen dentro de los próximos 7 días
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <!-- ======================
+         ESTADO GENERAL SST
+    ======================= -->
 
+      <div class="card shadow-sm mt-5">
+        <div class="card-body text-center">
+          <h4 class="fw-bold">🚦 Estado General SST</h4>
 
-    </div>
+          <h1 class="fw-bold mt-4">SEGURO</h1>
 
+          <p class="text-muted">Estado actual del sistema SST</p>
+        </div>
+      </div>
 
+      <!-- ======================
+         GRAFICOS SST
+    ======================= -->
 
+      <div class="card shadow-sm mt-5">
+        <div class="card-body">
+          <h4 class="fw-bold">📊 Análisis gráfico SST</h4>
 
+          <div class="row mt-4">
+           <div class="col-md-12">
 
+    <div style="height:350px;">
+    <canvas id="accionesChart"></canvas>
+</div>
 
-
-
-
-    <!-- ======================
+</div>
+            </div>
+          </div>
+        </div>
+          <!-- ======================
          ULTIMAS ACCIONES
     ======================= -->
 
-
-    <div class="card shadow-sm mt-5">
-
-
+      <div class="card shadow-sm mt-5">
         <div class="card-body">
+          <h4 class="fw-bold">Últimas acciones correctivas</h4>
 
+          <table class="table mt-3">
+            <thead>
+              <tr>
+                <th>Descripción</th>
 
-            <h4 class="fw-bold">
-                Últimas acciones correctivas
-            </h4>
+                <th>Responsable</th>
 
+                <th>Estado</th>
 
+                <th>Prioridad</th>
+              </tr>
+            </thead>
 
-            <table class="table mt-3">
+            <tbody>
+              <tr th:each="accion : ${acciones}">
+                <td th:text="${accion.descripcion}"></td>
 
+                <td
+                  th:text="${accion.responsable != null 
+                            ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
+                            : 'Sin asignar'}"
+                ></td>
 
-                <thead>
+                <td>
+                  <span class="badge bg-warning" th:text="${accion.estado}">
+                  </span>
+                </td>
 
-
-                    <tr>
-
-                        <th>
-                            Descripción
-                        </th>
-
-
-                        <th>
-                            Responsable
-                        </th>
-
-
-                        <th>
-                            Estado
-                        </th>
-
-
-                        <th>
-                            Prioridad
-                        </th>
-
-
-                    </tr>
-
-
-                </thead>
-
-
-
-
-                <tbody>
-
-
-
-                    <tr th:each="accion : ${acciones}">
-
-
-                        <td th:text="${accion.descripcion}">
-                        </td>
-
-
-
-                        <td
-                        th:text="${accion.responsable != null 
-                        ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
-                        : 'Sin asignar'}">
-                        </td>
-
-
-
-
-                        <td>
-
-
-                            <span 
-                                class="badge bg-warning"
-                                th:text="${accion.estado}">
-                            </span>
-
-
-                        </td>
-
-
-
-
-                        <td>
-
-
-                            <span 
-                                class="badge bg-danger"
-                                th:text="${accion.prioridad}">
-                            </span>
-
-
-                        </td>
-
-
-
-                    </tr>
-
-
-
-                </tbody>
-
-
-            </table>
-
-
-
+                <td>
+                  <span class="badge bg-danger" th:text="${accion.prioridad}">
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-
+      </div>
     </div>
-
-
-
-
-
-
-
-
 
     <!-- ======================
-         FUTUROS ANALISIS
-    ======================= -->
+     SCRIPT GRAFICOS
+======================= -->
+    <script th:inline="javascript">
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const canvas = document.getElementById("accionesChart");
+
+    if (canvas) {
 
 
-    <div class="card shadow-sm mt-5">
+        const pendientes = /*[[${accionesPendientes}]]*/ 0;
+
+        const proceso = /*[[${accionesProceso}]]*/ 0;
+
+        const completadas = /*[[${accionesCompletadas}]]*/ 0;
 
 
-        <div class="card-body">
+        new Chart(canvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Pendientes",
+                    "En proceso",
+                    "Completadas"
+                ],
+
+                datasets: [
+                    {
+                        data: [
+                            pendientes,
+                            proceso,
+                            completadas
+                        ]
+                    }
+                ]
+
+            },
 
 
-            <h4 class="fw-bold">
-                Análisis SST
-            </h4>
+            options: {
 
+                responsive: true,
 
-            <p class="text-muted">
+                plugins: {
 
-                Próximamente se incorporarán gráficos de riesgos,
-                incidentes y seguimiento de acciones correctivas.
+                    title: {
 
-            </p>
+                        display: true,
 
+                        text: "Estado de acciones correctivas"
 
-        </div>
+                    }
 
+                }
 
-    </div>
+            }
 
+        });
 
+    }
 
+});
 
-
-</div>
-
-
-
-</body>
-
-
+</script>
+  </body>
 </html>
