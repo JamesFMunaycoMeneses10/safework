@@ -35,7 +35,7 @@ public class UsuarioService {
 
 
     // =========================
-    // LISTAR USUARIOS
+    // LISTAR USUARIOS , SELECT* FROM USUARIOS , JALADOS DEL JPA DE USUARIO REPOSITORY
     // =========================
 
     public List<Usuario> listarUsuarios(){

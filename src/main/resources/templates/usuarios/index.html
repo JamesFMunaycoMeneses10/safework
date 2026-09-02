@@ -1,180 +1,82 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/head :: head}"> </head>
 
-<head th:replace="~{fragments/head :: head}">
-</head>
-
-<body class="sw-body">
-
+  <body class="sw-body">
     <!-- Navbar -->
-    <div th:replace="~{fragments/navbar :: navbar}">
-    </div>
-
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
     <div class="container py-5">
+      <!-- TITULO -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="fw-bold">Gestión de Usuarios</h1>
 
-
-        <!-- TITULO -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-
-            <div>
-                <h1 class="fw-bold">
-                    Gestión de Usuarios
-                </h1>
-
-                <p class="text-muted">
-                    Administración de usuarios del sistema SafeWork.
-                </p>
-            </div>
-
-
-            <a href="/usuarios/nuevo"
-               class="btn btn-primary">
-
-                + Nuevo Usuario
-
-            </a>
-
+          <p class="text-muted">
+            Administración de usuarios del sistema SafeWork.
+          </p>
         </div>
 
-
-
-
-        <!-- TABLA -->
-
-        <div class="sw-section">
-
-
-            <table class="table table-hover align-middle">
-
-
-                <thead class="table-dark">
-
-                    <tr>
-
-                        <th>
-                            Nombre
-                        </th>
-
-
-                        <th>
-                            Usuario
-                        </th>
-
-
-                        <th>
-                            Correo
-                        </th>
-
-
-                        <th>
-                            Rol
-                        </th>
-
-
-                        <th>
-                            Estado
-                        </th>
-
-
-                        <th>
-                            Acción
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-
-                <tbody>
-
-
-                    <tr th:each="usuario : ${usuarios}">
-
-
-                        <td>
-
-                            <span th:text="${usuario.nombre}">
-                                Nombre
-                            </span>
-
-                            <span th:text="${usuario.apellido}">
-                                Apellido
-                            </span>
-
-                        </td>
-
-
-
-                        <td th:text="${usuario.username}">
-                            usuario
-                        </td>
-
-
-
-                        <td th:text="${usuario.correo}">
-                            correo
-                        </td>
-
-
-
-                        <td>
-
-                            <span class="badge bg-primary"
-                                  th:text="${usuario.rol}">
-                                ADMIN
-                            </span>
-
-                        </td>
-
-
-
-
-                        <td>
-
-
-                            <span class="badge bg-success"
-                                  th:text="${usuario.estado}">
-                                ACTIVO
-                            </span>
-
-
-                        </td>
-
-
-
-
-                        <td>
-
-
-                            <a th:href="@{/usuarios/eliminar/{id}(id=${usuario.id})}"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('¿Eliminar usuario?')">
-
-                                Eliminar
-
-                            </a>
-
-
-                        </td>
-
-
-                    </tr>
-
-
-                </tbody>
-
-
-            </table>
-
-
-        </div>
-
-
+        <a href="/usuarios/nuevo" class="btn btn-primary"> + Nuevo Usuario </a>
+      </div>
+
+      <!-- TABLA -->
+
+      <div class="sw-section">
+        <table class="table table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Nombre</th>
+
+              <th>Usuario</th>
+
+              <th>Correo</th>
+
+              <th>Rol</th>
+
+              <th>Estado</th>
+
+              <th>Acción</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr th:each="usuario : ${usuarios}">
+              <td>
+                <span th:text="${usuario.nombre}"> Nombre </span>
+
+                <span th:text="${usuario.apellido}"> Apellido </span>
+              </td>
+
+              <td th:text="${usuario.username}">usuario</td>
+
+              <td th:text="${usuario.correo}">correo</td>
+
+              <td>
+                <span class="badge bg-primary" th:text="${usuario.rol}">
+                  ADMIN
+                </span>
+              </td>
+
+              <td>
+                <span class="badge bg-success" th:text="${usuario.estado}">
+                  ACTIVO
+                </span>
+              </td>
+
+              <td>
+                <a
+                  th:href="@{/usuarios/eliminar/{id}(id=${usuario.id})}"
+                  class="btn btn-danger btn-sm"
+                  onclick="return confirm('¿Eliminar usuario?');"
+                >
+                  Eliminar
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-
-
-</body>
-
+  </body>
 </html>
