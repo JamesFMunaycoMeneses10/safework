@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+
+<head th:replace="~{fragments/head :: head}">
+</head>
+
+
+<body class="sw-body">
+
+
+<!-- Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}">
+</div>
+
+
+
+<div class="container py-5">
+
+
+    <div class="sw-section">
+
+
+        <h1 class="fw-bold">
+            Crear Usuario
+        </h1>
+
+
+        <p class="text-muted">
+            Registrar un nuevo usuario en SafeWork.
+        </p>
+
+
+
+        <form th:action="@{/usuarios/guardar}"
+              th:object="${usuario}"
+              method="post">
+
+
+
+            <!-- Nombre -->
+
+            <div class="mb-3">
+
+                <label class="form-label fw-semibold">
+                    Nombre
+                </label>
+
+
+                <input 
+                    type="text"
+                    class="form-control"
+                    th:field="*{nombre}"
+                    placeholder="Ingrese nombre">
+
+            </div>
+
+
+
+            <!-- Apellido -->
+
+            <div class="mb-3">
+
+                <label class="form-label fw-semibold">
+                    Apellido
+                </label>
+
+
+                <input 
+                    type="text"
+                    class="form-control"
+                    th:field="*{apellido}"
+                    placeholder="Ingrese apellido">
+
+            </div>
+
+
+
+
+            <!-- Usuario -->
+
+            <div class="mb-3">
+
+                <label class="form-label fw-semibold">
+                    Usuario
+                </label>
+
+
+                <input 
+                    type="text"
+                    class="form-control"
+                    th:field="*{username}"
+                    placeholder="Ingrese usuario">
+
+            </div>
+
+
+
+
+            <!-- Correo -->
+
+            <div class="mb-3">
+
+                <label class="form-label fw-semibold">
+                    Correo
+                </label>
+
+
+                <input 
+                    type="email"
+                    class="form-control"
+                    th:field="*{correo}"
+                    placeholder="correo@empresa.com">
+
+            </div>
+
+
+
+
+            <!-- Contraseña -->
+
+            <div class="mb-3">
+
+                <label class="form-label fw-semibold">
+                    Contraseña
+                </label>
+
+
+                <input 
+                    type="password"
+                    class="form-control"
+                    th:field="*{password}"
+                    placeholder="Ingrese contraseña">
+
+            </div>
+
+
+
+
+            <!-- Rol -->
+
+            <div class="mb-3">
+
+                <label class="form-label fw-semibold">
+                    Rol
+                </label>
+
+
+                <select class="form-select"
+                        th:field="*{rol}">
+
+
+                    <option value="">
+                        Seleccione rol
+                    </option>
+
+
+                    <option value="ADMIN">
+                        Administrador
+                    </option>
+
+
+                    <option value="SUPERVISOR">
+                        Supervisor
+                    </option>
+
+
+                    <option value="TRABAJADOR">
+                        Trabajador
+                    </option>
+
+
+                </select>
+
+
+            </div>
+
+
+
+
+            <!-- Botones -->
+
+            <div class="mt-4">
+
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Guardar Usuario
+
+                </button>
+
+
+
+                <a href="/usuarios"
+                   class="btn btn-secondary">
+
+                    Cancelar
+
+                </a>
+
+
+            </div>
+
+
+
+
+        </form>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+</body>
+
+</html>

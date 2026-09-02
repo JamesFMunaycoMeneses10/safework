@@ -1,143 +1,77 @@
 <!doctype html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
+  <head th:replace="~{fragments/head :: head}"> </head>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <body class="login-body">
+    <div class="login-container">
+      <!-- Logo SafeWork -->
 
-    <title>Login - SafeWork</title>
+      <div class="login-logo-wrapper">
+        <img
+          th:src="@{/images/logo.png}"
+          alt="Logo SafeWork"
+          class="login-logo"
+        />
+      </div>
 
-    <!-- Bootstrap -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+      <!-- Titulo -->
 
-    <style>
-      body {
-        background: linear-gradient(135deg, #0f172a, #2563eb);
+      <h1 class="login-title">SafeWork</h1>
 
-        min-height: 100vh;
+      <div class="brand-line"></div>
 
-        display: flex;
+      <p class="login-subtitle">Sistema Integral de Gestión SST</p>
 
-        align-items: center;
+      <!-- Mensaje error -->
 
-        justify-content: center;
-      }
+      <div class="alert alert-danger" th:if="${param.error}">
+        Usuario o contraseña incorrectos.
+      </div>
 
-      .login-card {
-        width: 420px;
+      <!-- Mensaje logout -->
 
-        border-radius: 20px;
+      <div class="alert alert-success" th:if="${param.logout}">
+        Sesión cerrada correctamente.
+      </div>
 
-        border: none;
+      <!-- Formulario -->
 
-        box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.25);
-      }
+      <form th:action="@{/login}" method="post">
+        <!-- Usuario -->
 
-      .logo {
-        width: 150px;
+        <div class="mb-3">
+          <label class="login-label"> Usuario </label>
 
-        height: auto;
-      }
-
-      .btn-login {
-        background: #2563eb;
-
-        border: none;
-
-        padding: 12px;
-
-        font-size: 16px;
-
-        font-weight: bold;
-
-        border-radius: 10px;
-      }
-
-      .btn-login:hover {
-        background: #1d4ed8;
-      }
-
-      .titulo {
-        color: #0f172a;
-
-        font-weight: 700;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="card login-card">
-      <div class="card-body p-5">
-        <!-- Logo SafeWork -->
-
-        <div class="text-center mb-3">
-         <img
-    src="/images/logo.png"
-    alt="Logo SafeWork"
-    class="logo"
-
+          <input
+            type="text"
+            name="username"
+            class="login-input"
+            placeholder="Ingrese usuario"
           />
         </div>
 
-        <!-- Nombre sistema -->
+        <!-- Contraseña -->
 
-        <h2 class="text-center titulo">SafeWork</h2>
+        <div class="mb-3">
+          <label class="login-label"> Contraseña </label>
 
-        <p class="text-center text-muted mb-4">
-          Sistema Integral de Gestión SST
-        </p>
-
-        <!-- Mensaje error login -->
-
-        <div class="alert alert-danger" th:if="${param.error}">
-          Usuario o contraseña incorrectos.
+          <input
+            type="password"
+            name="password"
+            class="login-input"
+            placeholder="Ingrese contraseña"
+          />
         </div>
 
-        <!-- Mensaje cierre sesión -->
+        <!-- Botón -->
 
-        <div class="alert alert-success" th:if="${param.logout}">
-          Sesión cerrada correctamente.
-        </div>
+        <button type="submit" class="login-button">Ingresar</button>
+      </form>
 
-        <!-- Formulario Spring Security -->
+      <!-- Footer -->
 
-        <form th:action="@{/login}" method="post">
-          <div class="mb-3">
-            <label class="form-label fw-semibold"> Usuario </label>
-
-            <input
-              type="text"
-              name="username"
-              class="form-control"
-              placeholder="Ingrese usuario"
-            />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold"> Contraseña </label>
-
-            <input
-              type="password"
-              name="password"
-              class="form-control"
-              placeholder="Ingrese contraseña"
-            />
-          </div>
-
-          <button type="submit" class="btn btn-login text-white w-100">
-            Ingresar
-          </button>
-        </form>
-
-        <hr />
-
-        <p class="text-center text-muted small mb-0">
-          Seguridad y Salud en el Trabajo
-        </p>
-      </div>
+      <div class="login-footer">Seguridad y Salud en el Trabajo</div>
     </div>
   </body>
 </html>

@@ -1,38 +1,122 @@
 <head th:fragment="head">
-  <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
 
-  <title>SafeWork</title>
+    <meta name="viewport" 
+          content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap -->
 
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+    <title>SafeWork</title>
 
-  <!-- Tipografías SafeWork -->
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <!-- ==============================
+         BOOTSTRAP
+         Framework para componentes base
+    =============================== -->
 
-  <link
-    href="
-    https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap"
-    rel="stylesheet"
-  />
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
-  <!-- Diseño global SafeWork -->
 
-  <link rel="stylesheet" th:href="@{/css/safework-theme.css}" />
 
-  <!-- Componentes -->
+    <!-- ==============================
+         TIPOGRAFÍAS SAFEWORK
 
-  <link rel="stylesheet" th:href="@{/css/components.css}" />
+         Sora:
+         - Títulos
+         - Marca
+         - Encabezados
 
-  <!-- Dashboard SafeWork -->
+         Inter:
+         - Texto
+         - Formularios
+         - Botones
 
-  <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+    =============================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap"
+        rel="stylesheet">
+
+
+
+
+
+    <!-- ==============================
+         SISTEMA DE DISEÑO GLOBAL
+
+         Variables:
+         - Colores SafeWork
+         - Tipografías
+         - Sombras
+         - Radios
+         - Estilos generales
+
+    =============================== -->
+
+    <link rel="stylesheet"
+          th:href="@{/css/safework-theme.css}">
+
+
+
+
+
+    <!-- ==============================
+         COMPONENTES GENERALES
+
+         Incluye:
+         - Botones
+         - Formularios
+         - Tablas
+         - Badges
+
+    =============================== -->
+
+    <link rel="stylesheet"
+          th:href="@{/css/components.css}">
+
+
+
+
+
+    <!-- ==============================
+         ESTILOS DASHBOARD
+
+         Exclusivo para:
+         - Indicadores
+         - Tarjetas SST
+         - Gráficos
+
+    =============================== -->
+
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
+
+
+
+
+
+    <!-- ==============================
+         ESTILOS LOGIN
+
+         Incluye:
+         - Fondo login
+         - Tarjeta autenticación
+         - Inputs
+         - Botón ingresar
+         - Animaciones
+
+    =============================== -->
+
+    <link rel="stylesheet"
+          th:href="@{/css/login.css}">
+
+
 </head>
