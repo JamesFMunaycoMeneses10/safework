@@ -10,14 +10,13 @@ import com.safework.safework.model.AccionCorrectiva;
 import com.safework.safework.repository.AccionCorrectivaRepository;
 
 
-
 /**
- * Capa de servicios encargada
- * de la lógica de negocio
+ * Servicio encargado de la lógica
  * de las acciones correctivas.
  */
 @Service
 public class AccionCorrectivaService {
+
 
 
     private final AccionCorrectivaRepository accionRepository;
@@ -35,6 +34,8 @@ public class AccionCorrectivaService {
 
 
 
+
+
     /**
      * Lista todas las acciones correctivas.
      */
@@ -45,8 +46,10 @@ public class AccionCorrectivaService {
 
 
 
+
+
     /**
-     * Guarda una nueva acción
+     * Guarda una acción nueva
      * o actualiza una existente.
      */
     public AccionCorrectiva guardar(
@@ -57,8 +60,10 @@ public class AccionCorrectivaService {
 
 
 
+
+
     /**
-     * Busca una acción por id.
+     * Busca una acción por ID.
      */
     public Optional<AccionCorrectiva> buscarPorId(
             Long id) {
@@ -68,12 +73,25 @@ public class AccionCorrectivaService {
 
 
 
+
+
     /**
-     * Elimina una acción.
+     * Elimina una acción correctiva.
      */
     public void eliminarPorId(Long id) {
 
-        accionRepository.deleteById(id);
+
+        AccionCorrectiva accion =
+                accionRepository.findById(id)
+
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Acción correctiva no encontrada"));
+
+
+
+        accionRepository.delete(accion);
+
     }
 
 }

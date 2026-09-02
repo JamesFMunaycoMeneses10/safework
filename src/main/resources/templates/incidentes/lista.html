@@ -1,179 +1,330 @@
 <!doctype html>
-
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
 
+<head>
+
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Incidentes - SafeWork</title>
 
+
     <!-- Bootstrap -->
-
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
     />
-  </head>
 
-  <body class="bg-light">
-    <!-- Navbar reutilizable -->
+</head>
 
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <div class="container py-5">
-      <!-- Encabezado -->
+<body class="bg-light">
 
-      <div class="d-flex justify-content-between align-items-center mb-4">
+
+<!-- Navbar reutilizable -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+
+
+<div class="container py-5">
+
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
-          <h1 class="fw-bold">Gestión de Incidentes</h1>
 
-          <p class="text-muted mb-0">
-            Registro y seguimiento de incidentes y accidentes laborales
-          </p>
+            <h1 class="fw-bold">
+                Gestión de Incidentes
+            </h1>
+
+            <p class="text-muted mb-0">
+                Registro y seguimiento de incidentes y accidentes laborales
+            </p>
+
         </div>
 
-        <a th:href="@{/incidentes/nuevo}" class="btn btn-primary">
-          + Nuevo Incidente
+
+        <a th:href="@{/incidentes/nuevo}"
+           class="btn btn-primary">
+
+            + Nuevo Incidente
+
         </a>
-      </div>
 
-      <!-- Tabla -->
 
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-
-                  <th>Tipo</th>
-
-                  <th>Área</th>
-
-                  <th>Trabajador</th>
-
-                  <th>Gravedad</th>
-
-                  <th>Estado</th>
-
-                  <th>Descripción</th>
-
-                  <th class="text-end">Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr th:each="incidente : ${incidentes}">
-                  <!-- Fecha -->
-
-                  <td
-                    th:text="${#temporals.format(incidente.fechaHora,'dd/MM/yyyy HH:mm')}"
-                  ></td>
-
-                  <!-- Tipo -->
-
-                  <td th:text="${incidente.tipo}"></td>
-
-                  <!-- Área -->
-
-                  <td th:text="${incidente.area.nombre}"></td>
-
-                  <!-- Trabajador -->
-
-                  <td
-                    th:text="${incidente.trabajador.nombres + ' ' + incidente.trabajador.apellidos}"
-                  ></td>
-
-                  <!-- Gravedad -->
-
-                  <td>
-                    <span
-                      th:if="${incidente.gravedad == 'Leve'}"
-                      class="badge text-bg-success"
-                      th:text="${incidente.gravedad}"
-                    >
-                    </span>
-
-                    <span
-                      th:if="${incidente.gravedad == 'Moderada'}"
-                      class="badge text-bg-warning"
-                      th:text="${incidente.gravedad}"
-                    >
-                    </span>
-
-                    <span
-                      th:if="${incidente.gravedad == 'Grave'}"
-                      class="badge text-bg-danger"
-                      th:text="${incidente.gravedad}"
-                    >
-                    </span>
-                  </td>
-
-                  <!-- Estado -->
-
-                  <td>
-                    <span
-                      th:if="${incidente.estado == 'Reportado'}"
-                      class="badge text-bg-primary"
-                      th:text="${incidente.estado}"
-                    >
-                    </span>
-
-                    <span
-                      th:if="${incidente.estado == 'En investigación'}"
-                      class="badge text-bg-warning"
-                      th:text="${incidente.estado}"
-                    >
-                    </span>
-
-                    <span
-                      th:if="${incidente.estado == 'Cerrado'}"
-                      class="badge text-bg-success"
-                      th:text="${incidente.estado}"
-                    >
-                    </span>
-                  </td>
-
-                  <!-- Descripción -->
-
-                  <td th:text="${incidente.descripcion}"></td>
-
-                  <!-- Acciones -->
-
-                  <td class="text-end">
-                    <a
-                      th:href="@{/incidentes/editar/{id}(id=${incidente.id})}"
-                      class="btn btn-sm btn-outline-primary"
-                    >
-                      Editar
-                    </a>
-
-                    <form
-                      th:action="@{/incidentes/eliminar/{id}(id=${incidente.id})}"
-                      method="post"
-                      class="d-inline"
-                      onsubmit="
-                        return confirm(
-                          '¿Está seguro de eliminar este incidente?',
-                        );
-                      "
-                    >
-                      <button
-                        type="submit"
-                        class="btn btn-sm btn-outline-danger"
-                      >
-                        Eliminar
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
-  </body>
+
+
+
+    <!-- =============================== -->
+    <!-- MENSAJE DE ERROR -->
+    <!-- =============================== -->
+
+    <div
+        class="alert alert-danger"
+        th:if="${error}"
+        th:text="${error}">
+    </div>
+
+
+
+    <!-- =============================== -->
+    <!-- MENSAJE DE ÉXITO -->
+    <!-- =============================== -->
+
+    <div
+        class="alert alert-success"
+        th:if="${success}"
+        th:text="${success}">
+    </div>
+
+
+
+
+    <!-- Tabla -->
+
+    <div class="card shadow-sm">
+
+
+        <div class="card-body">
+
+
+            <div class="table-responsive">
+
+
+                <table class="table table-hover align-middle mb-0">
+
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Fecha</th>
+
+                            <th>Tipo</th>
+
+                            <th>Área</th>
+
+                            <th>Trabajador</th>
+
+                            <th>Gravedad</th>
+
+                            <th>Estado</th>
+
+                            <th>Descripción</th>
+
+                            <th class="text-end">
+                                Acciones
+                            </th>
+
+                        </tr>
+
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                    <tr th:each="incidente : ${incidentes}">
+
+
+                        <!-- Fecha -->
+
+                        <td
+                            th:text="${#temporals.format(incidente.fechaHora,'dd/MM/yyyy HH:mm')}">
+                        </td>
+
+
+
+                        <!-- Tipo -->
+
+                        <td th:text="${incidente.tipo}">
+                        </td>
+
+
+
+
+                        <!-- Área -->
+
+                        <td th:text="${incidente.area.nombre}">
+                        </td>
+
+
+
+
+                        <!-- Trabajador -->
+
+                        <td
+                            th:text="${incidente.trabajador.nombres + ' ' + incidente.trabajador.apellidos}">
+                        </td>
+
+
+
+
+
+                        <!-- Gravedad -->
+
+                        <td>
+
+
+                            <span
+                                th:if="${incidente.gravedad == 'Leve'}"
+                                class="badge text-bg-success"
+                                th:text="${incidente.gravedad}">
+                            </span>
+
+
+                            <span
+                                th:if="${incidente.gravedad == 'Moderada'}"
+                                class="badge text-bg-warning"
+                                th:text="${incidente.gravedad}">
+                            </span>
+
+
+                            <span
+                                th:if="${incidente.gravedad == 'Grave'}"
+                                class="badge text-bg-danger"
+                                th:text="${incidente.gravedad}">
+                            </span>
+
+
+                        </td>
+
+
+
+
+
+
+                        <!-- Estado -->
+
+
+                        <td>
+
+
+                            <span
+                                th:if="${incidente.estado == 'Reportado'}"
+                                class="badge text-bg-primary"
+                                th:text="${incidente.estado}">
+                            </span>
+
+
+
+                            <span
+                                th:if="${incidente.estado == 'En investigación'}"
+                                class="badge text-bg-warning"
+                                th:text="${incidente.estado}">
+                            </span>
+
+
+
+                            <span
+                                th:if="${incidente.estado == 'Cerrado'}"
+                                class="badge text-bg-success"
+                                th:text="${incidente.estado}">
+                            </span>
+
+
+                        </td>
+
+
+
+
+
+                        <!-- Descripción -->
+
+
+                        <td th:text="${incidente.descripcion}">
+                        </td>
+
+
+
+
+
+                        <!-- Acciones -->
+
+
+                        <td class="text-end">
+
+
+                            <!-- Editar -->
+
+                            <a
+                                th:href="@{/incidentes/editar/{id}(id=${incidente.id})}"
+                                class="btn btn-sm btn-outline-primary">
+
+                                Editar
+
+                            </a>
+
+
+
+
+
+                            <!-- Eliminar -->
+
+
+                            <form
+
+                                th:action="@{/incidentes/eliminar/{id}(id=${incidente.id})}"
+
+                                method="post"
+
+                                class="d-inline"
+
+                                onsubmit="
+                                return confirm('¿Está seguro de eliminar este incidente?');
+                                "
+
+                            >
+
+
+                                <button
+
+                                    type="submit"
+
+                                    class="btn btn-sm btn-outline-danger">
+
+                                    Eliminar
+
+                                </button>
+
+
+                            </form>
+
+
+
+
+                        </td>
+
+
+
+                    </tr>
+
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+</body>
+
 </html>

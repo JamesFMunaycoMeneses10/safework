@@ -6,11 +6,14 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 
 import com.safework.safework.model.AccionCorrectiva;
+
 import com.safework.safework.service.AccionCorrectivaService;
 import com.safework.safework.service.TrabajadorService;
 import com.safework.safework.service.RiesgoService;
@@ -25,27 +28,42 @@ public class AccionCorrectivaController {
 
 
     private final AccionCorrectivaService accionService;
+
     private final TrabajadorService trabajadorService;
+
     private final RiesgoService riesgoService;
+
     private final IncidenteService incidenteService;
 
 
 
     public AccionCorrectivaController(
+
             AccionCorrectivaService accionService,
+
             TrabajadorService trabajadorService,
+
             RiesgoService riesgoService,
+
             IncidenteService incidenteService) {
 
+
         this.accionService = accionService;
+
         this.trabajadorService = trabajadorService;
+
         this.riesgoService = riesgoService;
+
         this.incidenteService = incidenteService;
+
     }
 
 
 
 
+    // ==========================
+    // LISTAR ACCIONES
+    // ==========================
 
     @GetMapping
     public String listar(Model model) {
@@ -63,6 +81,10 @@ public class AccionCorrectivaController {
 
 
 
+
+    // ==========================
+    // NUEVA ACCIÓN
+    // ==========================
 
     @GetMapping("/nueva")
     public String nuevaAccion(Model model) {
@@ -86,39 +108,49 @@ public class AccionCorrectivaController {
 
 
         return "acciones/formulario";
+
     }
 
 
 
 
 
+    // ==========================
+    // GUARDAR / ACTUALIZAR
+    // ==========================
+
     @PostMapping("/guardar")
     public String guardar(
+
             @Valid @ModelAttribute("accion") AccionCorrectiva accion,
+
             BindingResult result,
+
             Model model) {
 
 
 
         if(result.hasErrors()){
 
+
             cargarCombos(model);
 
+
             return "acciones/formulario";
+
         }
 
 
 
-        /*
-         * Si tiene ID significa que estamos editando.
-         * Si no tiene ID es un registro nuevo.
-         */
+
 
         if(accion.getId() != null){
 
 
             AccionCorrectiva existente =
+
                     accionService.buscarPorId(accion.getId())
+
                     .orElse(null);
 
 
@@ -166,7 +198,6 @@ public class AccionCorrectivaController {
                 );
 
 
-
                 accionService.guardar(existente);
 
             }
@@ -178,29 +209,35 @@ public class AccionCorrectivaController {
 
             accionService.guardar(accion);
 
-
         }
 
 
 
         return "redirect:/acciones";
+
     }
 
 
 
 
 
-
+    // ==========================
+    // EDITAR
+    // ==========================
 
     @GetMapping("/editar/{id}")
     public String editar(
+
             @PathVariable Long id,
+
             Model model) {
 
 
 
         AccionCorrectiva accion =
+
                 accionService.buscarPorId(id)
+
                 .orElse(null);
 
 
@@ -210,6 +247,7 @@ public class AccionCorrectivaController {
             return "redirect:/acciones";
 
         }
+
 
 
 
@@ -225,6 +263,7 @@ public class AccionCorrectivaController {
 
 
         return "acciones/formulario";
+
     }
 
 
@@ -233,44 +272,94 @@ public class AccionCorrectivaController {
 
 
 
+    // ==========================
+    // ELIMINAR
+    // ==========================
 
     @PostMapping("/eliminar/{id}")
     public String eliminar(
-            @PathVariable Long id) {
+
+            @PathVariable Long id,
+
+            RedirectAttributes redirectAttributes) {
 
 
-        accionService.eliminarPorId(id);
+
+        try {
+
+
+            accionService.eliminarPorId(id);
+
+
+
+            redirectAttributes.addFlashAttribute(
+
+                    "mensaje",
+
+                    "Acción correctiva eliminada correctamente"
+
+            );
+
+
+
+        } catch(RuntimeException e) {
+
+
+
+            redirectAttributes.addFlashAttribute(
+
+                    "error",
+
+                    e.getMessage()
+
+            );
+
+
+        }
+
 
 
         return "redirect:/acciones";
+
     }
 
 
 
 
 
-
+    // ==========================
+    // CARGAR COMBOS
+    // ==========================
 
     private void cargarCombos(Model model){
 
 
         model.addAttribute(
+
                 "trabajadores",
+
                 trabajadorService.listarTodos()
+
         );
 
 
 
         model.addAttribute(
+
                 "riesgos",
+
                 riesgoService.listarTodos()
+
         );
 
 
 
         model.addAttribute(
+
                 "incidentes",
+
                 incidenteService.listarTodos()
+
         );
 
     }

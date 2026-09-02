@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -20,13 +21,15 @@
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
     <div class="container py-5">
-      <!-- Encabezado -->
+      <!-- ============================== -->
+      <!-- ENCABEZADO -->
+      <!-- ============================== -->
 
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h1 class="fw-bold">Gestión de Acciones Correctivas</h1>
 
-          <p class="text-muted">
+          <p class="text-muted mb-0">
             Registro y seguimiento de medidas correctivas para riesgos e
             incidentes laborales.
           </p>
@@ -37,7 +40,25 @@
         </a>
       </div>
 
-      <!-- Tabla -->
+      <!-- ============================== -->
+      <!-- MENSAJES -->
+      <!-- ============================== -->
+
+      <!-- Mensaje éxito -->
+
+      <div
+        class="alert alert-success"
+        th:if="${mensaje}"
+        th:text="${mensaje}"
+      ></div>
+
+      <!-- Mensaje error -->
+
+      <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+      <!-- ============================== -->
+      <!-- TABLA -->
+      <!-- ============================== -->
 
       <div class="card shadow-sm">
         <div class="card-body">
@@ -69,8 +90,8 @@
 
                   <td
                     th:text="${accion.responsable != null 
-        ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
-        : 'Sin asignar'}"
+                                    ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
+                                    : 'Sin asignar'}"
                   ></td>
 
                   <!-- Prioridad -->
@@ -144,12 +165,16 @@
                   <!-- Acciones -->
 
                   <td>
+                    <!-- Editar -->
+
                     <a
                       th:href="@{/acciones/editar/{id}(id=${accion.id})}"
                       class="btn btn-sm btn-outline-primary"
                     >
                       Editar
                     </a>
+
+                    <!-- Eliminar -->
 
                     <form
                       th:action="@{/acciones/eliminar/{id}(id=${accion.id})}"

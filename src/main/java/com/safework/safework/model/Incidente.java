@@ -1,6 +1,7 @@
 package com.safework.safework.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -11,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
-/*
+/**
  * Entidad que representa un incidente
  * o accidente laboral registrado
  * dentro de SafeWork.
@@ -28,26 +30,18 @@ import jakarta.validation.constraints.Size;
 public class Incidente {
 
 
-    /*
+    /**
      * Identificador interno.
-     *
-     * MySQL lo genera automáticamente
-     * mediante AUTO_INCREMENT.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
-    /*
+
+    /**
      * Fecha y hora en la que ocurrió
      * el incidente o accidente.
-     *
-     * Utilizamos LocalDateTime porque
-     * necesitamos almacenar:
-     *
-     * - Fecha
-     * - Hora
      */
     @NotNull(message = "La fecha y hora son obligatorias")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
@@ -55,126 +49,122 @@ public class Incidente {
     private LocalDateTime fechaHora;
 
 
-    /*
+
+    /**
      * Tipo de evento.
-     *
-     * Inicialmente utilizaremos:
-     *
-     * - Incidente
-     * - Accidente
      */
     @NotBlank(message = "El tipo de evento es obligatorio")
     @Size(
-            max = 30,
-            message = "El tipo no puede superar los 30 caracteres"
+        max = 30,
+        message = "El tipo no puede superar los 30 caracteres"
     )
     @Column(
-            nullable = false,
-            length = 30
+        nullable = false,
+        length = 30
     )
     private String tipo;
 
 
-    /*
+
+    /**
      * Área donde ocurrió el evento.
-     *
-     * Muchas situaciones pueden ocurrir
-     * dentro de una misma área.
      */
     @NotNull(message = "El área es obligatoria")
     @ManyToOne
     @JoinColumn(
-            name = "area_id",
-            nullable = false
+        name = "area_id",
+        nullable = false
     )
     private Area area;
 
 
-    /*
-     * Trabajador principal involucrado
-     * en el incidente o accidente.
-     *
-     * Un trabajador puede estar relacionado
-     * con diferentes incidentes a lo largo
-     * del tiempo.
+
+    /**
+     * Trabajador involucrado
+     * en el incidente.
      */
     @NotNull(message = "El trabajador involucrado es obligatorio")
     @ManyToOne
     @JoinColumn(
-            name = "trabajador_id",
-            nullable = false
+        name = "trabajador_id",
+        nullable = false
     )
     private Trabajador trabajador;
 
 
-    /*
+
+    /**
      * Descripción detallada
      * de lo ocurrido.
      */
     @NotBlank(message = "La descripción es obligatoria")
     @Size(
-            max = 500,
-            message = "La descripción no puede superar los 500 caracteres"
+        max = 500,
+        message = "La descripción no puede superar los 500 caracteres"
     )
     @Column(
-            nullable = false,
-            length = 500
+        nullable = false,
+        length = 500
     )
     private String descripcion;
 
 
-    /*
-     * Nivel de gravedad del evento.
-     *
-     * Inicialmente utilizaremos:
-     *
-     * - Leve
-     * - Moderada
-     * - Grave
+
+    /**
+     * Nivel de gravedad.
      */
     @NotBlank(message = "La gravedad es obligatoria")
     @Size(
-            max = 30,
-            message = "La gravedad no puede superar los 30 caracteres"
+        max = 30,
+        message = "La gravedad no puede superar los 30 caracteres"
     )
     @Column(
-            nullable = false,
-            length = 30
+        nullable = false,
+        length = 30
     )
     private String gravedad;
 
 
-    /*
+
+    /**
      * Estado actual del incidente.
-     *
-     * Inicialmente utilizaremos:
-     *
-     * - Reportado
-     * - En investigación
-     * - Cerrado
      */
     @NotBlank(message = "El estado es obligatorio")
     @Size(
-            max = 30,
-            message = "El estado no puede superar los 30 caracteres"
+        max = 30,
+        message = "El estado no puede superar los 30 caracteres"
     )
     @Column(
-            nullable = false,
-            length = 30
+        nullable = false,
+        length = 30
     )
     private String estado;
 
 
-    /*
+
+    /**
+     * Acciones correctivas asociadas
+     * al incidente.
+     *
+     * Un incidente puede tener
+     * varias acciones correctivas.
+     */
+    @OneToMany(mappedBy = "incidente")
+    private List<AccionCorrectiva> accionesCorrectivas;
+
+
+
+    /**
      * Constructor vacío requerido por JPA.
      */
     public Incidente() {
+
     }
 
 
-    /*
-     * Constructor con los principales
-     * atributos del incidente.
+
+    /**
+     * Constructor con los principales atributos.
      */
     public Incidente(
             LocalDateTime fechaHora,
@@ -195,6 +185,7 @@ public class Incidente {
     }
 
 
+
     // =========================
     // GETTERS Y SETTERS
     // =========================
@@ -210,6 +201,7 @@ public class Incidente {
     }
 
 
+
     public LocalDateTime getFechaHora() {
         return fechaHora;
     }
@@ -218,6 +210,7 @@ public class Incidente {
     public void setFechaHora(LocalDateTime fechaHora) {
         this.fechaHora = fechaHora;
     }
+
 
 
     public String getTipo() {
@@ -230,6 +223,7 @@ public class Incidente {
     }
 
 
+
     public Area getArea() {
         return area;
     }
@@ -238,6 +232,7 @@ public class Incidente {
     public void setArea(Area area) {
         this.area = area;
     }
+
 
 
     public Trabajador getTrabajador() {
@@ -250,6 +245,7 @@ public class Incidente {
     }
 
 
+
     public String getDescripcion() {
         return descripcion;
     }
@@ -258,6 +254,7 @@ public class Incidente {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+
 
 
     public String getGravedad() {
@@ -270,6 +267,7 @@ public class Incidente {
     }
 
 
+
     public String getEstado() {
         return estado;
     }
@@ -277,6 +275,17 @@ public class Incidente {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+
+
+    public List<AccionCorrectiva> getAccionesCorrectivas() {
+        return accionesCorrectivas;
+    }
+
+
+    public void setAccionesCorrectivas(List<AccionCorrectiva> accionesCorrectivas) {
+        this.accionesCorrectivas = accionesCorrectivas;
     }
 
 }

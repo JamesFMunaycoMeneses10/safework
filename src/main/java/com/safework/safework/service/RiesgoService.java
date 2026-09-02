@@ -1,31 +1,35 @@
 package com.safework.safework.service;
 
+
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.safework.safework.model.Riesgo;
 import com.safework.safework.repository.RiesgoRepository;
 
-/*
+
+/**
  * Servicio encargado de la lógica
  * relacionada con los riesgos.
  */
 @Service
 public class RiesgoService {
 
-    /*
-     * Repositorio que utilizaremos
-     * para acceder a la tabla riesgos.
+
+    /**
+     * Repositorio para acceder
+     * a la tabla riesgos.
      */
     private final RiesgoRepository riesgoRepository;
 
-    /*
-     * Inyección de dependencias
-     * mediante constructor.
-     *
-     * Spring proporciona automáticamente
-     * una instancia de RiesgoRepository.
+
+
+    /**
+     * Inyección de dependencias.
      */
     public RiesgoService(
             RiesgoRepository riesgoRepository) {
@@ -33,82 +37,106 @@ public class RiesgoService {
         this.riesgoRepository = riesgoRepository;
     }
 
-    /*
-     * Obtiene todos los riesgos
-     * registrados en el sistema.
+
+
+    /**
+     * Obtiene todos los riesgos registrados.
      */
     public List<Riesgo> listarTodos() {
 
         return riesgoRepository.findAll();
     }
 
-    /*
-     * Busca un riesgo mediante su ID.
+
+
+    /**
+     * Busca un riesgo por ID.
      */
     public Optional<Riesgo> buscarPorId(Long id) {
 
         return riesgoRepository.findById(id);
     }
 
-    /*
+
+
+    /**
      * Guarda un riesgo nuevo
      * o actualiza uno existente.
      *
-     * Antes de guardar calculamos
-     * automáticamente el nivel de riesgo.
+     * Calcula automáticamente:
+     *
+     * nivelRiesgo =
+     * probabilidad * severidad
      */
     public Riesgo guardar(Riesgo riesgo) {
 
-        /*
-         * Solo realizamos el cálculo
-         * si probabilidad y severidad
-         * tienen un valor.
-         */
+
         if (riesgo.getProbabilidad() != null
                 && riesgo.getSeveridad() != null) {
 
-            /*
-             * Fórmula:
-             *
-             * Nivel de riesgo =
-             * Probabilidad × Severidad
-             */
-            int nivelRiesgo = riesgo.getProbabilidad()
+
+            int nivelRiesgo =
+                    riesgo.getProbabilidad()
                     * riesgo.getSeveridad();
 
-            /*
-             * Guardamos el resultado
-             * dentro del objeto Riesgo.
-             */
-            riesgo.setNivelRiesgo(
-                    nivelRiesgo);
+
+            riesgo.setNivelRiesgo(nivelRiesgo);
         }
 
-        /*
-         * Después del cálculo,
-         * guardamos en la base de datos.
-         */
+
         return riesgoRepository.save(riesgo);
     }
 
-    /*
+
+
+    /**
      * Elimina un riesgo mediante su ID.
+     *
+     * No permite eliminar si tiene
+     * acciones correctivas asociadas.
      */
     @Transactional
     public void eliminarPorId(Long id) {
 
-        Riesgo riesgo = riesgoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        "Riesgo no encontrado"));
 
-        if (riesgo.getAccionesCorrectivas() != null &&
-                !riesgo.getAccionesCorrectivas().isEmpty()) {
+        Riesgo riesgo = riesgoRepository.findById(id)
+
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Riesgo no encontrado"));
+
+
+
+        /*
+         * Validamos relaciones existentes.
+         */
+        if (riesgo.getAccionesCorrectivas() != null
+                && !riesgo.getAccionesCorrectivas().isEmpty()) {
+
 
             throw new RuntimeException(
                     "No se puede eliminar el riesgo porque tiene acciones correctivas asociadas");
+        }
+
+
+
+        try {
+
+
+            riesgoRepository.delete(riesgo);
+
+            riesgoRepository.flush();
+
+
+
+        } catch (DataIntegrityViolationException e) {
+
+
+            throw new RuntimeException(
+                    "No se puede eliminar el riesgo porque tiene registros asociados");
 
         }
 
-        riesgoRepository.delete(riesgo);
     }
+
 }
