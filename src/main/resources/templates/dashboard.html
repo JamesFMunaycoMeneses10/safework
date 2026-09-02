@@ -17,12 +17,12 @@
         rel="stylesheet"
     />
 
-
 </head>
 
 
 
 <body class="bg-light">
+
 
 
 <!-- Navbar -->
@@ -37,51 +37,41 @@
 
 
 
-    <!-- Encabezado -->
-
-    <div class="mb-4">
-
-
-        <h1 class="fw-bold">
-            Dashboard SafeWork
-        </h1>
+    <h1 class="fw-bold">
+        Dashboard SafeWork
+    </h1>
 
 
-        <p class="text-muted">
-            Resumen general de Seguridad y Salud en el Trabajo.
-        </p>
-
-
-    </div>
+    <p class="text-muted">
+        Resumen general de Seguridad y Salud en el Trabajo.
+    </p>
 
 
 
 
 
-
-    <!-- Tarjetas KPI -->
-
-    <div class="row g-4">
-
+    <!-- ======================
+         INDICADORES GENERALES
+    ======================= -->
 
 
-        <!-- Trabajadores -->
+    <div class="row g-4 mt-3">
+
+
 
         <div class="col-md-3">
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
 
 
-                <div class="card-body text-center">
-
-
-                    <h5 class="text-secondary">
+                    <h5>
                         👷 Trabajadores
                     </h5>
 
 
-                    <h1 
-                        class="fw-bold"
+                    <h1 class="fw-bold"
                         th:text="${totalTrabajadores}">
                         0
                     </h1>
@@ -94,7 +84,6 @@
 
                 </div>
 
-
             </div>
 
         </div>
@@ -103,26 +92,20 @@
 
 
 
-
-
-        <!-- Riesgos -->
-
         <div class="col-md-3">
 
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
 
 
-                <div class="card-body text-center">
-
-
-                    <h5 class="text-secondary">
+                    <h5>
                         ⚠️ Riesgos
                     </h5>
 
 
-                    <h1
-                        class="fw-bold"
+                    <h1 class="fw-bold"
                         th:text="${totalRiesgos}">
                         0
                     </h1>
@@ -135,7 +118,6 @@
 
                 </div>
 
-
             </div>
 
 
@@ -146,27 +128,20 @@
 
 
 
-
-
-        <!-- Incidentes -->
-
-
         <div class="col-md-3">
 
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
 
 
-                <div class="card-body text-center">
-
-
-                    <h5 class="text-secondary">
+                    <h5>
                         🚨 Incidentes
                     </h5>
 
 
-                    <h1
-                        class="fw-bold"
+                    <h1 class="fw-bold"
                         th:text="${totalIncidentes}">
                         0
                     </h1>
@@ -191,26 +166,20 @@
 
 
 
-
-        <!-- Acciones -->
-
-
         <div class="col-md-3">
 
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
 
 
-                <div class="card-body text-center">
-
-
-                    <h5 class="text-secondary">
-                        🔧 Acciones
+                    <h5>
+                        🛠 Acciones
                     </h5>
 
 
-                    <h1
-                        class="fw-bold"
+                    <h1 class="fw-bold"
                         th:text="${totalAcciones}">
                         0
                     </h1>
@@ -223,7 +192,6 @@
 
                 </div>
 
-
             </div>
 
 
@@ -239,115 +207,123 @@
 
 
 
-    <!-- Últimas acciones -->
 
 
-    <div class="card shadow-sm border-0 mt-5">
+    <!-- ======================
+         SEGUIMIENTO ACCIONES
+    ======================= -->
+
+
+    <div class="card shadow-sm mt-5">
 
 
         <div class="card-body">
 
 
-            <h4 class="fw-bold mb-3">
-                Últimas acciones correctivas
+            <h4 class="fw-bold">
+                Seguimiento de acciones correctivas
             </h4>
 
 
 
-
-            <div class="table-responsive">
-
-
-                <table class="table table-hover">
-
-
-                    <thead>
-
-
-                        <tr>
-
-                            <th>
-                                Descripción
-                            </th>
-
-
-                            <th>
-                                Responsable
-                            </th>
-
-
-                            <th>
-                                Estado
-                            </th>
-
-
-                            <th>
-                                Prioridad
-                            </th>
-
-
-                        </tr>
-
-
-                    </thead>
+            <div class="row mt-4">
 
 
 
-                    <tbody>
+                <div class="col-md-4">
 
 
-                        <tr th:each="accion : ${acciones}">
+                    <div class="card border-warning text-center">
 
 
-                            <td th:text="${accion.descripcion}">
-                            </td>
+                        <div class="card-body">
 
 
+                            <h5>
+                                🟡 Pendientes
+                            </h5>
 
-                            <td 
-                            th:text="${accion.responsable != null 
-                            ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
-                            : 'Sin asignar'}">
-                            </td>
+
+                            <h2 class="fw-bold"
+                                th:text="${accionesPendientes}">
+                                0
+                            </h2>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
 
 
 
 
-                            <td>
 
 
-                                <span
-                                class="badge bg-warning"
-                                th:text="${accion.estado}">
-                                </span>
+                <div class="col-md-4">
 
 
-                            </td>
+                    <div class="card border-primary text-center">
+
+
+                        <div class="card-body">
+
+
+                            <h5>
+                                🔵 En proceso
+                            </h5>
+
+
+                            <h2 class="fw-bold"
+                                th:text="${accionesProceso}">
+                                0
+                            </h2>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
 
 
 
 
-                            <td>
 
 
-                                <span
-                                class="badge bg-danger"
-                                th:text="${accion.prioridad}">
-                                </span>
+                <div class="col-md-4">
 
 
-                            </td>
+                    <div class="card border-success text-center">
 
 
-                        </tr>
+                        <div class="card-body">
 
 
+                            <h5>
+                                🟢 Completadas
+                            </h5>
 
-                    </tbody>
+
+                            <h2 class="fw-bold"
+                                th:text="${accionesCompletadas}">
+                                0
+                            </h2>
 
 
+                        </div>
 
-                </table>
+
+                    </div>
+
+
+                </div>
+
 
 
             </div>
@@ -365,10 +341,257 @@
 
 
 
-    <!-- Próximamente gráficos -->
 
 
-    <div class="card shadow-sm border-0 mt-4">
+    <!-- ======================
+         ALERTAS SST
+    ======================= -->
+
+
+    <div class="card shadow-sm mt-5">
+
+
+        <div class="card-body">
+
+
+            <h4 class="fw-bold">
+                🚨 Alertas SST
+            </h4>
+
+
+
+            <div class="row mt-4">
+
+
+
+                <!-- Vencidas -->
+
+
+                <div class="col-md-6">
+
+
+                    <div class="card border-danger text-center">
+
+
+                        <div class="card-body">
+
+
+                            <h5>
+                                🔴 Acciones vencidas
+                            </h5>
+
+
+                            <h2 class="fw-bold text-danger"
+                                th:text="${accionesVencidas}">
+                                0
+                            </h2>
+
+
+                            <small class="text-muted">
+                                Requieren atención inmediata
+                            </small>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+
+                <!-- Próximas -->
+
+
+                <div class="col-md-6">
+
+
+                    <div class="card border-warning text-center">
+
+
+                        <div class="card-body">
+
+
+                            <h5>
+                                🟡 Próximas a vencer
+                            </h5>
+
+
+                            <h2 class="fw-bold text-warning"
+                                th:text="${accionesProximas}">
+                                0
+                            </h2>
+
+
+                            <small class="text-muted">
+                                Vencen dentro de los próximos 7 días
+                            </small>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- ======================
+         ULTIMAS ACCIONES
+    ======================= -->
+
+
+    <div class="card shadow-sm mt-5">
+
+
+        <div class="card-body">
+
+
+            <h4 class="fw-bold">
+                Últimas acciones correctivas
+            </h4>
+
+
+
+            <table class="table mt-3">
+
+
+                <thead>
+
+
+                    <tr>
+
+                        <th>
+                            Descripción
+                        </th>
+
+
+                        <th>
+                            Responsable
+                        </th>
+
+
+                        <th>
+                            Estado
+                        </th>
+
+
+                        <th>
+                            Prioridad
+                        </th>
+
+
+                    </tr>
+
+
+                </thead>
+
+
+
+
+                <tbody>
+
+
+
+                    <tr th:each="accion : ${acciones}">
+
+
+                        <td th:text="${accion.descripcion}">
+                        </td>
+
+
+
+                        <td
+                        th:text="${accion.responsable != null 
+                        ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
+                        : 'Sin asignar'}">
+                        </td>
+
+
+
+
+                        <td>
+
+
+                            <span 
+                                class="badge bg-warning"
+                                th:text="${accion.estado}">
+                            </span>
+
+
+                        </td>
+
+
+
+
+                        <td>
+
+
+                            <span 
+                                class="badge bg-danger"
+                                th:text="${accion.prioridad}">
+                            </span>
+
+
+                        </td>
+
+
+
+                    </tr>
+
+
+
+                </tbody>
+
+
+            </table>
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- ======================
+         FUTUROS ANALISIS
+    ======================= -->
+
+
+    <div class="card shadow-sm mt-5">
 
 
         <div class="card-body">
@@ -380,10 +603,11 @@
 
 
             <p class="text-muted">
+
                 Próximamente se incorporarán gráficos de riesgos,
                 incidentes y seguimiento de acciones correctivas.
-            </p>
 
+            </p>
 
 
         </div>
