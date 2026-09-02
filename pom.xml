@@ -143,8 +143,30 @@
 
         </dependency>
 
+ <!--
+            SPRING SECURITY
 
-        <!--
+            Permite implementar autenticación
+            y autorización dentro del sistema.
+
+            Proporciona:
+            - Login
+            - Control de sesiones
+            - Protección de rutas
+            - Gestión de roles
+
+            Ejemplo:
+            ADMIN
+            SUPERVISOR_SST
+            TRABAJADOR
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+
+        <!--F
             SPRING DATA JPA
 
             Permite trabajar con persistencia

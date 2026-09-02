@@ -1,0 +1,92 @@
+/* =========================
+   TARJETAS SAFEWORK
+========================= */
+
+
+.sw-card{
+
+
+    background:white;
+
+    border-radius:var(--sw-radius-lg);
+
+    border:1px solid var(--sw-border);
+
+    box-shadow:var(--sw-shadow-card);
+
+    transition:.3s;
+
+
+}
+
+
+.sw-card:hover{
+
+
+    transform:translateY(-5px);
+
+
+}
+
+
+
+
+.sw-section{
+
+
+    background:white;
+
+    padding:30px;
+
+    margin-top:35px;
+
+    border-radius:var(--sw-radius-lg);
+
+    box-shadow:var(--sw-shadow-card);
+
+
+}
+
+
+
+
+.sw-page-title{
+
+
+    color:var(--sw-navy-900);
+
+    font-weight:700;
+
+
+}
+
+
+
+.sw-page-description{
+
+
+    color:var(--sw-ink-600);
+
+
+}
+
+
+
+
+.sw-number{
+
+
+    color:var(--sw-blue-600);
+
+    font-size:42px;
+
+}
+
+
+
+.sw-icon{
+
+
+    font-size:35px;
+
+}

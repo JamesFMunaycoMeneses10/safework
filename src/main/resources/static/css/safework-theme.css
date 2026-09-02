@@ -1,0 +1,115 @@
+body{
+
+    font-family:'Inter',sans-serif;
+    background:var(--sw-mist-100);
+    color:var(--sw-ink-900);
+
+}
+
+
+
+h1,h2,h3,h4,h5{
+
+    font-family:'Sora',sans-serif;
+
+}
+
+
+
+/* ESTADO SST */
+
+
+.sw-status-title{
+
+    font-size:48px;
+
+    font-weight:700;
+
+}
+
+
+
+.status-safe{
+
+    color:var(--sw-green-600);
+
+}
+
+
+.status-warning{
+
+    color:#F5A623;
+
+}
+
+
+.status-danger{
+
+    color:var(--sw-danger);
+
+}
+
+
+
+.sw-status-message{
+
+    color:var(--sw-ink-600);
+
+    font-size:18px;
+
+}
+
+
+
+
+.sw-status-indicator{
+
+    margin-top:20px;
+
+    color:var(--sw-ink-600);
+
+    font-size:15px;
+
+}
+
+
+
+.sw-status-indicator span{
+
+
+    display:inline-block;
+
+    width:12px;
+
+    height:12px;
+
+    border-radius:50%;
+
+    margin-right:8px;
+
+
+}
+
+
+
+.dot-safe{
+
+    background:var(--sw-green-600);
+
+}
+
+
+
+.dot-warning{
+
+    background:#F5A623;
+
+}
+
+
+
+.dot-danger{
+
+    background:var(--sw-danger);
+
+}

@@ -1,0 +1,569 @@
+/* =====================================================
+   SAFEWORK - SISTEMA DE DISEÑO GLOBAL
+   Dashboard + Pantallas internas
+===================================================== */
+
+
+/* =========================
+   VARIABLES DE COLOR
+========================= */
+
+:root {
+
+    --sw-navy-900: #0A2A43;
+    --sw-navy-800: #0F3A5C;
+
+    --sw-blue-600: #1565A6;
+    --sw-blue-500: #1E7FBF;
+
+
+    --sw-green-600: #1F9D55;
+    --sw-green-500: #2FB86A;
+    --sw-green-100: #E6F7EC;
+
+
+    --sw-white: #FFFFFF;
+
+
+    --sw-ink-900: #14232E;
+    --sw-ink-600: #4B5D6A;
+    --sw-ink-400: #8598A4;
+
+
+    --sw-mist-100: #F4F8FA;
+    --sw-border: #E1E8EC;
+
+
+    --sw-danger: #C1432D;
+    --sw-danger-bg: #FBEAE6;
+
+
+
+    --sw-radius-lg: 22px;
+    --sw-radius-md: 12px;
+    --sw-radius-sm: 10px;
+
+
+
+    --sw-shadow-card:
+        0 30px 60px -20px rgba(10,42,67,.45),
+        0 10px 25px -12px rgba(10,42,67,.25);
+
+
+}
+
+
+
+
+
+/* =========================
+   CUERPO GENERAL
+========================= */
+
+
+.sw-body {
+
+    background: var(--sw-mist-100);
+
+    color: var(--sw-ink-900);
+
+    font-family: 'Inter', sans-serif;
+
+}
+
+
+
+
+
+
+/* =========================
+   TITULOS
+========================= */
+
+
+.sw-page-title {
+
+    font-family: 'Sora', sans-serif;
+
+    font-weight: 700;
+
+    color: var(--sw-navy-900);
+
+}
+
+
+
+.sw-page-description {
+
+    color: var(--sw-ink-600);
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   TARJETAS PRINCIPALES
+========================= */
+
+
+.sw-card {
+
+
+    background: var(--sw-white);
+
+
+    border: 1px solid var(--sw-border);
+
+
+    border-radius: var(--sw-radius-lg);
+
+
+    box-shadow: var(--sw-shadow-card);
+
+
+    transition: .3s ease;
+
+
+}
+
+
+
+
+
+.sw-card:hover {
+
+
+    transform: translateY(-4px);
+
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   ICONOS
+========================= */
+
+
+.sw-icon {
+
+
+    font-size: 35px;
+
+    margin-bottom: 15px;
+
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   NUMEROS
+========================= */
+
+
+.sw-number {
+
+
+    color: var(--sw-blue-600);
+
+    font-weight: 700;
+
+
+}
+
+
+
+
+
+
+.sw-card-title {
+
+
+    font-weight: 600;
+
+    color: var(--sw-ink-900);
+
+
+}
+
+
+
+
+.sw-description {
+
+
+    color: var(--sw-ink-600);
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   SECCIONES
+========================= */
+
+
+.sw-section {
+
+
+    background: var(--sw-white);
+
+
+    padding: 30px;
+
+
+    margin-top: 35px;
+
+
+    border-radius: var(--sw-radius-lg);
+
+
+    box-shadow: var(--sw-shadow-card);
+
+
+}
+
+
+
+
+
+
+.sw-section-title {
+
+
+    font-family: 'Sora', sans-serif;
+
+
+    font-weight: 700;
+
+
+    color: var(--sw-navy-900);
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   ESTADOS
+========================= */
+
+
+.sw-status {
+
+
+    padding: 25px;
+
+
+    border-radius: var(--sw-radius-md);
+
+
+    text-align: center;
+
+
+}
+
+
+
+
+.sw-status h2 {
+
+
+    font-size: 40px;
+
+
+    font-weight: 700;
+
+
+}
+
+
+
+
+
+.sw-status.warning {
+
+
+    background: #FFF8E1;
+
+
+    border: 1px solid #F5C542;
+
+
+}
+
+
+
+
+
+.sw-status.info {
+
+
+    background: #E8F1FB;
+
+
+    border: 1px solid var(--sw-blue-500);
+
+
+}
+
+
+
+
+
+.sw-status.success {
+
+
+    background: var(--sw-green-100);
+
+
+    border: 1px solid var(--sw-green-600);
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   ALERTAS
+========================= */
+
+
+.sw-alert {
+
+
+    padding: 25px;
+
+
+    border-radius: var(--sw-radius-md);
+
+
+    text-align: center;
+
+
+}
+
+
+
+
+.sw-alert h2 {
+
+
+    font-size: 40px;
+
+
+    font-weight: 700;
+
+
+}
+
+
+
+
+
+.sw-alert.danger {
+
+
+    background: var(--sw-danger-bg);
+
+
+    border: 1px solid var(--sw-danger);
+
+
+}
+
+
+
+
+
+.sw-alert.warning {
+
+
+    background: #FFF8E1;
+
+
+    border: 1px solid #F5C542;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   TABLAS
+========================= */
+
+
+.sw-table {
+
+
+    width: 100%;
+
+
+    border-collapse: collapse;
+
+
+}
+
+
+
+
+
+.sw-table th {
+
+
+    background: var(--sw-navy-900);
+
+
+    color: white;
+
+
+    padding: 15px;
+
+
+}
+
+
+
+
+
+.sw-table td {
+
+
+    padding: 14px;
+
+
+    border-bottom: 1px solid var(--sw-border);
+
+
+}
+
+
+
+
+
+.sw-table tr:hover {
+
+
+    background: var(--sw-mist-100);
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   ANIMACION ENTRADA
+========================= */
+
+
+.sw-card,
+.sw-section {
+
+
+    animation: fadeIn .5s ease;
+
+
+}
+
+
+
+
+@keyframes fadeIn {
+
+
+    from {
+
+
+        opacity: 0;
+
+
+        transform: translateY(15px);
+
+
+    }
+
+
+    to {
+
+
+        opacity: 1;
+
+
+        transform: translateY(0);
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   ACCESIBILIDAD
+========================= */
+
+
+button:focus-visible,
+input:focus-visible {
+
+
+    outline: 3px solid rgba(30,127,191,.35);
+
+
+}
