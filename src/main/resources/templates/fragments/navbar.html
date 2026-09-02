@@ -37,9 +37,29 @@
 
           <a class="nav-link" th:href="@{/inspecciones}"> Inspecciones </a>
 
-          <!-- ACCIONES CORRECTIVAS -->
+         <a class="nav-link" th:href="@{/acciones}">
+    Acciones Correctivas
+</a>
 
-          <a class="nav-link" th:href="@{/acciones}"> Acciones Correctivas </a>
+</div>
+
+
+<!-- BOTÓN SALIR SEPARADO -->
+<form 
+    th:action="@{/logout}" 
+    method="post"
+    class="ms-3">
+
+    <button 
+        type="submit" 
+        class="btn btn-danger btn-sm">
+
+        🚪 Salir
+
+    </button>
+
+</form>
+          </form>
         </div>
       </div>
     </nav>
