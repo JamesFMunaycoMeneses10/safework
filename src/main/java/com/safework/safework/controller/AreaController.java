@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.safework.safework.model.Area;
 import com.safework.safework.service.AreaService;
@@ -114,12 +115,27 @@ public class AreaController {
  * la información almacenada en el sistema.
  */
 @PostMapping("/areas/eliminar/{id}")
-public String eliminarArea(@PathVariable Long id) {
+public String eliminarArea(
+        @PathVariable Long id,
+        RedirectAttributes redirectAttributes){
 
-    // Eliminamos el área mediante la capa Service.
-    areaService.eliminarPorId(id);
+    try {
 
-    // Después regresamos al listado.
+        areaService.eliminarPorId(id);
+
+        redirectAttributes.addFlashAttribute(
+            "success",
+            "Área eliminada correctamente"
+        );
+
+    } catch(Exception e){
+
+        redirectAttributes.addFlashAttribute(
+            "error",
+            "No se puede eliminar el área porque tiene registros asociados"
+        );
+    }
+
     return "redirect:/areas";
 }
     /*

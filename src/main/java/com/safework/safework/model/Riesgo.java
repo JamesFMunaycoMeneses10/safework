@@ -14,7 +14,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+import java.util.List;
+import jakarta.persistence.OneToMany;
 
 /*
  * Entidad que representa un riesgo
@@ -24,7 +25,6 @@ import jakarta.validation.constraints.Size;
 @Table(name = "riesgos")
 public class Riesgo {
 
-
     /*
      * Identificador interno del riesgo.
      *
@@ -33,7 +33,6 @@ public class Riesgo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     /*
      * Peligro identificado.
@@ -46,32 +45,18 @@ public class Riesgo {
      * - Ruido excesivo
      */
     @NotBlank(message = "El peligro es obligatorio")
-    @Size(
-            max = 150,
-            message = "El peligro no puede superar los 150 caracteres"
-    )
-    @Column(
-            nullable = false,
-            length = 150
-    )
+    @Size(max = 150, message = "El peligro no puede superar los 150 caracteres")
+    @Column(nullable = false, length = 150)
     private String peligro;
-
 
     /*
      * Descripción más detallada
      * del riesgo identificado.
      */
     @NotBlank(message = "La descripción es obligatoria")
-    @Size(
-            max = 255,
-            message = "La descripción no puede superar los 255 caracteres"
-    )
-    @Column(
-            nullable = false,
-            length = 255
-    )
+    @Size(max = 255, message = "La descripción no puede superar los 255 caracteres")
+    @Column(nullable = false, length = 255)
     private String descripcion;
-
 
     /*
      * Probabilidad de que ocurra el evento.
@@ -79,17 +64,10 @@ public class Riesgo {
      * Utilizaremos una escala del 1 al 5.
      */
     @NotNull(message = "La probabilidad es obligatoria")
-    @Min(
-            value = 1,
-            message = "La probabilidad mínima es 1"
-    )
-    @Max(
-            value = 5,
-            message = "La probabilidad máxima es 5"
-    )
+    @Min(value = 1, message = "La probabilidad mínima es 1")
+    @Max(value = 5, message = "La probabilidad máxima es 5")
     @Column(nullable = false)
     private Integer probabilidad;
-
 
     /*
      * Severidad o consecuencia del evento.
@@ -98,17 +76,10 @@ public class Riesgo {
      * del 1 al 5.
      */
     @NotNull(message = "La severidad es obligatoria")
-    @Min(
-            value = 1,
-            message = "La severidad mínima es 1"
-    )
-    @Max(
-            value = 5,
-            message = "La severidad máxima es 5"
-    )
+    @Min(value = 1, message = "La severidad mínima es 1")
+    @Max(value = 5, message = "La severidad máxima es 5")
     @Column(nullable = false)
     private Integer severidad;
-
 
     /*
      * Resultado de:
@@ -123,18 +94,13 @@ public class Riesgo {
     @Column(nullable = false)
     private Integer nivelRiesgo;
 
-
     /*
      * Medida que puede aplicarse para
      * reducir o controlar el riesgo.
      */
-    @Size(
-            max = 255,
-            message = "La medida de control no puede superar los 255 caracteres"
-    )
+    @Size(max = 255, message = "La medida de control no puede superar los 255 caracteres")
     @Column(length = 255)
     private String medidaControl;
-
 
     /*
      * Área donde se identificó el riesgo.
@@ -144,12 +110,11 @@ public class Riesgo {
      */
     @NotNull(message = "El área es obligatoria")
     @ManyToOne
-    @JoinColumn(
-            name = "area_id",
-            nullable = false
-    )
+    @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
+    @OneToMany(mappedBy = "riesgo")
+    private List<AccionCorrectiva> accionesCorrectivas;
 
     /*
      * Constructor vacío.
@@ -159,7 +124,6 @@ public class Riesgo {
      */
     public Riesgo() {
     }
-
 
     /*
      * Constructor con los principales atributos.
@@ -182,137 +146,126 @@ public class Riesgo {
         this.area = area;
     }
 
-
     // =========================
     // GETTERS Y SETTERS
     // =========================
-
 
     public Long getId() {
         return id;
     }
 
-
     public void setId(Long id) {
         this.id = id;
     }
-
 
     public String getPeligro() {
         return peligro;
     }
 
-
     public void setPeligro(String peligro) {
         this.peligro = peligro;
     }
-
 
     public String getDescripcion() {
         return descripcion;
     }
 
-
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-
 
     public Integer getProbabilidad() {
         return probabilidad;
     }
 
-
     public void setProbabilidad(Integer probabilidad) {
         this.probabilidad = probabilidad;
     }
-
 
     public Integer getSeveridad() {
         return severidad;
     }
 
-
     public void setSeveridad(Integer severidad) {
         this.severidad = severidad;
     }
-
 
     public Integer getNivelRiesgo() {
         return nivelRiesgo;
     }
 
-
     public void setNivelRiesgo(Integer nivelRiesgo) {
         this.nivelRiesgo = nivelRiesgo;
     }
-
 
     public String getMedidaControl() {
         return medidaControl;
     }
 
-
     public void setMedidaControl(String medidaControl) {
         this.medidaControl = medidaControl;
     }
-
 
     public Area getArea() {
         return area;
     }
 
-
     public void setArea(Area area) {
         this.area = area;
     }
-/*
- * Devuelve la clasificación del riesgo
- * según el nivel calculado.
- *
- * Este valor no se almacena en MySQL.
- * Se calcula automáticamente cuando
- * necesitamos mostrarlo.
- */
-@Transient
-public String getClasificacionRiesgo() {
 
     /*
-     * Si todavía no existe nivel de riesgo,
-     * evitamos errores.
+     * Devuelve la clasificación del riesgo
+     * según el nivel calculado.
+     *
+     * Este valor no se almacena en MySQL.
+     * Se calcula automáticamente cuando
+     * necesitamos mostrarlo.
      */
-    if (nivelRiesgo == null) {
-        return "Sin calcular";
+    @Transient
+    public String getClasificacionRiesgo() {
+
+        /*
+         * Si todavía no existe nivel de riesgo,
+         * evitamos errores.
+         */
+        if (nivelRiesgo == null) {
+            return "Sin calcular";
+        }
+
+        /*
+         * Nivel entre 1 y 4.
+         */
+        if (nivelRiesgo <= 4) {
+            return "Bajo";
+        }
+
+        /*
+         * Nivel entre 5 y 9.
+         */
+        if (nivelRiesgo <= 9) {
+            return "Moderado";
+        }
+
+        /*
+         * Nivel entre 10 y 16.
+         */
+        if (nivelRiesgo <= 16) {
+            return "Alto";
+        }
+
+        /*
+         * Nivel entre 17 y 25.
+         */
+        return "Crítico";
     }
 
-
-    /*
-     * Nivel entre 1 y 4.
-     */
-    if (nivelRiesgo <= 4) {
-        return "Bajo";
-    }
-
-
-    /*
-     * Nivel entre 5 y 9.
-     */
-    if (nivelRiesgo <= 9) {
-        return "Moderado";
-    }
-
-
-    /*
-     * Nivel entre 10 y 16.
-     */
-    if (nivelRiesgo <= 16) {
-        return "Alto";
-    }
-
-
-    /*
-     * Nivel entre 17 y 25.
-     */
-    return "Crítico";
+   public List<AccionCorrectiva> getAccionesCorrectivas() {
+    return accionesCorrectivas;
 }
+
+
+public void setAccionesCorrectivas(List<AccionCorrectiva> accionesCorrectivas) {
+    this.accionesCorrectivas = accionesCorrectivas;
+} 
 }

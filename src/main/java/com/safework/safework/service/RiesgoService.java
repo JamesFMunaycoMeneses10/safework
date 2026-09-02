@@ -3,11 +3,11 @@ package com.safework.safework.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import com.safework.safework.model.Riesgo;
 import com.safework.safework.repository.RiesgoRepository;
-
 
 /*
  * Servicio encargado de la lógica
@@ -16,13 +16,11 @@ import com.safework.safework.repository.RiesgoRepository;
 @Service
 public class RiesgoService {
 
-
     /*
      * Repositorio que utilizaremos
      * para acceder a la tabla riesgos.
      */
     private final RiesgoRepository riesgoRepository;
-
 
     /*
      * Inyección de dependencias
@@ -37,7 +35,6 @@ public class RiesgoService {
         this.riesgoRepository = riesgoRepository;
     }
 
-
     /*
      * Obtiene todos los riesgos
      * registrados en el sistema.
@@ -47,7 +44,6 @@ public class RiesgoService {
         return riesgoRepository.findAll();
     }
 
-
     /*
      * Busca un riesgo mediante su ID.
      */
@@ -55,7 +51,6 @@ public class RiesgoService {
 
         return riesgoRepository.findById(id);
     }
-
 
     /*
      * Guarda un riesgo nuevo
@@ -66,7 +61,6 @@ public class RiesgoService {
      */
     public Riesgo guardar(Riesgo riesgo) {
 
-
         /*
          * Solo realizamos el cálculo
          * si probabilidad y severidad
@@ -75,27 +69,22 @@ public class RiesgoService {
         if (riesgo.getProbabilidad() != null
                 && riesgo.getSeveridad() != null) {
 
-
             /*
              * Fórmula:
              *
              * Nivel de riesgo =
              * Probabilidad × Severidad
              */
-            int nivelRiesgo =
-                    riesgo.getProbabilidad()
+            int nivelRiesgo = riesgo.getProbabilidad()
                     * riesgo.getSeveridad();
-
 
             /*
              * Guardamos el resultado
              * dentro del objeto Riesgo.
              */
             riesgo.setNivelRiesgo(
-                    nivelRiesgo
-            );
+                    nivelRiesgo);
         }
-
 
         /*
          * Después del cálculo,
@@ -104,13 +93,24 @@ public class RiesgoService {
         return riesgoRepository.save(riesgo);
     }
 
-
     /*
      * Elimina un riesgo mediante su ID.
      */
+    @Transactional
     public void eliminarPorId(Long id) {
 
-        riesgoRepository.deleteById(id);
-    }
+        Riesgo riesgo = riesgoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        "Riesgo no encontrado"));
 
+        if (riesgo.getAccionesCorrectivas() != null &&
+                !riesgo.getAccionesCorrectivas().isEmpty()) {
+
+            throw new RuntimeException(
+                    "No se puede eliminar el riesgo porque tiene acciones correctivas asociadas");
+
+        }
+
+        riesgoRepository.delete(riesgo);
+    }
 }

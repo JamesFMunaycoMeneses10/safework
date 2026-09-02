@@ -31,6 +31,15 @@
         agrega espacio vertical arriba y sabajo.
     -->
     <div class="container py-5">
+      <!-- Mensajes del sistema -->
+
+      <div
+        th:if="${success}"
+        class="alert alert-success"
+        th:text="${success}"
+      ></div>
+
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
       <!-- Encabezado de la página -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -58,7 +67,6 @@
               <!-- Encabezado de la tabla -->
               <thead class="table-light">
                 <tr>
-                 
                   <th>Nombre</th>
 
                   <th>Descripción</th>
@@ -74,7 +82,6 @@
                             -->
                 <tr th:each="area : ${areas}">
                   <!-- ID -->
-                 
 
                   <!-- Nombre -->
                   <td th:text="${area.nombre}"></td>

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.safework.safework.model.Trabajador;
 import com.safework.safework.repository.TrabajadorRepository;
 
-
 /*
  * Servicio encargado de la lógica relacionada
  * con los trabajadores.
@@ -17,7 +16,6 @@ import com.safework.safework.repository.TrabajadorRepository;
 public class TrabajadorService {
 
     private final TrabajadorRepository trabajadorRepository;
-
 
     /*
      * Inyección de dependencias por constructor.
@@ -28,7 +26,6 @@ public class TrabajadorService {
         this.trabajadorRepository = trabajadorRepository;
     }
 
-
     /*
      * Obtiene todos los trabajadores.
      */
@@ -36,7 +33,6 @@ public class TrabajadorService {
 
         return trabajadorRepository.findAll();
     }
-
 
     /*
      * Guarda un trabajador nuevo
@@ -47,7 +43,6 @@ public class TrabajadorService {
         return trabajadorRepository.save(trabajador);
     }
 
-
     /*
      * Busca un trabajador por ID.
      */
@@ -56,15 +51,23 @@ public class TrabajadorService {
         return trabajadorRepository.findById(id);
     }
 
-
     /*
      * Elimina un trabajador por ID.
      */
     public void eliminarPorId(Long id) {
 
-        trabajadorRepository.deleteById(id);
-    }
+        try {
 
+            trabajadorRepository.deleteById(id);
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "No se puede eliminar el trabajador porque tiene registros asociados");
+
+        }
+
+    }
 
     /*
      * Verifica si el DNI ya pertenece
@@ -83,16 +86,13 @@ public class TrabajadorService {
         if (trabajador.getId() == null) {
 
             return trabajadorRepository.existsByDni(
-                    trabajador.getDni()
-            );
+                    trabajador.getDni());
         }
-
 
         // Trabajador existente.
         return trabajadorRepository.existsByDniAndIdNot(
                 trabajador.getDni(),
-                trabajador.getId()
-        );
+                trabajador.getId());
     }
 
 }
