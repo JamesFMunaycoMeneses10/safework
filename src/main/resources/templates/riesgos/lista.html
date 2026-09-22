@@ -29,7 +29,7 @@
           </p>
         </div>
 
-        <a th:href="@{/riesgos/nuevo}" class="btn btn-primary">
+        <a th:if="${puedeGestionarSst}" th:href="@{/riesgos/nuevo}" class="btn btn-primary">
           + Nuevo Riesgo
         </a>
       </div>
@@ -68,7 +68,7 @@
 
                   <th>Medida de Control</th>
 
-                  <th class="text-end">Acciones</th>
+                  <th th:if="${puedeGestionarSst}" class="text-end">Acciones</th>
                 </tr>
               </thead>
 
@@ -102,7 +102,7 @@
 
                   <!-- ACCIONES -->
 
-                  <td class="text-end">
+                  <td th:if="${puedeGestionarSst}" class="text-end">
                     <!-- EDITAR -->
 
                     <a

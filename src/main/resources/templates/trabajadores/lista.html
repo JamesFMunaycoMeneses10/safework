@@ -48,6 +48,7 @@
 
 
         <a 
+            th:if="${puedeGestionarSst}"
             th:href="@{/trabajadores/nuevo}"
             class="btn btn-primary">
 
@@ -112,7 +113,7 @@
 
                             <th>Área</th>
 
-                            <th class="text-end">
+                            <th th:if="${puedeGestionarSst}" class="text-end">
                                 Acciones
                             </th>
 
@@ -156,7 +157,7 @@
 
 
 
-                            <td class="text-end">
+                            <td th:if="${puedeGestionarSst}" class="text-end">
 
 
                                 <!-- EDITAR -->

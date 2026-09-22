@@ -53,6 +53,7 @@
 
             <!-- Nueva inspección -->
             <a
+                th:if="${puedeGestionarSst}"
                 th:href="@{/inspecciones/nueva}"
                 class="btn btn-primary">
 
@@ -105,7 +106,7 @@
                                     Observaciones
                                 </th>
 
-                                <th class="text-end">
+                                <th th:if="${puedeGestionarSst}" class="text-end">
                                     Acciones
                                 </th>
 
@@ -204,7 +205,7 @@
                                 <!-- ACCIONES -->
                                 <!-- ============================== -->
 
-                                <td class="text-end">
+                                <td th:if="${puedeGestionarSst}" class="text-end">
 
 
                                     <!-- Editar -->

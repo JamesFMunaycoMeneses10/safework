@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 
 // Indica que esta clase contiene configuraciones
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 
 // Permite configurar las reglas de seguridad HTTP
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -113,18 +114,104 @@ public class SecurityConfig {
                                                 )
                                                 .permitAll()
 
+                                                // Solo los listados GET son de consulta para TRABAJADOR.
+                                                // Las rutas de formularios y escritura quedan bajo las
+                                                // reglas de gestión definidas después de esta excepción.
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/trabajadores", "/riesgos", "/incidentes",
+                                                                "/inspecciones", "/acciones")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR", "TRABAJADOR")
+
                                                 /**
-                                                 * Todas las demás rutas
-                                                 * requieren un usuario autenticado.
+                                                 * Gestión de usuarios y roles.
                                                  *
-                                                 * Ejemplo:
+                                                 * Solo el Administrador puede
+                                                 * crear, editar o eliminar
+                                                 * usuarios del sistema.
                                                  *
-                                                 * /dashboard
-                                                 * /trabajadores
-                                                 * /riesgos
-                                                 * /incidentes
-                                                 * /inspecciones
-                                                 * /acciones
+                                                 */
+                                                .requestMatchers("/usuarios/**")
+                                                .hasRole("ADMIN")
+
+                                                /**
+                                                 * Gestión de áreas.
+                                                 *
+                                                 * Solo el Administrador
+                                                 * organiza las áreas
+                                                 * de la empresa.
+                                                 *
+                                                 */
+                                                .requestMatchers("/areas/**")
+                                                .hasRole("ADMIN")
+
+                                                /**
+                                                 * Gestión de trabajadores.
+                                                 *
+                                                 * Administrador y Supervisor
+                                                 * pueden registrar y mantener
+                                                 * la información del personal.
+                                                 *
+                                                 */
+                                                .requestMatchers("/trabajadores/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
+                                                /**
+                                                 * Gestión de riesgos.
+                                                 *
+                                                 * Administrador y Supervisor
+                                                 * identifican y clasifican
+                                                 * los riesgos laborales.
+                                                 *
+                                                 */
+                                                .requestMatchers("/riesgos/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
+                                                /**
+                                                 * Gestión de inspecciones.
+                                                 *
+                                                 * Administrador y Supervisor
+                                                 * registran las inspecciones
+                                                 * de seguridad.
+                                                 *
+                                                 */
+                                                .requestMatchers("/inspecciones/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
+                                                /**
+                                                 * Gestión de incidentes.
+                                                 *
+                                                 * Administrador y Supervisor gestionan.
+                                                 * El Trabajador solo consulta el listado GET.
+                                                 *
+                                                 */
+                                                .requestMatchers("/incidentes/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
+                                                /**
+                                                 * Gestión de acciones correctivas.
+                                                 *
+                                                 * Administrador y Supervisor gestionan.
+                                                 * El Trabajador solo consulta el listado GET.
+                                                 *
+                                                 */
+                                                .requestMatchers("/acciones/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
+                                                /**
+                                                 * Dashboard.
+                                                 *
+                                                 * Visible para los tres roles,
+                                                 * cada uno según lo que
+                                                 * necesita supervisar.
+                                                 *
+                                                 */
+                                                .requestMatchers("/dashboard")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR", "TRABAJADOR")
+
+                                                /**
+                                                 * Cualquier otra ruta no
+                                                 * contemplada explícitamente
+                                                 * solo exige estar autenticado.
                                                  *
                                                  */
                                                 .anyRequest()

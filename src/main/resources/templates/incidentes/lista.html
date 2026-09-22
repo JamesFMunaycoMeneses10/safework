@@ -45,7 +45,7 @@
         </div>
 
 
-        <a th:href="@{/incidentes/nuevo}"
+        <a th:if="${puedeGestionarSst}" th:href="@{/incidentes/nuevo}"
            class="btn btn-primary">
 
             + Nuevo Incidente
@@ -114,7 +114,7 @@
 
                             <th>Descripción</th>
 
-                            <th class="text-end">
+                            <th th:if="${puedeGestionarSst}" class="text-end">
                                 Acciones
                             </th>
 
@@ -246,7 +246,7 @@
                         <!-- Acciones -->
 
 
-                        <td class="text-end">
+                        <td th:if="${puedeGestionarSst}" class="text-end">
 
 
                             <!-- Editar -->

@@ -35,7 +35,7 @@
           </p>
         </div>
 
-        <a th:href="@{/acciones/nueva}" class="btn btn-primary">
+        <a th:if="${puedeGestionarSst}" th:href="@{/acciones/nueva}" class="btn btn-primary">
           + Nueva Acción
         </a>
       </div>
@@ -76,7 +76,7 @@
 
                   <th>Fecha límite</th>
 
-                  <th>Acciones</th>
+                  <th th:if="${puedeGestionarSst}">Acciones</th>
                 </tr>
               </thead>
 
@@ -164,7 +164,7 @@
 
                   <!-- Acciones -->
 
-                  <td>
+                  <td th:if="${puedeGestionarSst}">
                     <!-- Editar -->
 
                     <a
