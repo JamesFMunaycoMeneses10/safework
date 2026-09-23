@@ -3,28 +3,32 @@ package com.safework.safework.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-/** Almacena adjuntos fuera de /static y nunca usa el nombre enviado por el usuario como ruta. */
+import com.safework.safework.model.ArchivoAdjunto;
+import com.safework.safework.repository.ArchivoAdjuntoRepository;
+
+/** Guarda los adjuntos en MySQL; solo lee la antigua carpeta durante la migración. */
 @Service
 public class ArchivoAdjuntoService {
     public static final long MAX_BYTES = 5L * 1024 * 1024;
     private static final Pattern NOMBRE_SEGURO = Pattern.compile(
             "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|png|webp|pdf)");
-    private final Path directorio;
+    private final Path directorioAnterior;
+    private final ArchivoAdjuntoRepository repositorio;
 
-    public ArchivoAdjuntoService(@Value("${safework.archivos.directorio}") String directorio) {
-        this.directorio = Path.of(directorio).toAbsolutePath().normalize();
+    public ArchivoAdjuntoService(ArchivoAdjuntoRepository repositorio,
+            @Value("${safework.archivos.directorio}") String directorioAnterior) {
+        this.repositorio = repositorio;
+        this.directorioAnterior = Path.of(directorioAnterior).toAbsolutePath().normalize();
     }
 
     public record ArchivoGuardado(String nombre, String nombreOriginal, String tipoContenido) {}
@@ -43,6 +47,7 @@ public class ArchivoAdjuntoService {
         }
     }
 
+    @Transactional
     public ArchivoGuardado guardar(MultipartFile archivo, boolean permitirPdf) {
         validar(archivo, permitirPdf);
         try {
@@ -54,66 +59,62 @@ public class ArchivoAdjuntoService {
                 case "image/webp" -> "webp";
                 default -> "pdf";
             };
-            Files.createDirectories(directorio);
             String nombre = UUID.randomUUID() + "." + extension;
-            Files.write(rutaSegura(nombre), contenido, StandardOpenOption.CREATE_NEW);
             String original = archivo.getOriginalFilename();
             if (original == null || original.isBlank()) original = "archivo." + extension;
             original = original.replace('\\', '/');
             original = original.substring(original.lastIndexOf('/') + 1).replaceAll("[\\p{Cntrl}]", "_");
             if (original.length() > 255) original = original.substring(0, 255);
+            repositorio.save(new ArchivoAdjunto(nombre, original, tipo, contenido));
             return new ArchivoGuardado(nombre, original, tipo);
         } catch (IOException e) {
-            throw new IllegalStateException("No se pudo guardar el archivo adjunto", e);
+            throw new IllegalStateException("No se pudo leer el archivo adjunto", e);
         }
     }
 
     public Resource abrir(String nombre) {
-        Path ruta = rutaSegura(nombre);
-        if (!Files.isRegularFile(ruta)) {
-            throw new IllegalArgumentException("El archivo adjunto no está disponible");
-        }
-        return new FileSystemResource(ruta);
+        validarNombre(nombre);
+        ArchivoAdjunto adjunto = repositorio.findById(nombre)
+                .orElseThrow(() -> new IllegalArgumentException("El archivo adjunto no está disponible"));
+        return new ByteArrayResource(adjunto.getContenido());
     }
 
+    /** La llamada se realiza dentro de la transacción del registro padre. */
+    @Transactional
     public void borrarDespuesDeConfirmar(String nombre) {
-        if (nombre == null) return;
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() { borrarSiExiste(nombre); }
-            });
-        } else {
-            borrarSiExiste(nombre);
-        }
+        borrarSiExiste(nombre);
     }
 
-    public void borrarSiHayRollback(String nombre) {
-        if (nombre == null || !TransactionSynchronizationManager.isSynchronizationActive()) return;
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCompletion(int estado) {
-                if (estado != STATUS_COMMITTED) borrarSiExiste(nombre);
-            }
-        });
-    }
-
+    @Transactional
     public void borrarSiExiste(String nombre) {
         if (nombre == null) return;
+        validarNombre(nombre);
+        repositorio.deleteById(nombre);
+    }
+
+    /** Copia un archivo del almacenamiento anterior a MySQL sin borrar el original. */
+    @Transactional
+    public boolean migrarArchivoLocal(String nombre, String nombreOriginal, boolean permitirPdf) {
+        validarNombre(nombre);
+        if (repositorio.existsById(nombre)) return true;
+        Path ruta = directorioAnterior.resolve(nombre).normalize();
+        if (!ruta.startsWith(directorioAnterior) || !Files.isRegularFile(ruta)) return false;
         try {
-            Files.deleteIfExists(rutaSegura(nombre));
-        } catch (IOException e) {
-            // El archivo queda para limpieza administrativa; no se elimina el registro de BD.
+            if (Files.size(ruta) > MAX_BYTES) return false;
+            byte[] contenido = Files.readAllBytes(ruta);
+            String tipo = detectarTipo(contenido, permitirPdf);
+            String original = nombreOriginal == null || nombreOriginal.isBlank() ? nombre : nombreOriginal;
+            repositorio.save(new ArchivoAdjunto(nombre, original, tipo, contenido));
+            return true;
+        } catch (IOException | IllegalArgumentException e) {
+            return false;
         }
     }
 
-    private Path rutaSegura(String nombre) {
+    private void validarNombre(String nombre) {
         if (nombre == null || !NOMBRE_SEGURO.matcher(nombre).matches()) {
             throw new IllegalArgumentException("Nombre de archivo inválido");
         }
-        Path ruta = directorio.resolve(nombre).normalize();
-        if (!ruta.startsWith(directorio)) throw new IllegalArgumentException("Ruta de archivo inválida");
-        return ruta;
     }
 
     private String detectarTipo(byte[] bytes, boolean permitirPdf) {

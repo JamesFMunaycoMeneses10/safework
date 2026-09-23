@@ -44,6 +44,9 @@ public class RiesgoService {
     public Riesgo guardar(Riesgo riesgo, MultipartFile foto) {
         Riesgo anterior = riesgo.getId() == null ? null : riesgoRepository.findById(riesgo.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Riesgo no encontrado"));
+        // Con JPA save() puede hacer merge sobre la entidad administrada "anterior".
+        // Conservar el nombre previo antes de guardar evita borrar la foto recién subida.
+        String fotoAnterior = anterior == null ? null : anterior.getFotoArchivo();
         boolean nuevaFoto = foto != null && !foto.isEmpty();
         if (nuevaFoto) archivos.validar(foto, false);
         if (riesgo.getProbabilidad() != null
@@ -60,22 +63,15 @@ public class RiesgoService {
             riesgo.setFotoNombre(anterior.getFotoNombre());
             riesgo.setFotoTipo(anterior.getFotoTipo());
         }
-        ArchivoAdjuntoService.ArchivoGuardado guardado = null;
-        try {
-            if (nuevaFoto) {
-                guardado = archivos.guardar(foto, false);
-                archivos.borrarSiHayRollback(guardado.nombre());
-                riesgo.setFotoArchivo(guardado.nombre());
-                riesgo.setFotoNombre(guardado.nombreOriginal());
-                riesgo.setFotoTipo(guardado.tipoContenido());
-            }
-            Riesgo resultado = riesgoRepository.save(riesgo);
-            if (nuevaFoto && anterior != null) archivos.borrarDespuesDeConfirmar(anterior.getFotoArchivo());
-            return resultado;
-        } catch (RuntimeException e) {
-            if (guardado != null) archivos.borrarSiExiste(guardado.nombre());
-            throw e;
+        if (nuevaFoto) {
+            var guardado = archivos.guardar(foto, false);
+            riesgo.setFotoArchivo(guardado.nombre());
+            riesgo.setFotoNombre(guardado.nombreOriginal());
+            riesgo.setFotoTipo(guardado.tipoContenido());
         }
+        Riesgo resultado = riesgoRepository.save(riesgo);
+        if (nuevaFoto) archivos.borrarDespuesDeConfirmar(fotoAnterior);
+        return resultado;
     }
 
     @Transactional

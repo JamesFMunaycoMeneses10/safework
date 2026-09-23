@@ -93,7 +93,7 @@ public class AccionCorrectivaController {
 
     @PostMapping("/guardar")
     public String guardar(@Valid @ModelAttribute("accion") AccionCorrectiva accion,
-            BindingResult result, @RequestParam(name = "archivoEvidencia", required = false) MultipartFile archivo,
+            BindingResult result, @RequestParam(name = "adjuntoEvidencia", required = false) MultipartFile archivo,
             Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             cargarCombos(model);

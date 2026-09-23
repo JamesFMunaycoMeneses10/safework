@@ -122,22 +122,15 @@ public class AccionCorrectivaService {
                 : null);
 
         String anterior = accion.getArchivoEvidencia();
-        ArchivoAdjuntoService.ArchivoGuardado guardado = null;
-        try {
-            if (nuevoArchivo) {
-                guardado = archivos.guardar(adjunto, true);
-                archivos.borrarSiHayRollback(guardado.nombre());
-                accion.setArchivoEvidencia(guardado.nombre());
-                accion.setNombreEvidencia(guardado.nombreOriginal());
-                accion.setTipoEvidencia(guardado.tipoContenido());
-            }
-            AccionCorrectiva resultado = accionRepository.save(accion);
-            if (nuevoArchivo) archivos.borrarDespuesDeConfirmar(anterior);
-            return resultado;
-        } catch (RuntimeException e) {
-            if (guardado != null) archivos.borrarSiExiste(guardado.nombre());
-            throw e;
+        if (nuevoArchivo) {
+            var guardado = archivos.guardar(adjunto, true);
+            accion.setArchivoEvidencia(guardado.nombre());
+            accion.setNombreEvidencia(guardado.nombreOriginal());
+            accion.setTipoEvidencia(guardado.tipoContenido());
         }
+        AccionCorrectiva resultado = accionRepository.save(accion);
+        if (nuevoArchivo) archivos.borrarDespuesDeConfirmar(anterior);
+        return resultado;
     }
 
     private Trabajador buscarResponsable(AccionCorrectiva datos) {
