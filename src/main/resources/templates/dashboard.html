@@ -1,278 +1,125 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/head :: head}"> </head>
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="sw-body dashboard-page">
+  <div class="dashboard-shell">
+    <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Navegación principal">
+      <a class="dashboard-brand" th:href="@{/dashboard}">
+        <svg class="brand-mark" viewBox="0 0 32 36" aria-hidden="true" focusable="false">
+          <path d="M16 2 29 6v10c0 8.4-5.1 14.5-13 18C8.1 30.5 3 24.4 3 16V6L16 2Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          <path d="m16 8-6 12h5l-1 8 8-13h-5l2-7h-3Z" fill="currentColor"/>
+        </svg>
+        <span>SafeWork</span>
+      </a>
+      <nav class="dashboard-nav">
+        <a class="active" th:href="@{/dashboard}" aria-current="page"><span class="nav-icon">⌂</span> Dashboard</a>
+        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon">▣</span> Áreas</a>
+        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon">♙</span> Usuarios</a>
+        <a th:href="@{/trabajadores}"><span class="nav-icon">♟</span> Trabajadores</a>
+        <a th:href="@{/riesgos}"><span class="nav-icon">⚠</span> Riesgos</a>
+        <a th:href="@{/incidentes}"><span class="nav-icon">◇</span> Incidentes</a>
+        <a th:href="@{/inspecciones}"><span class="nav-icon">☑</span> Inspecciones</a>
+        <a th:href="@{/acciones}"><span class="nav-icon">⚒</span> Acciones Correctivas</a>
+      </nav>
+    </aside>
+    <button class="dashboard-scrim" id="dashboardScrim" type="button" aria-label="Cerrar menú"></button>
 
-  <body class="sw-body">
-    <!-- NAVBAR -->
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="dashboardSidebar" aria-expanded="false">☰</button>
+        <div class="dashboard-account">
+          <span class="account-icon" aria-hidden="true">♙</span>
+          <span th:text="${nombreUsuario}">Usuario</span>
+          <span class="account-role" th:text="${esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador')}">Rol</span>
+          <form th:action="@{/logout}" method="post"><button type="submit" class="dashboard-logout">Salir</button></form>
+        </div>
+      </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <div class="container py-5">
-      <!-- TITULO -->
-
-      <h1 class="sw-page-title">Dashboard SafeWork</h1>
-
-      <p class="sw-page-description">
-        Resumen general de Seguridad y Salud en el Trabajo.
-      </p>
-
-      <!-- =========================
-         INDICADORES GENERALES
-    ========================== -->
-
-      <div class="row g-4 mt-3">
-        <!-- Trabajadores -->
-
-        <div class="col-md-3">
-          <div class="sw-card text-center p-4">
-            <div class="sw-icon">👷</div>
-
-            <h5 class="sw-card-title">Trabajadores</h5>
-
-            <h1 class="sw-number" th:text="${totalTrabajadores}">0</h1>
-
-            <small class="sw-description"> Personal registrado </small>
-          </div>
+      <main class="dashboard-content">
+        <div class="dashboard-heading">
+          <h1>Dashboard SafeWork</h1>
+          <p>Resumen general de Seguridad y Salud en el Trabajo.</p>
         </div>
 
-        <!-- Riesgos -->
+        <section class="dashboard-kpis" aria-label="Indicadores principales">
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon blue">♟</span><div><h2>Trabajadores</h2><strong th:text="${totalTrabajadores}">0</strong><p>Personal registrado</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon amber">⚠</span><div><h2>Riesgos</h2><strong th:text="${totalRiesgos}">0</strong><p>Riesgos identificados</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon red">!</span><div><h2>Incidentes</h2><strong th:text="${totalIncidentes}">0</strong><p>Incidentes reportados</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon green">⚒</span><div><h2>Acciones correctivas</h2><strong th:text="${totalAcciones}">0</strong><p>Medidas registradas</p></div></article>
+        </section>
 
-        <div class="col-md-3">
-          <div class="sw-card text-center p-4">
-            <div class="sw-icon">⚠️</div>
-
-            <h5 class="sw-card-title">Riesgos</h5>
-
-            <h1 class="sw-number" th:text="${totalRiesgos}">0</h1>
-
-            <small class="sw-description"> Riesgos identificados </small>
-          </div>
-        </div>
-
-        <!-- Incidentes -->
-
-        <div class="col-md-3">
-          <div class="sw-card text-center p-4">
-            <div class="sw-icon">🚨</div>
-
-            <h5 class="sw-card-title">Incidentes</h5>
-
-            <h1 class="sw-number" th:text="${totalIncidentes}">0</h1>
-
-            <small class="sw-description"> Eventos registrados </small>
-          </div>
-        </div>
-
-        <!-- Acciones -->
-
-        <div class="col-md-3">
-          <div class="sw-card text-center p-4">
-            <div class="sw-icon">🛠</div>
-
-            <h5 class="sw-card-title">Acciones</h5>
-
-            <h1 class="sw-number" th:text="${totalAcciones}">0</h1>
-
-            <small class="sw-description"> Medidas correctivas </small>
-          </div>
-        </div>
-      </div>
-
-      <!-- =========================
-         SEGUIMIENTO ACCIONES
-    ========================== -->
-
-      <div class="sw-section">
-        <h4 class="sw-section-title">Seguimiento de acciones correctivas</h4>
-
-        <div class="row mt-4">
-          <div class="col-md-4">
-            <div class="sw-status warning">
-              <h5>🟡 Pendientes</h5>
-
-              <h2 th:text="${accionesPendientes}">0</h2>
+        <section class="dashboard-charts" aria-label="Análisis de riesgos e incidentes">
+          <article class="dashboard-panel chart-panel">
+            <h2>Riesgos por nivel</h2>
+            <div class="risk-chart-layout">
+              <div class="chart-frame donut-frame"><canvas id="riesgosChart" aria-label="Gráfico de riesgos por nivel" role="img"></canvas></div>
+              <ul class="risk-legend">
+                <li><span class="legend-dot critical"></span>Crítico <strong th:text="${riesgosCriticos}">0</strong></li>
+                <li><span class="legend-dot high"></span>Alto <strong th:text="${riesgosAltos}">0</strong></li>
+                <li><span class="legend-dot medium"></span>Moderado <strong th:text="${riesgosMedios}">0</strong></li>
+                <li><span class="legend-dot low"></span>Bajo <strong th:text="${riesgosBajos}">0</strong></li>
+              </ul>
             </div>
-          </div>
+            <p class="chart-note" th:if="${totalRiesgos == 0}">Aún no hay riesgos registrados.</p>
+          </article>
+          <article class="dashboard-panel chart-panel">
+            <h2>Incidentes por mes <small th:text="${anioActual}">2026</small></h2>
+            <div class="chart-frame line-frame"><canvas id="incidentesChart" aria-label="Gráfico de incidentes por mes" role="img"></canvas></div>
+            <p class="chart-note">Se muestran los incidentes del año actual.</p>
+          </article>
+        </section>
 
-          <div class="col-md-4">
-            <div class="sw-status info">
-              <h5>🔵 En proceso</h5>
-
-              <h2 th:text="${accionesProceso}">0</h2>
-            </div>
-          </div>
-
-          <div class="col-md-4">
-            <div class="sw-status success">
-              <h5>🟢 Completadas</h5>
-
-              <h2 th:text="${accionesCompletadas}">0</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- =========================
-         ALERTAS SST
-    ========================== -->
-
-      <div class="sw-section">
-        <h4 class="sw-section-title">🚨 Alertas SST</h4>
-
-        <div class="row mt-4">
-          <div class="col-md-6">
-            <div class="sw-alert danger">
-              <h5>🔴 Acciones vencidas</h5>
-
-              <h2 th:text="${accionesVencidas}">0</h2>
-
-              <small> Requieren atención inmediata </small>
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="sw-alert warning">
-              <h5>🟡 Próximas a vencer</h5>
-
-              <h2 th:text="${accionesProximas}">0</h2>
-
-              <small> Vencen dentro de los próximos 7 días </small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- =========================
-         ESTADO SST
-    ========================== -->
-
-      <div class="sw-section">
-        <div class="text-center">
-          <h4 class="sw-section-title">🚦 Estado General SST</h4>
-
-          <h1
-            class="sw-status-title mt-4"
-            th:text="${estadoSST}"
-            th:classappend="${estadoSST == 'SEGURO'} 
-                ? ' status-safe' 
-                : (${estadoSST == 'ATENCIÓN'} 
-                ? ' status-warning' 
-                : ' status-danger')"
-          >
-            SEGURO
-          </h1>
-
-          <div class="sw-status-indicator">
-            <span
-              th:classappend="${estadoSST == 'SEGURO'} 
-                ? 'dot-safe' 
-                : (${estadoSST == 'ATENCIÓN'} 
-                ? 'dot-warning' 
-                : 'dot-danger')"
-            >
-            </span>
-
-            Nivel actual de seguridad
-          </div>
-
-          <p class="sw-status-message" th:text="${mensajeSST}">
-            Estado actual del sistema SST
-          </p>
-        </div>
-      </div>
-
-      <!-- GRAFICO -->
-
-      <div class="sw-section">
-        <h4 class="sw-section-title">📊 Análisis gráfico SST</h4>
-
-        <div style="height: 350px">
-          <canvas id="accionesChart"></canvas>
-        </div>
-      </div>
-
-      <!-- TABLA -->
-
-      <div class="sw-section">
-        <h4 class="sw-section-title">Últimas acciones correctivas</h4>
-
-        <table class="sw-table mt-4">
-          <thead>
-            <tr>
-              <th>Descripción</th>
-
-              <th>Responsable</th>
-
-              <th>Estado</th>
-
-              <th>Prioridad</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr th:each="accion:${acciones}">
-              <td th:text="${accion.descripcion}"></td>
-
-              <td
-                th:text="${accion.responsable != null 
-                ? accion.responsable.nombres+' '+accion.responsable.apellidos 
-                : 'Sin asignar'}"
-              ></td>
-
-              <td>
-                <span class="badge bg-warning" th:text="${accion.estado}">
-                </span>
-              </td>
-
-              <td>
-                <span class="badge bg-danger" th:text="${accion.prioridad}">
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <section class="dashboard-bottom" aria-label="Seguimiento y resumen">
+          <article class="dashboard-panel action-panel">
+            <div class="panel-heading"><h2>Últimas acciones correctivas</h2><a th:href="@{/acciones}">Ver todas →</a></div>
+            <div class="dashboard-table-wrap"><table class="dashboard-table">
+              <thead><tr><th>Descripción</th><th>Responsable</th><th>Estado</th><th>Prioridad</th><th>Fecha límite</th></tr></thead>
+              <tbody>
+                <tr th:each="accion : ${ultimasAcciones}">
+                  <td th:text="${accion.descripcion}">Acción</td>
+                  <td th:text="${accion.responsable != null ? accion.responsable.nombres + ' ' + accion.responsable.apellidos : 'Sin asignar'}">Responsable</td>
+                  <td><span class="status-pill" th:classappend="${accion.estado == 'Completada' ? ' done' : (accion.estado == 'En proceso' ? ' progress' : ' pending')}" th:text="${accion.estado}">Pendiente</span></td>
+                  <td><span class="priority-pill" th:classappend="${accion.prioridad == 'Alta' ? ' high' : (accion.prioridad == 'Media' ? ' medium' : ' low')}" th:text="${accion.prioridad}">Media</span></td>
+                  <td th:text="${accion.fechaLimite != null ? #temporals.format(accion.fechaLimite, 'dd/MM/yyyy') : '—'}">—</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(ultimasAcciones)}"><td colspan="5" class="empty-row">Aún no hay acciones correctivas registradas.</td></tr>
+              </tbody>
+            </table></div>
+          </article>
+          <article class="dashboard-panel summary-panel">
+            <h2>Resumen de estado</h2>
+            <div class="summary-item"><span class="summary-icon" th:classappend="${estadoSST == 'SEGURO' ? ' green' : (estadoSST == 'ATENCIÓN' ? ' amber' : ' red')}" th:text="${estadoSST == 'SEGURO' ? '✓' : '⚠'}">✓</span><p><strong th:text="${estadoSST}">SEGURO</strong> · <span th:text="${mensajeSST}">Estado SST</span></p></div>
+            <div class="summary-item"><span class="summary-icon amber">⚠</span><p><strong th:text="${riesgosAltos + riesgosCriticos}">0</strong> riesgos altos o críticos requieren atención.</p></div>
+            <div class="summary-item"><span class="summary-icon red">!</span><p><strong th:text="${accionesVencidas}">0</strong> acciones vencidas y <strong th:text="${accionesProximas}">0</strong> próximas a vencer.</p></div>
+            <div class="summary-item"><span class="summary-icon blue">ⓘ</span><p><strong th:text="${accionesPendientes}">0</strong> pendientes, <strong th:text="${accionesProceso}">0</strong> en proceso y <strong th:text="${accionesCompletadas}">0</strong> completadas.</p></div>
+          </article>
+        </section>
+        <footer class="dashboard-footer">SafeWork · Sistema de Gestión de Seguridad y Salud en el Trabajo</footer>
+      </main>
     </div>
+  </div>
 
-    <script th:inline="javascript">
-      document.addEventListener("DOMContentLoaded", function () {
-        const canvas = document.getElementById("accionesChart");
-
-        if (canvas) {
-          const pendientes = /*[[${accionesPendientes}]]*/ 0;
-
-          const proceso = /*[[${accionesProceso}]]*/ 0;
-
-          const completadas = /*[[${accionesCompletadas}]]*/ 0;
-
-          new Chart(canvas, {
-            type: "doughnut",
-
-            data: {
-              labels: ["Pendientes", "En proceso", "Completadas"],
-
-              datasets: [
-                {
-                  data: [pendientes, proceso, completadas],
-                },
-              ],
-            },
-
-            options: {
-              responsive: true,
-
-              plugins: {
-                title: {
-                  display: true,
-
-                  text: "Estado de acciones correctivas",
-                },
-              },
-            },
-          });
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" defer></script>
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('menuToggle');
+      const scrim = document.getElementById('dashboardScrim');
+      const closeMenu = () => { document.body.classList.remove('dashboard-menu-open'); toggle.setAttribute('aria-expanded', 'false'); };
+      toggle.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          const open = document.body.classList.toggle('dashboard-menu-open');
+          toggle.setAttribute('aria-expanded', String(open));
+        } else {
+          document.body.classList.toggle('dashboard-menu-collapsed');
         }
       });
-    </script>
-  </body>
+      scrim.addEventListener('click', closeMenu);
+      if (!window.Chart) return;
+      const riesgos = /*[[${riesgosDistribucion}]]*/ [0, 0, 0, 0];
+      const meses = /*[[${incidentesPorMes}]]*/ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      new Chart(document.getElementById('riesgosChart'), {type: 'doughnut', data: {labels: ['Crítico', 'Alto', 'Moderado', 'Bajo'], datasets: [{data: riesgos.some(n => n > 0) ? riesgos : [1], backgroundColor: riesgos.some(n => n > 0) ? ['#9b2c48', '#f05258', '#f5aa13', '#47ad63'] : ['#e8edf3'], borderWidth: 0}]}, options: {responsive: true, maintainAspectRatio: false, cutout: '67%', plugins: {legend: {display: false}}}});
+      new Chart(document.getElementById('incidentesChart'), {type: 'line', data: {labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'], datasets: [{data: meses, borderColor: '#2468d5', backgroundColor: '#2468d5', tension: .25, pointRadius: 4, pointHoverRadius: 6, fill: false}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true, ticks: {precision: 0}, grid: {color: '#e9edf3'}}, x: {grid: {display: false}}}}});
+    });
+  </script>
+</body>
 </html>

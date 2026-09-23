@@ -1,0 +1,38 @@
+/* Rediseño aislado de /dashboard; no modifica las pantallas internas. */
+.dashboard-page{background:#f8fafc;color:#202832}
+.dashboard-page .dashboard-shell{min-height:100vh;display:flex}
+.dashboard-page.dashboard-menu-collapsed .dashboard-sidebar{display:none}
+.dashboard-sidebar{width:240px;flex:none;position:sticky;top:0;height:100vh;overflow:auto;background:#1e2b38;color:#fff;padding:20px 14px;z-index:30}
+.dashboard-brand{display:flex;align-items:center;gap:12px;margin:0 12px 38px;color:#fff;text-decoration:none;font:700 23px 'Sora',sans-serif}
+.dashboard-brand:hover{color:#fff}.brand-mark{width:31px;height:35px;flex:none;color:#edf4fc}
+.dashboard-nav{display:grid;gap:6px}
+.dashboard-nav a{display:flex;align-items:center;gap:13px;min-height:46px;padding:9px 13px;border-radius:8px;color:#eef3f8;text-decoration:none;font-size:15px}
+.dashboard-nav a:hover,.dashboard-nav a:focus-visible{background:#30465c;color:#fff}
+.dashboard-nav a.active{background:#2867c7;color:#fff}
+.nav-icon{display:inline-flex;width:21px;justify-content:center;font-size:20px;line-height:1}
+.dashboard-main{flex:1;min-width:0}
+.dashboard-topbar{display:flex;justify-content:space-between;align-items:center;height:66px;padding:0 24px;border-bottom:1px solid #e0e5eb;background:#fff;box-shadow:0 2px 9px rgba(22,36,54,.03)}
+.menu-toggle{border:0;background:transparent;color:#1e2b38;font-size:24px;line-height:1;padding:8px;cursor:pointer}
+.dashboard-account{display:flex;align-items:center;gap:9px;font-size:14px}.account-icon{font-size:22px}.account-role{color:#697789}
+.dashboard-account form{margin:0 0 0 8px}.dashboard-logout{border:1px solid #d7e0eb;background:#fff;color:#253548;border-radius:7px;padding:5px 12px}.dashboard-logout:hover{background:#f0f4f9}
+.dashboard-content{max-width:1560px;margin:auto;padding:22px 22px 10px}
+.dashboard-heading h1{color:#18232d;font:700 clamp(24px,2vw,32px) 'Sora',sans-serif;margin:0 0 10px}.dashboard-heading p{color:#4e5a67;margin:0 0 22px;font-size:15px}
+.dashboard-panel{background:#fff;border:1px solid #e0e5eb;border-radius:9px;box-shadow:0 2px 7px rgba(27,42,60,.07)}
+.dashboard-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.dashboard-kpi{display:flex;align-items:center;gap:16px;min-height:142px;padding:15px}
+.kpi-icon{display:grid;place-items:center;width:68px;height:68px;flex:none;border-radius:12px;font-size:34px;font-weight:700}
+.kpi-icon.blue,.summary-icon.blue{color:#2266ca;background:#eaf2ff}.kpi-icon.amber,.summary-icon.amber{color:#eba000;background:#fff5e2}.kpi-icon.red,.summary-icon.red{color:#ee4b55;background:#fff0f0}.kpi-icon.green,.summary-icon.green{color:#35a450;background:#eaf8ef}
+.dashboard-kpi h2{margin:0 0 5px;font:600 15px 'Inter',sans-serif}.dashboard-kpi strong{display:block;color:#151b22;font:700 33px 'Sora',sans-serif;line-height:1.15}.dashboard-kpi p{margin:6px 0 0;color:#525f6d;font-size:13px}
+.dashboard-charts{display:grid;grid-template-columns:.9fr 1.3fr;gap:18px;margin-top:20px}.chart-panel{min-height:280px;padding:17px 18px 12px}
+.chart-panel h2,.dashboard-bottom h2{margin:0 0 18px;font:700 16px 'Inter',sans-serif;color:#202832}.chart-panel h2 small{color:#788493;font-size:12px;font-weight:500}
+.risk-chart-layout{display:flex;align-items:center;justify-content:center;gap:24px}.chart-frame{position:relative;min-width:0}.donut-frame{width:min(55%,215px);height:205px}.line-frame{height:220px;width:100%}
+.risk-legend{flex:1;list-style:none;margin:0;padding:0;max-width:190px}.risk-legend li{display:flex;align-items:center;gap:8px;margin:13px 0;font-size:13px}.risk-legend strong{margin-left:auto;font-weight:600}
+.legend-dot{display:inline-block;height:14px;width:14px;flex:none;border-radius:50%}.legend-dot.critical{background:#9b2c48}.legend-dot.high{background:#f05258}.legend-dot.medium{background:#f5aa13}.legend-dot.low{background:#47ad63}.chart-note{color:#788493;font-size:12px;margin:4px 0 0}
+.dashboard-bottom{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:20px}.action-panel,.summary-panel{padding:17px 18px}.panel-heading{display:flex;justify-content:space-between;gap:10px;align-items:start}.panel-heading a{color:#2867c7;text-decoration:none;font-size:13px;white-space:nowrap}
+.dashboard-table-wrap{width:100%;overflow-x:auto}.dashboard-table{width:100%;min-width:610px;border-collapse:collapse;font-size:12px}.dashboard-table th{background:#f5f7fa;color:#263341;font-weight:600;text-align:left}.dashboard-table th,.dashboard-table td{padding:11px 10px;border-bottom:1px solid #e8edf3;vertical-align:middle}.dashboard-table td:first-child{max-width:210px}.dashboard-table tbody tr:last-child td{border-bottom:0}.empty-row{color:#697789;text-align:center}
+.status-pill,.priority-pill{display:inline-block;white-space:nowrap;border-radius:6px;padding:5px 8px;font-size:11px}.status-pill.pending{color:#235aa7;background:#e7f0ff}.status-pill.progress{color:#a86608;background:#fff2db}.status-pill.done{color:#1e7b43;background:#e8f7ed}.priority-pill.high{color:#bc3b44;background:#ffebed}.priority-pill.medium{color:#98610d;background:#fff3e3}.priority-pill.low{color:#27733e;background:#e8f7ed}
+.summary-item{display:flex;gap:13px;align-items:center;padding:10px 0;border-bottom:1px solid #e8edf3}.summary-item:last-child{border-bottom:0}.summary-item p{margin:0;font-size:13px;line-height:1.45}.summary-icon{width:43px;height:43px;border-radius:9px;display:grid;place-items:center;flex:none;font-size:23px}
+.dashboard-footer{color:#697789;text-align:center;font-size:12px;padding:25px 10px 10px}.dashboard-scrim{display:none}
+@media(max-width:1250px){.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.dashboard-charts,.dashboard-bottom{grid-template-columns:1fr}.dashboard-sidebar{position:fixed;left:0;transform:translateX(-100%);transition:transform .2s ease}.dashboard-menu-open .dashboard-sidebar{transform:translateX(0)}.dashboard-menu-open .dashboard-scrim{display:block;position:fixed;inset:0;border:0;background:rgba(15,25,37,.45);z-index:20}}
+@media(max-width:580px){.dashboard-content{padding:20px 13px 8px}.dashboard-topbar{padding:0 12px}.dashboard-kpis{grid-template-columns:1fr;gap:10px}.dashboard-kpi{min-height:105px}.dashboard-account{font-size:12px}.account-role{display:none}.risk-chart-layout{gap:12px}.donut-frame{width:50%;height:180px}}

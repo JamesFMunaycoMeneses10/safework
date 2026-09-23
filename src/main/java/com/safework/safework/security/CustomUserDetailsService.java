@@ -48,6 +48,7 @@ public class CustomUserDetailsService
                 .username(usuario.getUsername())
                 .password(usuario.getPassword())
                 .roles(usuario.getRol())
+                .disabled(!"ACTIVO".equals(usuario.getEstado()))
                 .build();
 
     }

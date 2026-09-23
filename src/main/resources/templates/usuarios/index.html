@@ -1,82 +1,52 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/head :: head}"> </head>
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="sw-body">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-  <body class="sw-body">
-    <!-- Navbar -->
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
-
-    <div class="container py-5">
-      <!-- TITULO -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 class="fw-bold">Gestión de Usuarios</h1>
-
-          <p class="text-muted">
-            Administración de usuarios del sistema SafeWork.
-          </p>
-        </div>
-
-        <a href="/usuarios/nuevo" class="btn btn-primary"> + Nuevo Usuario </a>
-      </div>
-
-      <!-- TABLA -->
-
-      <div class="sw-section">
-        <table class="table table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>Nombre</th>
-
-              <th>Usuario</th>
-
-              <th>Correo</th>
-
-              <th>Rol</th>
-
-              <th>Estado</th>
-
-              <th>Acción</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr th:each="usuario : ${usuarios}">
-              <td>
-                <span th:text="${usuario.nombre}"> Nombre </span>
-
-                <span th:text="${usuario.apellido}"> Apellido </span>
-              </td>
-
-              <td th:text="${usuario.username}">usuario</td>
-
-              <td th:text="${usuario.correo}">correo</td>
-
-              <td>
-                <span class="badge bg-primary" th:text="${usuario.rol}">
-                  ADMIN
-                </span>
-              </td>
-
-              <td>
-                <span class="badge bg-success" th:text="${usuario.estado}">
-                  ACTIVO
-                </span>
-              </td>
-
-              <td>
-                <a
-                  th:href="@{/usuarios/eliminar/{id}(id=${usuario.id})}"
-                  class="btn btn-danger btn-sm"
-                  onclick="return confirm('¿Eliminar usuario?');"
-                >
-                  Eliminar
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="fw-bold">Gestión de Usuarios</h1>
+      <p class="text-muted">Administración de usuarios del sistema SafeWork.</p>
     </div>
-  </body>
+    <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">+ Nuevo Usuario</a>
+  </div>
+
+  <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+  <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+  <div class="sw-section table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Nombre</th>
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="usuario : ${usuarios}">
+          <td th:text="${usuario.nombre + ' ' + usuario.apellido}"></td>
+          <td th:text="${usuario.username}"></td>
+          <td th:text="${usuario.correo != null ? usuario.correo : '—'}"></td>
+          <td><span class="badge bg-primary" th:text="${usuario.rol}"></span></td>
+          <td><span class="badge" th:classappend="${usuario.estado == 'ACTIVO' ? ' bg-success' : ' bg-secondary'}"
+                    th:text="${usuario.estado}"></span></td>
+          <td>
+            <a th:href="@{/usuarios/editar/{id}(id=${usuario.id})}" class="btn btn-outline-primary btn-sm">Editar</a>
+            <form th:action="@{/usuarios/eliminar/{id}(id=${usuario.id})}" method="post" class="d-inline"
+                  onsubmit="return confirm('¿Eliminar usuario?');">
+              <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
 </html>

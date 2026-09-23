@@ -171,6 +171,8 @@ class SeguridadRolesTests {
             mvc.perform(get(url).session(session)).andExpect(status().is(rol.equals("ADMIN") ? 200 : 403));
         }
         mvc.perform(get("/usuarios/eliminar/1").session(session))
+                .andExpect(status().is(rol.equals("ADMIN") ? 405 : 403));
+        mvc.perform(postConCsrf("/usuarios/eliminar/1", session))
                 .andExpect(status().is(rol.equals("ADMIN") ? 302 : 403));
         mvc.perform(postConCsrf("/areas/eliminar/1", session))
                 .andExpect(status().is(rol.equals("ADMIN") ? 302 : 403));

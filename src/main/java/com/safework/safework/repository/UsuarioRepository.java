@@ -21,5 +21,9 @@ extends JpaRepository<Usuario,Long>{
 // Buscar usuarios por estado
     List<Usuario> findByEstado(String estado);
 
+    boolean existsByUsernameAndIdNot(String username, Long id);
+    boolean existsByCorreoAndIdNot(String correo, Long id);
+    long countByRolAndEstado(String rol, String estado);
+
 
 }
