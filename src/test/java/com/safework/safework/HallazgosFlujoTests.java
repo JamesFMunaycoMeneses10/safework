@@ -36,7 +36,7 @@ class HallazgosFlujoTests {
     private final InspeccionRepository inspeccionesRepo = mock(InspeccionRepository.class);
     private final RiesgoRepository riesgosRepo = mock(RiesgoRepository.class);
     private final InspeccionService inspecciones = new InspeccionService(inspeccionesRepo, hallazgos);
-    private final RiesgoService riesgos = new RiesgoService(riesgosRepo, hallazgos);
+    private final RiesgoService riesgos = new RiesgoService(riesgosRepo, hallazgos, org.mockito.Mockito.mock(com.safework.safework.service.ArchivoAdjuntoService.class));
     private final HallazgoInspeccionController controlador =
             new HallazgoInspeccionController(hallazgos, inspecciones, riesgos);
 

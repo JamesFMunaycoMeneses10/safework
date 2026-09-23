@@ -17,18 +17,20 @@
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
         rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
 
+    <link rel="stylesheet" th:href="@{/css/internal-layout.css}" />
 </head>
 
 
-<body class="bg-light">
+<body class="bg-light sw-form-page">
 
 
     <!-- Barra de navegación -->
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 
-    <div class="container py-5">
+    <div class="container py-5 sw-form-container">
 
 
         <div
@@ -60,10 +62,11 @@
 
 
                 <!-- Formulario -->
-                <form
+                <form class="sw-editor-form"
                     th:action="@{/riesgos/guardar}"
                     th:object="${riesgo}"
-                    method="post">
+                    method="post" enctype="multipart/form-data">
+                    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
 
                     <!--
@@ -381,6 +384,15 @@
 
                     </div>
 
+
+                    <div class="mb-4">
+                        <label class="form-label" for="fotoRiesgo">Foto del riesgo (opcional)</label>
+                        <input class="form-control" type="file" id="fotoRiesgo" name="fotoRiesgo"
+                               accept="image/jpeg,image/png,image/webp">
+                        <small class="form-text">JPG, PNG o WebP; máximo 5 MB.</small>
+                        <a th:if="${riesgo.id != null and riesgo.fotoArchivo != null}"
+                           th:href="@{/riesgos/{id}/foto(id=${riesgo.id})}" target="_blank" rel="noopener" class="d-block mt-2">Ver foto actual</a>
+                    </div>
 
                     <!-- Botones -->
                     <div class="d-flex gap-2">

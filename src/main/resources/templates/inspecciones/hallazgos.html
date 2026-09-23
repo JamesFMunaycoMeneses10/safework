@@ -12,21 +12,21 @@
         <span>SafeWork</span>
       </a>
       <nav class="dashboard-nav">
-        <a th:href="@{/dashboard}"><span class="nav-icon">⌂</span> Dashboard</a>
-        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon">▣</span> Áreas</a>
-        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon">♙</span> Usuarios</a>
-        <a th:href="@{/trabajadores}"><span class="nav-icon">♟</span> Trabajadores</a>
-        <a th:href="@{/riesgos}"><span class="nav-icon">⚠</span> Riesgos</a>
-        <a th:href="@{/incidentes}"><span class="nav-icon">◇</span> Incidentes</a>
-        <a class="active" th:href="@{/inspecciones}" aria-current="page"><span class="nav-icon">☑</span> Inspecciones</a>
-        <a th:href="@{/acciones}"><span class="nav-icon">⚒</span> Acciones Correctivas</a>
+        <a th:href="@{/dashboard}"><span class="nav-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span> Dashboard</a>
+        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
+        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
+        <a th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
+        <a th:href="@{/riesgos}"><span class="nav-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span> Riesgos</a>
+        <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
+        <a class="active" th:href="@{/inspecciones}" aria-current="page"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>
+        <a th:href="@{/acciones}"><span class="nav-icon"><i class="bi bi-tools" aria-hidden="true"></i></span> Acciones Correctivas</a>
       </nav>
     </aside>
     <button class="dashboard-scrim" id="dashboardScrim" type="button" aria-label="Cerrar menú"></button>
 
     <div class="dashboard-main">
       <header class="dashboard-topbar">
-        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="dashboardSidebar" aria-expanded="false">☰</button>
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="dashboardSidebar" aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i></button>
         <div class="dashboard-account">
           <span class="account-role" th:text="${esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador')}">Rol</span>
           <form th:action="@{/logout}" method="post"><button type="submit" class="dashboard-logout">Salir</button></form>
@@ -51,7 +51,7 @@
           <section class="dashboard-panel hallazgos-card" th:if="${puedeGestionarSst}" aria-labelledby="hallazgoFormTitulo">
             <h2 id="hallazgoFormTitulo">Registrar hallazgo</h2>
             <p class="hallazgos-help">Describe una situación concreta detectada durante esta inspección.</p>
-            <form th:action="@{/inspecciones/{id}/hallazgos(id=${inspeccion.id})}" method="post">
+            <form class="sw-editor-form" th:action="@{/inspecciones/{id}/hallazgos(id=${inspeccion.id})}" method="post">
               <div class="mb-3">
                 <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
                 <textarea id="descripcion" name="descripcion" class="form-control" rows="4" maxlength="500" required></textarea>
@@ -79,6 +79,8 @@
                     <td th:text="${hallazgo.descripcion}">Descripción</td>
                     <td>
                       <span class="hallazgos-risk" th:if="${hallazgo.riesgo != null}" th:text="${hallazgo.riesgo.peligro}">Riesgo</span>
+                      <a class="small ms-2" th:if="${hallazgo.riesgo != null}"
+                         th:href="@{/acciones(riesgoId=${hallazgo.riesgo.id})}">Ver acciones</a>
                       <span class="hallazgos-pending" th:if="${hallazgo.riesgo == null}">Pendiente de evaluación</span>
                     </td>
                   </tr>

@@ -15,11 +15,13 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
         rel="stylesheet"
     />
+    <link rel="stylesheet" th:href="@{/css/forms.css}" />
 
+    <link rel="stylesheet" th:href="@{/css/internal-layout.css}" />
 </head>
 
 
-<body class="bg-light">
+<body class="bg-light sw-form-page">
 
 
     <!-- Navbar -->
@@ -27,7 +29,7 @@
 
 
 
-    <div class="container py-5">
+    <div class="container py-5 sw-form-container">
 
 
         <div class="card shadow-sm mx-auto"
@@ -49,11 +51,16 @@
 
 
 
-                <form
+                <form class="sw-editor-form"
                     th:action="@{/acciones/guardar}"
                     th:object="${accion}"
-                    method="post"
+                    method="post" enctype="multipart/form-data"
                 >
+                    <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                        <div>Corrige los campos señalados antes de guardar:</div>
+                        <ul class="mb-0"><li th:each="fallo : ${#fields.allErrors()}" th:text="${fallo}"></li></ul>
+                    </div>
 
 
                     <!-- Mantiene el ID para actualizar -->
@@ -114,9 +121,10 @@
                         <input
                             type="date"
                             class="form-control"
-                            name="fechaRegistro"
-                            th:value="${accion.fechaRegistro}"
+                            th:field="*{fechaRegistro}"
+                            readonly
                         />
+                        <small class="form-text">Asignada por el sistema; no se puede modificar.</small>
 
 
                     </div>
@@ -141,9 +149,10 @@
                         <input
                             type="date"
                             class="form-control"
-                            name="fechaLimite"
-                            th:value="${accion.fechaLimite}"
+                            th:field="*{fechaLimite}"
+                            required
                         />
+                        <div class="text-danger" th:if="${#fields.hasErrors('fechaLimite')}" th:errors="*{fechaLimite}"></div>
 
 
                     </div>
@@ -170,7 +179,8 @@
 
                         <select
                             class="form-select"
-                            th:field="*{responsable}"
+                            name="responsable.id"
+                            required
                         >
 
 
@@ -183,7 +193,8 @@
                             <option
                                 th:each="trabajador : ${trabajadores}"
                                 th:value="${trabajador.id}"
-                                th:text="${trabajador.nombres + ' ' + trabajador.apellidos}">
+                                th:selected="${accion.responsable != null and accion.responsable.id == trabajador.id}"
+                                th:text="${trabajador.nombres + ' ' + trabajador.apellidos + ' · ' + trabajador.area.nombre}">
                             </option>
 
 
@@ -214,7 +225,7 @@
 
                         <select
                             class="form-select"
-                            th:field="*{riesgo}"
+                            name="riesgo.id"
                         >
 
 
@@ -227,7 +238,8 @@
                             <option
                                 th:each="riesgo : ${riesgos}"
                                 th:value="${riesgo.id}"
-                                th:text="${riesgo.peligro}">
+                                th:selected="${accion.riesgo != null and accion.riesgo.id == riesgo.id}"
+                                th:text="${riesgo.peligro + ' · ' + riesgo.area.nombre}">
                             </option>
 
 
@@ -258,7 +270,7 @@
 
                         <select
                             class="form-select"
-                            th:field="*{incidente}"
+                            name="incidente.id"
                         >
 
 
@@ -271,11 +283,13 @@
                             <option
                                 th:each="incidente : ${incidentes}"
                                 th:value="${incidente.id}"
-                                th:text="${incidente.descripcion}">
+                                th:selected="${accion.incidente != null and accion.incidente.id == incidente.id}"
+                                th:text="${incidente.descripcion + ' · ' + incidente.area.nombre}">
                             </option>
 
 
                         </select>
+                        <small class="form-text">Selecciona un riesgo, un incidente o ambos si corresponden a la misma área.</small>
 
 
                     </div>
@@ -402,24 +416,30 @@
 
 
 
+                    <div class="mb-4">
+                        <label class="form-label" for="evidenciaCierre">Evidencia de cumplimiento</label>
+                        <textarea id="evidenciaCierre" class="form-control" rows="3" maxlength="1000"
+                                  th:field="*{evidenciaCierre}"
+                                  placeholder="Describe qué se hizo y cómo se comprobó"></textarea>
+                        <small class="form-text">Obligatoria al marcar la acción como Completada.</small>
+                        <div class="text-danger" th:if="${#fields.hasErrors('evidenciaCierre')}" th:errors="*{evidenciaCierre}"></div>
+                        <small class="form-text" th:if="${accion.fechaCierre != null}"
+                               th:text="${'Fecha de cierre: ' + #temporals.format(accion.fechaCierre, 'dd/MM/yyyy')}"></small>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="archivoEvidencia">Foto o PDF de evidencia</label>
+                        <input class="form-control" type="file" id="archivoEvidencia" name="archivoEvidencia"
+                               accept="image/jpeg,image/png,image/webp,application/pdf">
+                        <small class="form-text">Obligatorio para completar la acción. JPG, PNG, WebP o PDF; máximo 5 MB.</small>
+                        <a th:if="${accion.id != null and accion.archivoEvidencia != null}"
+                           th:href="@{/acciones/{id}/evidencia(id=${accion.id})}" class="d-block mt-2">Ver evidencia actual</a>
+                    </div>
+
                     <!-- BOTONES -->
-
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        Guardar
-                    </button>
-
-
-
-                    <a
-                        th:href="@{/acciones}"
-                        class="btn btn-secondary"
-                    >
-                        Cancelar
-                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <a th:href="@{/acciones}" class="btn btn-secondary">Cancelar</a>
+                    </div>
 
 
 

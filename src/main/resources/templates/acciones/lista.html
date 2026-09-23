@@ -13,6 +13,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" th:href="@{/css/internal-layout.css}" />
   </head>
 
   <body class="bg-light">
@@ -55,6 +56,24 @@
       <!-- Mensaje error -->
 
       <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+      <div class="alert alert-info d-flex justify-content-between align-items-center gap-2 flex-wrap"
+           th:if="${riesgoFiltrado != null}">
+        <span>Acciones del riesgo: <strong th:text="${riesgoFiltrado.peligro}">Riesgo</strong></span>
+        <span>
+          <a th:if="${puedeGestionarSst}" th:href="@{/acciones/nueva(riesgoId=${riesgoFiltrado.id})}"
+             class="btn btn-sm btn-primary">Nueva acción para este riesgo</a>
+          <a th:href="@{/acciones}" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+        </span>
+      </div>
+      <div class="alert alert-info d-flex justify-content-between align-items-center gap-2 flex-wrap"
+           th:if="${incidenteFiltrado != null}">
+        <span>Acciones del incidente <strong th:text="${'#' + incidenteFiltrado.id}">#</strong></span>
+        <span>
+          <a th:if="${puedeGestionarSst}" th:href="@{/acciones/nueva(incidenteId=${incidenteFiltrado.id})}"
+             class="btn btn-sm btn-primary">Nueva acción para este incidente</a>
+          <a th:href="@{/acciones}" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+        </span>
+      </div>
 
       <!-- ============================== -->
       <!-- TABLA -->
@@ -70,11 +89,15 @@
 
                   <th>Responsable</th>
 
+                  <th>Origen</th>
+
                   <th>Prioridad</th>
 
                   <th>Estado</th>
 
                   <th>Fecha límite</th>
+
+                  <th>Cierre</th>
 
                   <th th:if="${puedeGestionarSst}">Acciones</th>
                 </tr>
@@ -84,7 +107,15 @@
                 <tr th:each="accion : ${acciones}">
                   <!-- Descripción -->
 
-                  <td th:text="${accion.descripcion}"></td>
+                  <td>
+                    <span th:text="${accion.descripcion}">Descripción</span>
+                    <details class="mt-1" th:if="${accion.evidenciaCierre != null and !accion.evidenciaCierre.isBlank()}">
+                      <summary class="small text-primary">Ver evidencia</summary>
+                      <p class="small text-muted mb-0" th:text="${accion.evidenciaCierre}"></p>
+                    </details>
+                    <a class="small d-block mt-1" th:if="${accion.archivoEvidencia != null}"
+                       th:href="@{/acciones/{id}/evidencia(id=${accion.id})}">Descargar evidencia</a>
+                  </td>
 
                   <!-- Responsable -->
 
@@ -93,6 +124,14 @@
                                     ? accion.responsable.nombres + ' ' + accion.responsable.apellidos 
                                     : 'Sin asignar'}"
                   ></td>
+
+                  <td>
+                    <span class="badge text-bg-warning me-1" th:if="${accion.riesgo != null}"
+                          th:text="${'Riesgo: ' + accion.riesgo.peligro}">Riesgo</span>
+                    <span class="badge text-bg-info" th:if="${accion.incidente != null}"
+                          th:text="${'Incidente #' + accion.incidente.id}">Incidente</span>
+                    <span class="text-muted" th:if="${accion.riesgo == null and accion.incidente == null}">Sin origen (registro anterior)</span>
+                  </td>
 
                   <!-- Prioridad -->
 
@@ -162,6 +201,8 @@
 
                   <td th:text="${accion.fechaLimite}"></td>
 
+                  <td th:text="${accion.fechaCierre != null ? #temporals.format(accion.fechaCierre, 'dd/MM/yyyy') : '—'}"></td>
+
                   <!-- Acciones -->
 
                   <td th:if="${puedeGestionarSst}">
@@ -193,6 +234,7 @@
                     </form>
                   </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(acciones)}"><td th:colspan="${puedeGestionarSst ? 8 : 7}" class="text-center text-muted py-4">No hay acciones correctivas para mostrar.</td></tr>
               </tbody>
             </table>
           </div>

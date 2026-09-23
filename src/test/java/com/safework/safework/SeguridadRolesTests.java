@@ -56,6 +56,7 @@ class SeguridadRolesTests {
     @MockitoBean IncidenteService incidentes;
     @MockitoBean InspeccionService inspecciones;
     @MockitoBean AccionCorrectivaService acciones;
+    @MockitoBean ArchivoAdjuntoService archivos;
     @MockitoBean AreaService areas;
     @MockitoBean UsuarioService usuarios;
     @MockitoBean HallazgoInspeccionRepository hallazgos;
@@ -141,6 +142,36 @@ class SeguridadRolesTests {
         assertThat(html.contains("/" + modulo + "/nuev")).isEqualTo(gestiona);
         assertThat(html.contains("href=\"/areas\"")).isEqualTo(rol.equals("ADMIN"));
         assertThat(html.contains("href=\"/usuarios\"")).isEqualTo(rol.equals("ADMIN"));
+    }
+
+    @Test
+    void accionesFiltradasPorRiesgoYFormularioPreseleccionado() throws Exception {
+        String html = mvc.perform(get("/acciones").param("riesgoId", "1").session(sesion("ADMIN")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(html).contains("Acciones del riesgo", "Nueva acción para este riesgo");
+
+        var resultado = mvc.perform(get("/acciones/nueva").param("riesgoId", "1")
+                .session(sesion("SUPERVISOR"))).andExpect(status().isOk()).andReturn();
+        AccionCorrectiva accion = (AccionCorrectiva) resultado.getModelAndView().getModel().get("accion");
+        assertThat(accion.getRiesgo().getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void guardaAccionConRiesgoYSinIncidente() throws Exception {
+        mvc.perform(postConCsrf("/acciones/guardar", sesion("ADMIN"))
+                .param("id", "1")
+                .param("descripcion", "Asegurar estantería")
+                .param("fechaRegistro", "2026-09-16")
+                .param("fechaLimite", "2026-09-30")
+                .param("responsable.id", "1")
+                .param("riesgo.id", "1")
+                .param("incidente.id", "")
+                .param("prioridad", "Alta")
+                .param("estado", "Pendiente")
+                .param("evidenciaCierre", "Se fijó el estante"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/acciones"));
+        verify(acciones).guardar(any(AccionCorrectiva.class), any());
     }
 
     @ParameterizedTest

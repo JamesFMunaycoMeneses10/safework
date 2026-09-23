@@ -42,11 +42,14 @@ public class DashboardController {
         long proceso = acciones.stream().filter(a -> "En proceso".equalsIgnoreCase(a.getEstado())).count();
         long completadas = acciones.stream().filter(a -> "Completada".equalsIgnoreCase(a.getEstado())).count();
         long vencidas = acciones.stream().filter(a -> a.getFechaLimite() != null
-                && a.getFechaLimite().isBefore(hoy) && !"Completada".equalsIgnoreCase(a.getEstado())).count();
+                && a.getFechaLimite().isBefore(hoy)
+                && !"Completada".equalsIgnoreCase(a.getEstado())
+                && !"Cancelada".equalsIgnoreCase(a.getEstado())).count();
         long proximas = acciones.stream().filter(a -> a.getFechaLimite() != null
                 && ChronoUnit.DAYS.between(hoy, a.getFechaLimite()) >= 0
                 && ChronoUnit.DAYS.between(hoy, a.getFechaLimite()) <= 7
-                && !"Completada".equalsIgnoreCase(a.getEstado())).count();
+                && !"Completada".equalsIgnoreCase(a.getEstado())
+                && !"Cancelada".equalsIgnoreCase(a.getEstado())).count();
 
         // Las bandas coinciden con Riesgo.getClasificacionRiesgo().
         long riesgosBajos = riesgos.stream().filter(r -> r.getNivelRiesgo() != null

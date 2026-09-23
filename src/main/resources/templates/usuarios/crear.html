@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head}"></head>
-<body class="sw-body">
+<body class="sw-body sw-form-page">
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="container py-5">
-  <div class="sw-section mx-auto" style="max-width: 760px">
+<div class="container py-5 sw-form-container">
+  <div class="sw-section mx-auto sw-form-card">
     <h1 class="fw-bold" th:text="${usuario.id == null ? 'Crear Usuario' : 'Editar Usuario'}">Crear Usuario</h1>
     <p class="text-muted" th:text="${usuario.id == null ? 'Registrar un nuevo usuario en SafeWork.' : 'Actualizar los datos del usuario.'}"></p>
 
-    <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+    <form class="sw-editor-form" th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
       <input type="hidden" th:field="*{id}">
       <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
         <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>

@@ -15,6 +15,7 @@
         rel="stylesheet"
     />
 
+    <link rel="stylesheet" th:href="@{/css/internal-layout.css}" />
 </head>
 
 
@@ -113,6 +114,8 @@
                             <th>Estado</th>
 
                             <th>Descripción</th>
+
+                            <th>Seguimiento</th>
 
                             <th th:if="${puedeGestionarSst}" class="text-end">
                                 Acciones
@@ -238,6 +241,9 @@
 
                         <td th:text="${incidente.descripcion}">
                         </td>
+
+                        <td><a class="btn btn-sm btn-outline-secondary"
+                               th:href="@{/acciones(incidenteId=${incidente.id})}">Ver acciones</a></td>
 
 
 

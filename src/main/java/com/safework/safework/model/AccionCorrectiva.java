@@ -13,6 +13,7 @@
     import jakarta.validation.constraints.NotBlank;
     import jakarta.validation.constraints.NotNull;
     import jakarta.validation.constraints.Size;
+    import org.springframework.format.annotation.DateTimeFormat;
 
     /**
      * Entidad que representa una acción correctiva
@@ -38,6 +39,7 @@
          * Fecha en la que se registra la acción.
          */
         @NotNull(message = "La fecha de registro es obligatoria")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         @Column(nullable = false)
         private LocalDate fechaRegistro;
 
@@ -45,6 +47,7 @@
          * Fecha límite para completar la acción.
          */
         @NotNull(message = "La fecha límite es obligatoria")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         @Column(nullable = false)
         private LocalDate fechaLimite;
 
@@ -82,6 +85,22 @@
         @ManyToOne
         @JoinColumn(name = "incidente_id")
         private Incidente incidente;
+
+        /** Evidencia textual que respalda el cierre de la acción. */
+        @Size(max = 1000, message = "La evidencia no puede superar los 1000 caracteres")
+        @Column(name = "evidencia_cierre", length = 1000)
+        private String evidenciaCierre;
+
+        /** Fecha asignada por el servidor al completar la acción. */
+        @Column(name = "fecha_cierre")
+        private LocalDate fechaCierre;
+
+        @Column(name = "archivo_evidencia", length = 40)
+        private String archivoEvidencia;
+        @Column(name = "nombre_evidencia", length = 255)
+        private String nombreEvidencia;
+        @Column(name = "tipo_evidencia", length = 50)
+        private String tipoEvidencia;
 
         public AccionCorrectiva() {
         }
@@ -177,5 +196,28 @@
         public void setIncidente(Incidente incidente) {
             this.incidente = incidente;
         }
+
+        public String getEvidenciaCierre() {
+            return evidenciaCierre;
+        }
+
+        public void setEvidenciaCierre(String evidenciaCierre) {
+            this.evidenciaCierre = evidenciaCierre;
+        }
+
+        public LocalDate getFechaCierre() {
+            return fechaCierre;
+        }
+
+        public void setFechaCierre(LocalDate fechaCierre) {
+            this.fechaCierre = fechaCierre;
+        }
+
+        public String getArchivoEvidencia() { return archivoEvidencia; }
+        public void setArchivoEvidencia(String valor) { this.archivoEvidencia = valor; }
+        public String getNombreEvidencia() { return nombreEvidencia; }
+        public void setNombreEvidencia(String valor) { this.nombreEvidencia = valor; }
+        public String getTipoEvidencia() { return tipoEvidencia; }
+        public void setTipoEvidencia(String valor) { this.tipoEvidencia = valor; }
 
     }

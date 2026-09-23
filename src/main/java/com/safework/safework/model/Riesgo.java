@@ -102,6 +102,13 @@ public class Riesgo {
     @Column(length = 255)
     private String medidaControl;
 
+    @Column(name = "foto_archivo", length = 40)
+    private String fotoArchivo;
+    @Column(name = "foto_nombre", length = 255)
+    private String fotoNombre;
+    @Column(name = "foto_tipo", length = 50)
+    private String fotoTipo;
+
 
 
     /**
@@ -255,6 +262,13 @@ public class Riesgo {
 
         this.medidaControl = medidaControl;
     }
+
+    public String getFotoArchivo() { return fotoArchivo; }
+    public void setFotoArchivo(String valor) { this.fotoArchivo = valor; }
+    public String getFotoNombre() { return fotoNombre; }
+    public void setFotoNombre(String valor) { this.fotoNombre = valor; }
+    public String getFotoTipo() { return fotoTipo; }
+    public void setFotoTipo(String valor) { this.fotoTipo = valor; }
 
 
 

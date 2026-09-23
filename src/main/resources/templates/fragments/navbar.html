@@ -1,65 +1,61 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <body>
-    <nav
-      class="navbar navbar-expand-lg bg-dark navbar-dark"
-      th:fragment="navbar"
-    >
-      <div class="container">
-        <!-- Logo / Inicio -->
-        <a class="navbar-brand fw-bold" th:href="@{/dashboard}"> SafeWork </a>
-
-        <!-- Navegación principal -->
-
-        <div class="navbar-nav">
-          <!-- DASHBOARD -->
-
-          <a class="nav-link" th:href="@{/dashboard}"> Dashboard </a>
-
-          <!-- ÁREAS -->
-
-          <a class="nav-link" th:if="${esAdministrador}" th:href="@{/areas}"> Áreas </a>
-          <a class="nav-link" th:if="${esAdministrador}" th:href="@{/usuarios}"> Usuarios </a>
-
-          <!-- TRABAJADORES -->
-
-          <a class="nav-link" th:href="@{/trabajadores}"> Trabajadores </a>
-
-          <!-- RIESGOS -->
-
-          <a class="nav-link" th:href="@{/riesgos}"> Riesgos </a>
-
-          <!-- INCIDENTES -->
-
-          <a class="nav-link" th:href="@{/incidentes}"> Incidentes </a>
-
-          <!-- INSPECCIONES -->
-
-          <a class="nav-link" th:href="@{/inspecciones}"> Inspecciones </a>
-
-         <a class="nav-link" th:href="@{/acciones}">
-    Acciones Correctivas
-</a>
-
-</div>
-
-
-<!-- BOTÓN SALIR SEPARADO -->
-<form 
-    th:action="@{/logout}" 
-    method="post"
-    class="ms-3">
-
-    <button 
-        type="submit" 
-        class="btn btn-danger btn-sm">
-
-        🚪 Salir
-
-    </button>
-
-</form>
+<body>
+  <div class="sw-app-nav" th:fragment="navbar">
+    <aside class="sw-app-sidebar" id="swAppSidebar" aria-label="Navegación principal">
+      <a class="sw-app-brand" th:href="@{/dashboard}">
+        <svg class="brand-mark" viewBox="0 0 32 36" aria-hidden="true" focusable="false">
+          <path d="M16 2 29 6v10c0 8.4-5.1 14.5-13 18C8.1 30.5 3 24.4 3 16V6L16 2Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          <path d="m16 8-6 12h5l-1 8 8-13h-5l2-7h-3Z" fill="currentColor"/>
+        </svg>
+        <span>SafeWork</span>
+      </a>
+      <nav class="sw-app-links">
+        <a th:href="@{/dashboard}"><i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span></a>
+        <a th:if="${esAdministrador}" th:href="@{/areas}"><i class="bi bi-diagram-3" aria-hidden="true"></i><span>Áreas</span></a>
+        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><i class="bi bi-person-gear" aria-hidden="true"></i><span>Usuarios</span></a>
+        <a th:href="@{/trabajadores}"><i class="bi bi-people" aria-hidden="true"></i><span>Trabajadores</span></a>
+        <a th:href="@{/riesgos}"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><span>Riesgos</span></a>
+        <a th:href="@{/incidentes}"><i class="bi bi-activity" aria-hidden="true"></i><span>Incidentes</span></a>
+        <a th:href="@{/inspecciones}"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span>Inspecciones</span></a>
+        <a th:href="@{/acciones}"><i class="bi bi-tools" aria-hidden="true"></i><span>Acciones Correctivas</span></a>
+      </nav>
+    </aside>
+    <button class="sw-app-scrim" type="button" aria-label="Cerrar menú"></button>
+    <header class="sw-app-topbar">
+      <button class="sw-app-toggle" type="button" aria-label="Mostrar u ocultar menú" aria-controls="swAppSidebar" aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i></button>
+      <div class="sw-app-account">
+        <i class="bi bi-person-circle" aria-hidden="true"></i>
+        <span class="sw-app-role" th:text="${esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador')}">Usuario</span>
+        <form th:action="@{/logout}" method="post"><button type="submit" class="sw-app-logout">Salir</button></form>
       </div>
-    </nav>
-  </body>
+    </header>
+    <script>
+      (() => {
+        const root = document.currentScript.closest('.sw-app-nav');
+        const toggle = root.querySelector('.sw-app-toggle');
+        toggle.setAttribute('aria-expanded', String(!window.matchMedia('(max-width: 900px)').matches));
+        const close = () => { document.body.classList.remove('sw-app-menu-open'); toggle.setAttribute('aria-expanded', 'false'); };
+        toggle.addEventListener('click', () => {
+          if (window.matchMedia('(max-width: 900px)').matches) {
+            const open = document.body.classList.toggle('sw-app-menu-open');
+            toggle.setAttribute('aria-expanded', String(open));
+          } else {
+            document.body.classList.toggle('sw-app-menu-closed');
+            toggle.setAttribute('aria-expanded', String(!document.body.classList.contains('sw-app-menu-closed')));
+          }
+        });
+        root.querySelector('.sw-app-scrim').addEventListener('click', close);
+        root.querySelectorAll('.sw-app-links a').forEach(link => {
+          const route = new URL(link.href).pathname;
+          if (location.pathname === route || (route !== '/dashboard' && location.pathname.startsWith(route + '/'))) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+          }
+          link.addEventListener('click', close);
+        });
+      })();
+    </script>
+  </div>
+</body>
 </html>

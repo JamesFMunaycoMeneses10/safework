@@ -2,13 +2,21 @@ package com.safework.safework.controller;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.safework.safework.model.Riesgo;
 import com.safework.safework.service.AreaService;
+import com.safework.safework.service.ArchivoAdjuntoService;
 import com.safework.safework.service.RiesgoService;
 
 import jakarta.validation.Valid;
@@ -27,15 +35,17 @@ public class RiesgoController {
     private final RiesgoService riesgoService;
 
     private final AreaService areaService;
+    private final ArchivoAdjuntoService archivos;
 
 
 
     public RiesgoController(
             RiesgoService riesgoService,
-            AreaService areaService) {
+            AreaService areaService, ArchivoAdjuntoService archivos) {
 
         this.riesgoService = riesgoService;
         this.areaService = areaService;
+        this.archivos = archivos;
     }
 
 
@@ -95,6 +105,7 @@ public class RiesgoController {
     public String guardarRiesgo(
             @Valid @ModelAttribute("riesgo") Riesgo riesgo,
             BindingResult resultado,
+            @RequestParam(name = "fotoRiesgo", required = false) MultipartFile foto,
             Model model) {
 
 
@@ -113,11 +124,32 @@ public class RiesgoController {
 
 
 
-        riesgoService.guardar(riesgo);
+        try {
+            riesgoService.guardar(riesgo, foto);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("areas", areaService.listarTodas());
+            return "riesgos/formulario";
+        }
 
 
 
         return "redirect:/riesgos";
+    }
+
+    @GetMapping("/{id}/foto")
+    public ResponseEntity<Resource> verFoto(@PathVariable Long id) {
+        Riesgo riesgo = riesgoService.buscarPorId(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (riesgo.getFotoArchivo() == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        try {
+            return ResponseEntity.ok().header("X-Content-Type-Options", "nosniff")
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                    .contentType(MediaType.parseMediaType(riesgo.getFotoTipo()))
+                    .body(archivos.abrir(riesgo.getFotoArchivo()));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
 

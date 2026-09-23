@@ -12,23 +12,23 @@
         <span>SafeWork</span>
       </a>
       <nav class="dashboard-nav">
-        <a class="active" th:href="@{/dashboard}" aria-current="page"><span class="nav-icon">⌂</span> Dashboard</a>
-        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon">▣</span> Áreas</a>
-        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon">♙</span> Usuarios</a>
-        <a th:href="@{/trabajadores}"><span class="nav-icon">♟</span> Trabajadores</a>
-        <a th:href="@{/riesgos}"><span class="nav-icon">⚠</span> Riesgos</a>
-        <a th:href="@{/incidentes}"><span class="nav-icon">◇</span> Incidentes</a>
-        <a th:href="@{/inspecciones}"><span class="nav-icon">☑</span> Inspecciones</a>
-        <a th:href="@{/acciones}"><span class="nav-icon">⚒</span> Acciones Correctivas</a>
+        <a class="active" th:href="@{/dashboard}" aria-current="page"><span class="nav-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span> Dashboard</a>
+        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
+        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
+        <a th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
+        <a th:href="@{/riesgos}"><span class="nav-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span> Riesgos</a>
+        <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
+        <a th:href="@{/inspecciones}"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>
+        <a th:href="@{/acciones}"><span class="nav-icon"><i class="bi bi-tools" aria-hidden="true"></i></span> Acciones Correctivas</a>
       </nav>
     </aside>
     <button class="dashboard-scrim" id="dashboardScrim" type="button" aria-label="Cerrar menú"></button>
 
     <div class="dashboard-main">
       <header class="dashboard-topbar">
-        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="dashboardSidebar" aria-expanded="false">☰</button>
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="dashboardSidebar" aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i></button>
         <div class="dashboard-account">
-          <span class="account-icon" aria-hidden="true">♙</span>
+          <span class="account-icon" aria-hidden="true"><i class="bi bi-person-circle"></i></span>
           <span th:text="${nombreUsuario}">Usuario</span>
           <span class="account-role" th:text="${esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador')}">Rol</span>
           <form th:action="@{/logout}" method="post"><button type="submit" class="dashboard-logout">Salir</button></form>
@@ -42,10 +42,10 @@
         </div>
 
         <section class="dashboard-kpis" aria-label="Indicadores principales">
-          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon blue">♟</span><div><h2>Trabajadores</h2><strong th:text="${totalTrabajadores}">0</strong><p>Personal registrado</p></div></article>
-          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon amber">⚠</span><div><h2>Riesgos</h2><strong th:text="${totalRiesgos}">0</strong><p>Riesgos identificados</p></div></article>
-          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon red">!</span><div><h2>Incidentes</h2><strong th:text="${totalIncidentes}">0</strong><p>Incidentes reportados</p></div></article>
-          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon green">⚒</span><div><h2>Acciones correctivas</h2><strong th:text="${totalAcciones}">0</strong><p>Medidas registradas</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon blue"><i class="bi bi-people-fill" aria-hidden="true"></i></span><div><h2>Trabajadores</h2><strong th:text="${totalTrabajadores}">0</strong><p>Personal registrado</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon amber"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></span><div><h2>Riesgos</h2><strong th:text="${totalRiesgos}">0</strong><p>Riesgos identificados</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon red"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i></span><div><h2>Incidentes</h2><strong th:text="${totalIncidentes}">0</strong><p>Incidentes reportados</p></div></article>
+          <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon green"><i class="bi bi-tools" aria-hidden="true"></i></span><div><h2>Acciones correctivas</h2><strong th:text="${totalAcciones}">0</strong><p>Medidas registradas</p></div></article>
         </section>
 
         <section class="dashboard-charts" aria-label="Análisis de riesgos e incidentes">
@@ -88,10 +88,10 @@
           </article>
           <article class="dashboard-panel summary-panel">
             <h2>Resumen de estado</h2>
-            <div class="summary-item"><span class="summary-icon" th:classappend="${estadoSST == 'SEGURO' ? ' green' : (estadoSST == 'ATENCIÓN' ? ' amber' : ' red')}" th:text="${estadoSST == 'SEGURO' ? '✓' : '⚠'}">✓</span><p><strong th:text="${estadoSST}">SEGURO</strong> · <span th:text="${mensajeSST}">Estado SST</span></p></div>
-            <div class="summary-item"><span class="summary-icon amber">⚠</span><p><strong th:text="${riesgosAltos + riesgosCriticos}">0</strong> riesgos altos o críticos requieren atención.</p></div>
-            <div class="summary-item"><span class="summary-icon red">!</span><p><strong th:text="${accionesVencidas}">0</strong> acciones vencidas y <strong th:text="${accionesProximas}">0</strong> próximas a vencer.</p></div>
-            <div class="summary-item"><span class="summary-icon blue">ⓘ</span><p><strong th:text="${accionesPendientes}">0</strong> pendientes, <strong th:text="${accionesProceso}">0</strong> en proceso y <strong th:text="${accionesCompletadas}">0</strong> completadas.</p></div>
+            <div class="summary-item"><span class="summary-icon" th:classappend="${estadoSST == 'SEGURO' ? ' green' : (estadoSST == 'ATENCIÓN' ? ' amber' : ' red')}"><i th:class="${estadoSST == 'SEGURO' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill'}" aria-hidden="true"></i></span><p><strong th:text="${estadoSST}">SEGURO</strong> · <span th:text="${mensajeSST}">Estado SST</span></p></div>
+            <div class="summary-item"><span class="summary-icon amber"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></span><p><strong th:text="${riesgosAltos + riesgosCriticos}">0</strong> riesgos altos o críticos requieren atención.</p></div>
+            <div class="summary-item"><span class="summary-icon red"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i></span><p><strong th:text="${accionesVencidas}">0</strong> acciones vencidas y <strong th:text="${accionesProximas}">0</strong> próximas a vencer.</p></div>
+            <div class="summary-item"><span class="summary-icon blue"><i class="bi bi-info-circle-fill" aria-hidden="true"></i></span><p><strong th:text="${accionesPendientes}">0</strong> pendientes, <strong th:text="${accionesProceso}">0</strong> en proceso y <strong th:text="${accionesCompletadas}">0</strong> completadas.</p></div>
           </article>
         </section>
         <footer class="dashboard-footer">SafeWork · Sistema de Gestión de Seguridad y Salud en el Trabajo</footer>

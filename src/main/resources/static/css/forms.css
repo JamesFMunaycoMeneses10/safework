@@ -1,0 +1,161 @@
+/* Formularios SafeWork: estilos acotados para no alterar los listados. */
+.sw-form-page {
+  background: #f5f8fc !important;
+  color: #172638;
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.sw-form-container {
+  max-width: 1040px;
+  padding-top: clamp(1.5rem, 4vw, 3rem) !important;
+  padding-bottom: 4rem !important;
+}
+
+.sw-form-container > h1,
+.sw-form-container .card-body > h1,
+.sw-form-container .card-body > h2,
+.sw-form-container .sw-form-card > h1 {
+  color: #172638;
+  font-size: clamp(1.65rem, 2.8vw, 2.2rem);
+  font-weight: 750;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+  margin-bottom: .45rem !important;
+}
+
+.sw-form-container > p,
+.sw-form-container .sw-form-card > p {
+  color: #617287 !important;
+  font-size: .97rem;
+}
+
+.sw-form-container > .card,
+.sw-form-container .sw-form-card {
+  max-width: none !important;
+  margin-top: 1.5rem;
+  border: 1px solid #dce5f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 38px rgba(24, 49, 77, .07) !important;
+  overflow: hidden;
+}
+
+.sw-form-container > .card .card-body,
+.sw-form-container .sw-form-card {
+  padding: clamp(1.4rem, 3vw, 2.5rem) !important;
+}
+
+.sw-form-container .sw-form-card:hover { transform: none; }
+
+.sw-editor-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.35rem;
+  row-gap: .25rem;
+  margin-top: 1.4rem;
+}
+
+.sw-editor-form > input[type="hidden"] { display: none; }
+.sw-editor-form > .alert,
+.sw-editor-form > .row,
+.sw-editor-form > .d-flex,
+.sw-editor-form > .mb-4,
+.sw-editor-form > .mb-3:has(textarea),
+.sw-editor-form > button,
+.sw-editor-form > a {
+  grid-column: 1 / -1;
+}
+
+.sw-editor-form > .mb-3,
+.sw-editor-form > .mb-4 { min-width: 0; }
+
+.sw-editor-form .form-label {
+  display: inline-block;
+  color: #253b55;
+  font-size: .89rem;
+  font-weight: 650;
+  margin-bottom: .55rem;
+}
+
+.sw-editor-form .form-control,
+.sw-editor-form .form-select {
+  min-height: 46px;
+  border: 1px solid #cbd7e5;
+  border-radius: 9px;
+  color: #213249;
+  background-color: #fff;
+  padding: .65rem .85rem;
+  box-shadow: none;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.sw-editor-form textarea.form-control {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.sw-editor-form .form-control::placeholder { color: #8a99aa; }
+.sw-editor-form .form-control:hover,
+.sw-editor-form .form-select:hover { border-color: #91a9c4; }
+.sw-editor-form .form-control:focus,
+.sw-editor-form .form-select:focus {
+  border-color: #2b69c9;
+  box-shadow: 0 0 0 4px rgba(43, 105, 201, .14);
+  outline: none;
+}
+
+.sw-editor-form .form-text,
+.sw-editor-form small { color: #64758a; }
+.sw-editor-form .text-danger { font-size: .82rem; margin-top: .3rem; }
+.sw-editor-form .alert-danger {
+  border: 1px solid #f4b9be;
+  border-radius: 10px;
+  background: #fff2f3;
+  color: #982631;
+}
+
+.sw-editor-form > .d-flex:last-child {
+  border-top: 1px solid #e5ebf2;
+  padding-top: 1.4rem;
+  margin-top: .2rem;
+  flex-wrap: wrap;
+}
+
+.sw-editor-form .btn,
+.sw-editor-form > button,
+.sw-editor-form > a {
+  min-height: 42px;
+  border-radius: 9px;
+  padding: .55rem 1.1rem;
+  font-weight: 600;
+}
+.sw-editor-form > button,
+.sw-editor-form > a { width: fit-content; }
+.sw-editor-form .btn-primary {
+  background: #2868c8;
+  border-color: #2868c8;
+}
+.sw-editor-form .btn-primary:hover { background: #1e55a6; border-color: #1e55a6; }
+.sw-editor-form .btn-secondary,
+.sw-editor-form .btn-outline-secondary {
+  background: #fff;
+  border: 1px solid #b8c6d7;
+  color: #38516c;
+}
+.sw-editor-form .btn-secondary:hover,
+.sw-editor-form .btn-outline-secondary:hover {
+  background: #edf3fa;
+  color: #243e5d;
+}
+
+/* Hallazgos mantiene su composición de paneles del dashboard. */
+.hallazgos-page .sw-editor-form { display: block; margin-top: 1.2rem; }
+
+@media (max-width: 700px) {
+  .sw-editor-form { grid-template-columns: 1fr; }
+  .sw-form-container { padding-inline: 1rem; }
+  .sw-form-container > .card .card-body,
+  .sw-form-container .sw-form-card { padding: 1.3rem !important; }
+  .sw-editor-form > .d-flex:last-child .btn { flex: 1 1 140px; }
+}

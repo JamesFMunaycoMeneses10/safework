@@ -13,13 +13,15 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" th:href="@{/css/forms.css}" />
+    <link rel="stylesheet" th:href="@{/css/internal-layout.css}" />
   </head>
 
-  <body class="bg-light">
+  <body class="bg-light sw-form-page">
     <!-- Navbar -->
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <div class="container py-5">
+    <div class="container py-5 sw-form-container">
       <!--
             El título cambia dependiendo
             de si registramos o editamos.
@@ -37,7 +39,7 @@
 
       <div class="card shadow-sm">
         <div class="card-body">
-          <form
+          <form class="sw-editor-form"
             th:action="@{/trabajadores/guardar}"
             th:object="${trabajador}"
             method="post"

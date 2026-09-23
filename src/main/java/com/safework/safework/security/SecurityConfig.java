@@ -177,6 +177,9 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET, "/inspecciones/*/hallazgos")
                                                 .hasAnyRole("ADMIN", "SUPERVISOR", "TRABAJADOR")
 
+                                                .requestMatchers(HttpMethod.GET, "/riesgos/*/foto", "/acciones/*/evidencia")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR", "TRABAJADOR")
+
                                                 .requestMatchers(HttpMethod.POST, "/inspecciones/*/hallazgos")
                                                 .hasAnyRole("ADMIN", "SUPERVISOR")
 
