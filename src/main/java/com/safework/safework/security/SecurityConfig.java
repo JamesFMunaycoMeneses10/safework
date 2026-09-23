@@ -174,6 +174,12 @@ public class SecurityConfig {
                                                  * de seguridad.
                                                  *
                                                  */
+                                                .requestMatchers(HttpMethod.GET, "/inspecciones/*/hallazgos")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR", "TRABAJADOR")
+
+                                                .requestMatchers(HttpMethod.POST, "/inspecciones/*/hallazgos")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
                                                 .requestMatchers("/inspecciones/**")
                                                 .hasAnyRole("ADMIN", "SUPERVISOR")
 
@@ -214,6 +220,7 @@ public class SecurityConfig {
                                                  * solo exige estar autenticado.
                                                  *
                                                  */
+
                                                 .anyRequest()
                                                 .authenticated()
 

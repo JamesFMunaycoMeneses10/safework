@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.safework.safework.model.Inspeccion;
 import com.safework.safework.service.AreaService;
@@ -264,11 +265,16 @@ public class InspeccionController {
      */
     @PostMapping("/inspecciones/eliminar/{id}")
     public String eliminarInspeccion(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
 
-
-        inspeccionService.eliminarPorId(id);
-
+        try {
+            inspeccionService.eliminarPorId(id);
+            redirectAttributes.addFlashAttribute(
+                    "success", "Inspección eliminada correctamente");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
 
         return "redirect:/inspecciones";
     }

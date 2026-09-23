@@ -3,75 +3,57 @@ package com.safework.safework.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.safework.safework.model.Inspeccion;
+import com.safework.safework.repository.HallazgoInspeccionRepository;
 import com.safework.safework.repository.InspeccionRepository;
 
-
-/*
- * Servicio encargado de la lógica
- * relacionada con las inspecciones.
- */
 @Service
 public class InspeccionService {
 
-
-    /*
-     * Repositorio utilizado para acceder
-     * a los datos de las inspecciones.
-     */
     private final InspeccionRepository inspeccionRepository;
+    private final HallazgoInspeccionRepository hallazgoRepository;
 
-
-    /*
-     * Inyección de dependencias por constructor.
-     *
-     * Spring proporciona automáticamente
-     * una instancia de InspeccionRepository.
-     */
     public InspeccionService(
-            InspeccionRepository inspeccionRepository) {
+            InspeccionRepository inspeccionRepository,
+            HallazgoInspeccionRepository hallazgoRepository) {
 
         this.inspeccionRepository = inspeccionRepository;
+        this.hallazgoRepository = hallazgoRepository;
     }
 
-
-    /*
-     * Obtiene todas las inspecciones
-     * registradas en SafeWork.
-     */
     public List<Inspeccion> listarTodas() {
-
         return inspeccionRepository.findAll();
     }
 
-
-    /*
-     * Guarda una inspección nueva
-     * o actualiza una existente.
-     */
     public Inspeccion guardar(Inspeccion inspeccion) {
-
         return inspeccionRepository.save(inspeccion);
     }
 
-
-    /*
-     * Busca una inspección mediante su ID.
-     */
     public Optional<Inspeccion> buscarPorId(Long id) {
-
         return inspeccionRepository.findById(id);
     }
 
-
-    /*
-     * Elimina una inspección mediante su ID.
-     */
+    @Transactional
     public void eliminarPorId(Long id) {
+        if (!inspeccionRepository.existsById(id)) {
+            throw new IllegalArgumentException("La inspección no existe");
+        }
 
-        inspeccionRepository.deleteById(id);
+        if (hallazgoRepository.existsByInspeccionId(id)) {
+            throw new IllegalStateException(
+                    "No se puede eliminar la inspección porque tiene hallazgos registrados");
+        }
+
+        try {
+            inspeccionRepository.deleteById(id);
+            inspeccionRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException(
+                    "No se puede eliminar la inspección porque tiene registros asociados", e);
+        }
     }
-
 }

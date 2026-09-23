@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.safework.safework.model.*;
+import com.safework.safework.repository.HallazgoInspeccionRepository;
 import com.safework.safework.security.SecurityConfig;
 import com.safework.safework.service.*;
 
@@ -57,6 +58,7 @@ class SeguridadRolesTests {
     @MockitoBean AccionCorrectivaService acciones;
     @MockitoBean AreaService areas;
     @MockitoBean UsuarioService usuarios;
+    @MockitoBean HallazgoInspeccionRepository hallazgos;
 
     @BeforeEach
     void datosDeConsulta() {
@@ -104,6 +106,23 @@ class SeguridadRolesTests {
         var result = mvc.perform(get("/login").session(session)).andExpect(status().isOk()).andReturn();
         CsrfToken token = (CsrfToken) result.getRequest().getAttribute("_csrf");
         return post(url).session(session).param(token.getParameterName(), token.getToken());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ADMIN", "SUPERVISOR", "TRABAJADOR"})
+    void hallazgosSeMuestranSegunRol(String rol) throws Exception {
+        String html = mvc.perform(get("/inspecciones/1/hallazgos").session(sesion(rol)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(html).contains("Hallazgos de la inspección", "dashboard-sidebar");
+        assertThat(html.contains("Registrar hallazgo")).isEqualTo(!rol.equals("TRABAJADOR"));
+    }
+
+    @Test
+    void trabajadorNoPuedeRegistrarHallazgo() throws Exception {
+        mvc.perform(postConCsrf("/inspecciones/1/hallazgos", sesion("TRABAJADOR"))
+                .param("descripcion", "Prueba"))
+                .andExpect(status().isForbidden());
+        verify(hallazgos, never()).save(any());
     }
 
     static Stream<Arguments> rolesYModulos() {

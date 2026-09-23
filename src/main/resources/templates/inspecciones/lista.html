@@ -1,263 +1,187 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Inspecciones - SafeWork</title>
 
     <!-- Bootstrap -->
     <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
 
-</head>
-
-
-<body class="bg-light">
-
-
+  <body class="bg-light">
     <!-- Barra de navegación -->
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-
     <div class="container py-5">
+      <!-- ============================== -->
+      <!-- ENCABEZADO -->
+      <!-- ============================== -->
 
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="fw-bold">Gestión de Inspecciones</h1>
 
-        <!-- ============================== -->
-        <!-- ENCABEZADO -->
-        <!-- ============================== -->
-
-        <div
-            class="d-flex justify-content-between align-items-center mb-4">
-
-            <div>
-
-                <h1 class="fw-bold">
-                    Gestión de Inspecciones
-                </h1>
-
-                <p class="text-muted mb-0">
-                    Registro y seguimiento de inspecciones de seguridad
-                </p>
-
-            </div>
-
-
-            <!-- Nueva inspección -->
-            <a
-                th:if="${puedeGestionarSst}"
-                th:href="@{/inspecciones/nueva}"
-                class="btn btn-primary">
-
-                + Nueva Inspección
-
-            </a>
-
+          <p class="text-muted mb-0">
+            Registro y seguimiento de inspecciones de seguridad
+          </p>
         </div>
 
+        <!-- Nueva inspección -->
+        <a
+          th:if="${puedeGestionarSst}"
+          th:href="@{/inspecciones/nueva}"
+          class="btn btn-primary"
+        >
+          + Nueva Inspección
+        </a>
+      </div>
 
-        <!-- ============================== -->
-        <!-- TABLA -->
-        <!-- ============================== -->
+      <!-- ============================== -->
+      <!-- TABLA -->
+      <!-- ============================== -->
 
-        <div class="card shadow-sm">
+      <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+      <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
 
-            <div class="card-body">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
 
-                <div class="table-responsive">
+                  <th>Tipo</th>
 
-                    <table
-                        class="table table-hover align-middle mb-0">
+                  <th>Área</th>
 
+                  <th>Responsable</th>
 
-                        <thead>
+                  <th>Estado</th>
 
-                            <tr>
+                  <th>Observaciones</th>
 
-                                <th>
-                                    Fecha
-                                </th>
+                  <th th:if="${puedeGestionarSst}" class="text-end">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
 
-                                <th>
-                                    Tipo
-                                </th>
-
-                                <th>
-                                    Área
-                                </th>
-
-                                <th>
-                                    Responsable
-                                </th>
-
-                                <th>
-                                    Estado
-                                </th>
-
-                                <th>
-                                    Observaciones
-                                </th>
-
-                                <th th:if="${puedeGestionarSst}" class="text-end">
-                                    Acciones
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-
-                            <!--
+              <tbody>
+                <!--
                                 Recorremos las inspecciones
                                 enviadas por InspeccionController.
                             -->
-                            <tr th:each="inspeccion : ${inspecciones}">
-
-
-                                <!-- Fecha -->
-                                <td
-                                    th:text="${#temporals.format(
+                <tr th:each="inspeccion : ${inspecciones}">
+                  <!-- Fecha -->
+                  <td
+                    th:text="${#temporals.format(
                                         inspeccion.fecha,
                                         'dd/MM/yyyy'
-                                    )}">
-                                </td>
+                                    )}"
+                  ></td>
 
+                  <!-- Tipo -->
+                  <td th:text="${inspeccion.tipo}"></td>
 
-                                <!-- Tipo -->
-                                <td th:text="${inspeccion.tipo}">
-                                </td>
+                  <!-- Área -->
+                  <td th:text="${inspeccion.area.nombre}"></td>
 
-
-                                <!-- Área -->
-                                <td th:text="${inspeccion.area.nombre}">
-                                </td>
-
-
-                                <!-- Responsable -->
-                                <td>
-
-                                    <span
-                                        th:text="${inspeccion.responsable.nombres
+                  <!-- Responsable -->
+                  <td>
+                    <span
+                      th:text="${inspeccion.responsable.nombres
                                             + ' '
-                                            + inspeccion.responsable.apellidos}">
-                                    </span>
+                                            + inspeccion.responsable.apellidos}"
+                    >
+                    </span>
+                  </td>
 
-                                </td>
+                  <!-- ============================== -->
+                  <!-- ESTADO -->
+                  <!-- ============================== -->
 
+                  <td>
+                    <!-- Programada -->
+                    <span
+                      th:if="${inspeccion.estado == 'Programada'}"
+                      class="badge text-bg-warning"
+                    >
+                      Programada
+                    </span>
 
-                                <!-- ============================== -->
-                                <!-- ESTADO -->
-                                <!-- ============================== -->
+                    <!-- Realizada -->
+                    <span
+                      th:if="${inspeccion.estado == 'Realizada'}"
+                      class="badge text-bg-primary"
+                    >
+                      Realizada
+                    </span>
 
-                                <td>
+                    <!-- Cerrada -->
+                    <span
+                      th:if="${inspeccion.estado == 'Cerrada'}"
+                      class="badge text-bg-success"
+                    >
+                      Cerrada
+                    </span>
+                  </td>
 
+                  <!-- Observaciones -->
+                  <td th:text="${inspeccion.observaciones}"></td>
 
-                                    <!-- Programada -->
-                                    <span
-                                        th:if="${inspeccion.estado == 'Programada'}"
-                                        class="badge text-bg-warning">
+                  <!-- ============================== -->
+                  <!-- ACCIONES -->
+                  <!-- ============================== -->
 
-                                        Programada
+                  <td th:if="${puedeGestionarSst}" class="text-end">
+                    <a
+                      th:href="@{/inspecciones/{id}/hallazgos(id=${inspeccion.id})}"
+                      class="btn btn-sm btn-outline-info"
+                    >
+                      Hallazgos
+                    </a>
 
-                                    </span>
+                    <!-- Editar -->
+                    <a
+                      th:href="@{/inspecciones/editar/{id}(id=${inspeccion.id})}"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      Editar
+                    </a>
 
-
-                                    <!-- Realizada -->
-                                    <span
-                                        th:if="${inspeccion.estado == 'Realizada'}"
-                                        class="badge text-bg-primary">
-
-                                        Realizada
-
-                                    </span>
-
-
-                                    <!-- Cerrada -->
-                                    <span
-                                        th:if="${inspeccion.estado == 'Cerrada'}"
-                                        class="badge text-bg-success">
-
-                                        Cerrada
-
-                                    </span>
-
-
-                                </td>
-
-
-                                <!-- Observaciones -->
-                                <td th:text="${inspeccion.observaciones}">
-                                </td>
-
-
-                                <!-- ============================== -->
-                                <!-- ACCIONES -->
-                                <!-- ============================== -->
-
-                                <td th:if="${puedeGestionarSst}" class="text-end">
-
-
-                                    <!-- Editar -->
-                                    <a
-                                        th:href="@{/inspecciones/editar/{id}(id=${inspeccion.id})}"
-                                        class="btn btn-sm btn-outline-primary">
-
-                                        Editar
-
-                                    </a>
-
-
-                                    <!-- Eliminar -->
-                                    <form
-                                        th:action="@{/inspecciones/eliminar/{id}(id=${inspeccion.id})}"
-                                        method="post"
-                                        class="d-inline"
-                                        onsubmit="return confirm('¿Está seguro de eliminar esta inspección?');">
-
-
-                                        <button
-                                            type="submit"
-                                            class="btn btn-sm btn-outline-danger">
-
-                                            Eliminar
-
-                                        </button>
-
-
-                                    </form>
-
-
-                                </td>
-
-
-                            </tr>
-
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
+                    <!-- Eliminar -->
+                    <form
+                      th:action="@{/inspecciones/eliminar/{id}(id=${inspeccion.id})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="
+                        return confirm(
+                          '¿Está seguro de eliminar esta inspección?',
+                        );
+                      "
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                      >
+                        Eliminar
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-
-
+      </div>
     </div>
-
-
-</body>
-
+  </body>
 </html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="sw-body dashboard-page hallazgos-page">
+  <div class="dashboard-shell">
+    <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Navegación principal">
+      <a class="dashboard-brand" th:href="@{/dashboard}">
+        <svg class="brand-mark" viewBox="0 0 32 36" aria-hidden="true" focusable="false">
+          <path d="M16 2 29 6v10c0 8.4-5.1 14.5-13 18C8.1 30.5 3 24.4 3 16V6L16 2Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          <path d="m16 8-6 12h5l-1 8 8-13h-5l2-7h-3Z" fill="currentColor"/>
+        </svg>
+        <span>SafeWork</span>
+      </a>
+      <nav class="dashboard-nav">
+        <a th:href="@{/dashboard}"><span class="nav-icon">⌂</span> Dashboard</a>
+        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon">▣</span> Áreas</a>
+        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon">♙</span> Usuarios</a>
+        <a th:href="@{/trabajadores}"><span class="nav-icon">♟</span> Trabajadores</a>
+        <a th:href="@{/riesgos}"><span class="nav-icon">⚠</span> Riesgos</a>
+        <a th:href="@{/incidentes}"><span class="nav-icon">◇</span> Incidentes</a>
+        <a class="active" th:href="@{/inspecciones}" aria-current="page"><span class="nav-icon">☑</span> Inspecciones</a>
+        <a th:href="@{/acciones}"><span class="nav-icon">⚒</span> Acciones Correctivas</a>
+      </nav>
+    </aside>
+    <button class="dashboard-scrim" id="dashboardScrim" type="button" aria-label="Cerrar menú"></button>
+
+    <div class="dashboard-main">
+      <header class="dashboard-topbar">
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú" aria-controls="dashboardSidebar" aria-expanded="false">☰</button>
+        <div class="dashboard-account">
+          <span class="account-role" th:text="${esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador')}">Rol</span>
+          <form th:action="@{/logout}" method="post"><button type="submit" class="dashboard-logout">Salir</button></form>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div class="hallazgos-heading">
+          <a class="hallazgos-back" th:href="@{/inspecciones}">← Volver a inspecciones</a>
+          <h1>Hallazgos de la inspección</h1>
+          <p>Registra lo observado y relaciónalo con un riesgo de la misma área.</p>
+        </div>
+
+        <section class="dashboard-panel hallazgos-context" aria-label="Datos de la inspección">
+          <div><span>Área</span><strong th:text="${inspeccion.area.nombre}">Almacén</strong></div>
+          <div><span>Fecha</span><strong th:text="${#temporals.format(inspeccion.fecha, 'dd/MM/yyyy')}">15/09/2026</strong></div>
+          <div><span>Tipo</span><strong th:text="${inspeccion.tipo}">Inspección</strong></div>
+          <div><span>Estado</span><strong th:text="${inspeccion.estado}">Realizada</strong></div>
+        </section>
+
+        <div class="hallazgos-grid" th:classappend="${!puedeGestionarSst} ? ' hallazgos-readonly' : ''">
+          <section class="dashboard-panel hallazgos-card" th:if="${puedeGestionarSst}" aria-labelledby="hallazgoFormTitulo">
+            <h2 id="hallazgoFormTitulo">Registrar hallazgo</h2>
+            <p class="hallazgos-help">Describe una situación concreta detectada durante esta inspección.</p>
+            <form th:action="@{/inspecciones/{id}/hallazgos(id=${inspeccion.id})}" method="post">
+              <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                <textarea id="descripcion" name="descripcion" class="form-control" rows="4" maxlength="500" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="riesgoId" class="form-label">Riesgo relacionado</label>
+                <select id="riesgoId" name="riesgoId" class="form-select">
+                  <option value="">Aún no evaluado</option>
+                  <option th:each="riesgo : ${riesgos}" th:value="${riesgo.id}" th:text="${riesgo.peligro}"></option>
+                </select>
+                <small class="hallazgos-help">Solo se muestran riesgos del área de esta inspección.</small>
+              </div>
+              <button type="submit" class="btn btn-primary">Guardar hallazgo</button>
+            </form>
+          </section>
+
+          <section class="dashboard-panel hallazgos-card" aria-labelledby="hallazgosListaTitulo">
+            <h2 id="hallazgosListaTitulo">Hallazgos registrados</h2>
+            <p class="hallazgos-help" th:text="${#lists.size(hallazgos)} + ' hallazgo(s) en esta inspección'">0 hallazgos</p>
+            <div class="table-responsive" th:if="${!#lists.isEmpty(hallazgos)}">
+              <table class="table hallazgos-table align-middle">
+                <thead><tr><th scope="col">Hallazgo</th><th scope="col">Riesgo vinculado</th></tr></thead>
+                <tbody>
+                  <tr th:each="hallazgo : ${hallazgos}">
+                    <td th:text="${hallazgo.descripcion}">Descripción</td>
+                    <td>
+                      <span class="hallazgos-risk" th:if="${hallazgo.riesgo != null}" th:text="${hallazgo.riesgo.peligro}">Riesgo</span>
+                      <span class="hallazgos-pending" th:if="${hallazgo.riesgo == null}">Pendiente de evaluación</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="hallazgos-empty" th:if="${#lists.isEmpty(hallazgos)}">Todavía no hay hallazgos registrados para esta inspección.</p>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('menuToggle');
+      const scrim = document.getElementById('dashboardScrim');
+      const closeMenu = () => {
+        document.body.classList.remove('dashboard-menu-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      toggle.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          const open = document.body.classList.toggle('dashboard-menu-open');
+          toggle.setAttribute('aria-expanded', String(open));
+        } else {
+          document.body.classList.toggle('dashboard-menu-collapsed');
+        }
+      });
+      scrim.addEventListener('click', closeMenu);
+    });
+  </script>
+</body>
+</html>

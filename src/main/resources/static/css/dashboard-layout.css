@@ -36,3 +36,33 @@
 @media(max-width:1250px){.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.dashboard-charts,.dashboard-bottom{grid-template-columns:1fr}.dashboard-sidebar{position:fixed;left:0;transform:translateX(-100%);transition:transform .2s ease}.dashboard-menu-open .dashboard-sidebar{transform:translateX(0)}.dashboard-menu-open .dashboard-scrim{display:block;position:fixed;inset:0;border:0;background:rgba(15,25,37,.45);z-index:20}}
 @media(max-width:580px){.dashboard-content{padding:20px 13px 8px}.dashboard-topbar{padding:0 12px}.dashboard-kpis{grid-template-columns:1fr;gap:10px}.dashboard-kpi{min-height:105px}.dashboard-account{font-size:12px}.account-role{display:none}.risk-chart-layout{gap:12px}.donut-frame{width:50%;height:180px}}
+
+/* Detalle de hallazgos: reutiliza la estructura del dashboard. */
+.hallazgos-page .dashboard-content{padding-top:28px;padding-bottom:40px}
+.hallazgos-heading{margin-bottom:22px}
+.hallazgos-back{display:inline-block;margin-bottom:13px;color:#2867c7;text-decoration:none;font-size:14px;font-weight:600}
+.hallazgos-back:hover{text-decoration:underline}
+.hallazgos-heading h1{margin:0 0 7px;color:#18232d;font:700 clamp(25px,2.2vw,34px) 'Sora',sans-serif}
+.hallazgos-heading p{margin:0;color:#596675;font-size:15px}
+.hallazgos-context{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:18px;padding:20px 24px}
+.hallazgos-context div{display:grid;gap:5px;min-width:0}
+.hallazgos-context span{color:#738194;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.hallazgos-context strong{color:#1e2b38;font-size:15px;overflow-wrap:anywhere}
+.hallazgos-grid{display:grid;grid-template-columns:minmax(310px,.85fr) minmax(0,1.15fr);gap:18px;align-items:start}
+.hallazgos-grid.hallazgos-readonly{grid-template-columns:1fr}
+.hallazgos-card{padding:22px 24px}
+.hallazgos-card h2{margin:0 0 6px;color:#1e2b38;font:700 17px 'Inter',sans-serif}
+.hallazgos-help{display:block;margin:0 0 20px;color:#697789;font-size:13px}
+.hallazgos-card .form-label{font-size:14px;font-weight:600;color:#2b3b4d}
+.hallazgos-card textarea{resize:vertical}
+.hallazgos-card .btn-primary{background:#2867c7;border-color:#2867c7}
+.hallazgos-card .btn-primary:hover{background:#2056a8;border-color:#2056a8}
+.hallazgos-table{font-size:14px;margin-bottom:0}
+.hallazgos-table th{background:#f5f7fa;color:#334257;font-size:12px;font-weight:700;white-space:nowrap}
+.hallazgos-table td{padding-top:14px;padding-bottom:14px;overflow-wrap:anywhere}
+.hallazgos-risk,.hallazgos-pending{display:inline-block;padding:5px 9px;border-radius:6px;font-size:12px;font-weight:600}
+.hallazgos-risk{color:#245b9d;background:#eaf2ff}.hallazgos-pending{color:#96600b;background:#fff2db}
+.hallazgos-empty{margin:22px 0 3px;color:#697789;font-size:14px}
+@media(max-width:1050px){.hallazgos-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.hallazgos-context{grid-template-columns:repeat(2,minmax(0,1fr));padding:16px}.hallazgos-card{padding:18px}}
+@media(max-width:420px){.hallazgos-context{grid-template-columns:1fr}}
