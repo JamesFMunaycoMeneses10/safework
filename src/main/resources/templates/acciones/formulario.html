@@ -172,7 +172,7 @@
 
 
                         <label class="form-label">
-                            Responsable
+                            Responsable de ejecutar la acción
                         </label>
 
 
@@ -194,11 +194,13 @@
                                 th:each="trabajador : ${trabajadores}"
                                 th:value="${trabajador.id}"
                                 th:selected="${accion.responsable != null and accion.responsable.id == trabajador.id}"
-                                th:text="${trabajador.nombres + ' ' + trabajador.apellidos + ' · ' + trabajador.area.nombre}">
+                                th:text="${trabajador.nombres + ' ' + trabajador.apellidos + ' · Área habitual: ' + trabajador.area.nombre}">
                             </option>
 
 
                         </select>
+
+                        <small class="form-text text-muted">Puede asignarse personal de otra área para atender el riesgo o incidente.</small>
 
 
                     </div>
@@ -289,6 +291,7 @@
 
 
                         </select>
+
                         <small class="form-text">Selecciona un riesgo, un incidente o ambos si corresponden a la misma área.</small>
 
 
@@ -393,11 +396,6 @@
                             </option>
 
 
-                            <option value="Completada">
-                                Completada
-                            </option>
-
-
                             <option value="Cancelada">
                                 Cancelada
                             </option>
@@ -416,24 +414,7 @@
 
 
 
-                    <div class="mb-4">
-                        <label class="form-label" for="evidenciaCierre">Evidencia de cumplimiento</label>
-                        <textarea id="evidenciaCierre" class="form-control" rows="3" maxlength="1000"
-                                  th:field="*{evidenciaCierre}"
-                                  placeholder="Describe qué se hizo y cómo se comprobó"></textarea>
-                        <small class="form-text">Obligatoria al marcar la acción como Completada.</small>
-                        <div class="text-danger" th:if="${#fields.hasErrors('evidenciaCierre')}" th:errors="*{evidenciaCierre}"></div>
-                        <small class="form-text" th:if="${accion.fechaCierre != null}"
-                               th:text="${'Fecha de cierre: ' + #temporals.format(accion.fechaCierre, 'dd/MM/yyyy')}"></small>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label" for="adjuntoEvidencia">Foto o PDF de evidencia</label>
-                        <input class="form-control" type="file" id="adjuntoEvidencia" name="adjuntoEvidencia"
-                               accept="image/jpeg,image/png,image/webp,application/pdf">
-                        <small class="form-text">Obligatorio para completar la acción. JPG, PNG, WebP o PDF; máximo 5 MB.</small>
-                        <a th:if="${accion.id != null and accion.archivoEvidencia != null}"
-                           th:href="@{/acciones/{id}/evidencia(id=${accion.id})}" class="d-block mt-2">Ver evidencia actual</a>
-                    </div>
+                    <p class="text-muted">El responsable entregará la evidencia desde su cuenta. Un supervisor SST la revisará antes del cierre.</p>
 
                     <!-- BOTONES -->
                     <div class="d-flex gap-2">

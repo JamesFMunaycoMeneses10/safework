@@ -11,14 +11,24 @@
         <span>SafeWork</span>
       </a>
       <nav class="sw-app-links">
-        <a th:href="@{/dashboard}"><i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span></a>
-        <a th:if="${esAdministrador}" th:href="@{/areas}"><i class="bi bi-diagram-3" aria-hidden="true"></i><span>Áreas</span></a>
-        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><i class="bi bi-person-gear" aria-hidden="true"></i><span>Usuarios</span></a>
-        <a th:href="@{/trabajadores}"><i class="bi bi-people" aria-hidden="true"></i><span>Trabajadores</span></a>
-        <a th:href="@{/riesgos}"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><span>Riesgos</span></a>
-        <a th:href="@{/incidentes}"><i class="bi bi-activity" aria-hidden="true"></i><span>Incidentes</span></a>
-        <a th:href="@{/inspecciones}"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span>Inspecciones</span></a>
-        <a th:href="@{/acciones}"><i class="bi bi-tools" aria-hidden="true"></i><span>Acciones Correctivas</span></a>
+        <a class="sw-nav-home" th:href="@{/dashboard}"><i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span></a>
+        <div class="sw-nav-group">
+          <span class="sw-nav-label">ORGANIZACIÓN</span>
+          <a th:if="${esAdministrador}" th:href="@{/areas}"><i class="bi bi-diagram-3" aria-hidden="true"></i><span>Áreas</span></a>
+          <a th:href="@{/trabajadores}"><i class="bi bi-people" aria-hidden="true"></i><span>Trabajadores</span></a>
+          <a th:if="${esAdministrador}" th:href="@{/usuarios}"><i class="bi bi-person-gear" aria-hidden="true"></i><span>Usuarios</span></a>
+        </div>
+        <div class="sw-nav-group">
+          <span class="sw-nav-label">SEGURIDAD Y SALUD</span>
+          <a th:href="@{/riesgos}"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><span>Riesgos</span></a>
+          <a th:href="@{/incidentes}"><i class="bi bi-activity" aria-hidden="true"></i><span>Incidentes</span></a>
+          <a th:href="@{/inspecciones}"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span>Inspecciones</span></a>
+          <a th:href="@{/acciones}"><i class="bi bi-tools" aria-hidden="true"></i><span>Acciones Correctivas</span></a>
+        </div>
+        <div class="sw-nav-group" th:if="${puedeGestionarSst}">
+          <span class="sw-nav-label">CONTROL</span>
+          <a th:href="@{/auditoria}"><i class="bi bi-clock-history" aria-hidden="true"></i><span>Bitácora</span></a>
+        </div>
       </nav>
     </aside>
     <button class="sw-app-scrim" type="button" aria-label="Cerrar menú"></button>

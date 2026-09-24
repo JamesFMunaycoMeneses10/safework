@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.safework.safework.model.Incidente;
 import com.safework.safework.repository.IncidenteRepository;
+import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -26,6 +28,7 @@ public class IncidenteService {
      * a los datos de los incidentes.
      */
     private final IncidenteRepository incidenteRepository;
+    private final AuditoriaService auditoria;
 
 
 
@@ -33,10 +36,16 @@ public class IncidenteService {
      * Inyección de dependencias
      * mediante constructor.
      */
-    public IncidenteService(
-            IncidenteRepository incidenteRepository) {
+    @Autowired
+    public IncidenteService(IncidenteRepository incidenteRepository, AuditoriaService auditoria) {
 
         this.incidenteRepository = incidenteRepository;
+        this.auditoria = auditoria;
+    }
+
+    /** Constructor de compatibilidad para pruebas unitarias existentes. */
+    public IncidenteService(IncidenteRepository incidenteRepository) {
+        this(incidenteRepository, null);
     }
 
 
@@ -56,9 +65,23 @@ public class IncidenteService {
      * Guarda un incidente nuevo
      * o actualiza uno existente.
      */
-    public Incidente guardar(Incidente incidente) {
+    @Transactional
+    public Incidente guardar(Incidente incidente, String usuario) {
+        Incidente anterior = incidente.getId() == null ? null : incidenteRepository.findById(incidente.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Incidente no encontrado"));
+        String resumenAnterior = anterior == null ? null : resumenAuditoria(anterior);
+        Incidente guardado = incidenteRepository.save(incidente);
+        if (auditoria != null) {
+            String detalle = anterior == null ? resumenAuditoria(guardado)
+                    : "Antes: " + resumenAnterior + " | Después: " + resumenAuditoria(guardado);
+            auditoria.registrar("INCIDENTES", guardado.getId(),
+                    anterior == null ? "CREADO" : "ACTUALIZADO", usuario, detalle);
+        }
+        return guardado;
+    }
 
-        return incidenteRepository.save(incidente);
+    public Incidente guardar(Incidente incidente) {
+        return guardar(incidente, "Sistema");
     }
 
 
@@ -81,6 +104,11 @@ public class IncidenteService {
      */
     @Transactional
     public void eliminar(Long id) {
+        eliminar(id, "Sistema");
+    }
+
+    @Transactional
+    public void eliminar(Long id, String usuario) {
 
 
         Incidente incidente = incidenteRepository.findById(id)
@@ -107,10 +135,12 @@ public class IncidenteService {
 
 
         try {
-
-
+            String resumen = resumenAuditoria(incidente);
             incidenteRepository.delete(incidente);
-
+            incidenteRepository.flush();
+            if (auditoria != null) {
+                auditoria.registrar("INCIDENTES", id, "ELIMINADO", usuario, resumen);
+            }
 
         } catch (DataIntegrityViolationException e) {
 
@@ -121,6 +151,21 @@ public class IncidenteService {
 
         }
 
+    }
+
+    private String resumenAuditoria(Incidente incidente) {
+        String area = incidente.getArea() == null ? "Sin área" : incidente.getArea().getNombre();
+        String trabajador = incidente.getTrabajador() == null ? "Sin trabajador"
+                : incidente.getTrabajador().getNombres() + " " + incidente.getTrabajador().getApellidos();
+        String fecha = incidente.getFechaHora() == null ? "Sin fecha"
+                : incidente.getFechaHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        return "Fecha y hora: " + fecha
+                + " | Tipo: " + incidente.getTipo()
+                + " | Área: " + area
+                + " | Trabajador: " + trabajador
+                + " | Descripción: " + incidente.getDescripcion()
+                + " | Gravedad: " + incidente.getGravedad()
+                + " | Estado: " + incidente.getEstado();
     }
 
 }

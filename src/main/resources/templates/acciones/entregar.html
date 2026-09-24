@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entregar evidencia - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head>
+<body class="bg-light">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5" style="max-width: 900px">
+    <h1 class="h3">Entregar evidencia</h1>
+    <p class="text-muted" th:text="${accion.descripcion}"></p>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-info" th:if="${accion.estado == 'Devuelta'}">
+      La entrega fue devuelta. Corrige la evidencia y vuelve a enviarla.
+      <p class="mb-0" th:if="${accion.observacionRevision != null}" th:text="${accion.observacionRevision}"></p>
+    </div>
+    <form th:action="@{/acciones/{id}/entregar(id=${accion.id})}" method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
+      <label for="evidencia" class="form-label">Qué se hizo y cómo se comprobó</label>
+      <textarea id="evidencia" name="evidencia" class="form-control mb-3" rows="5" maxlength="1000" required
+                th:text="${accion.evidenciaCierre}"></textarea>
+      <label for="adjunto" class="form-label">Foto o PDF de evidencia</label>
+      <input id="adjunto" name="adjunto" type="file" class="form-control" accept="image/jpeg,image/png,image/webp,application/pdf"
+             th:attr="required=${accion.archivoEvidencia == null}">
+      <div class="form-text mb-3">JPG, PNG, WebP o PDF; máximo 5 MB. Si ya hay un archivo, puedes conservarlo.</div>
+      <a th:if="${accion.archivoEvidencia != null}" th:href="@{/acciones/{id}/evidencia(id=${accion.id})}" class="mb-3">Descargar evidencia actual</a>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Enviar a revisión</button>
+        <a th:href="@{/acciones}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

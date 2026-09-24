@@ -44,6 +44,7 @@
             th:object="${trabajador}"
             method="post"
           >
+            <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
             <!-- Alerta general -->
             <div
               class="alert alert-danger"
@@ -169,6 +170,17 @@
                 th:if="${#fields.hasErrors('area')}"
                 th:errors="*{area}"
               ></div>
+            </div>
+
+            <div class="mb-4">
+              <label for="usuario" class="form-label">Cuenta de acceso del trabajador</label>
+              <select id="usuario" class="form-select" th:field="*{usuario}">
+                <option value="">Sin cuenta vinculada</option>
+                <option th:each="usuario : ${usuarios}" th:if="${usuario.estado == 'ACTIVO'}"
+                        th:value="${usuario.id}"
+                        th:text="${usuario.nombre + ' ' + usuario.apellido + ' (' + usuario.username + ')'}"></option>
+              </select>
+              <small class="form-text">Vincula una cuenta única para que solo esta persona pueda entregar sus evidencias.</small>
             </div>
 
             <!-- Botones -->

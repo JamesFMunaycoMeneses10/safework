@@ -75,6 +75,76 @@
         </span>
       </div>
 
+      <div class="alert alert-warning py-2 px-3 mb-3" role="status"
+           th:if="${!#lists.isEmpty(avisosProximos)}">
+        <strong th:text="${'Por vencer en los próximos 7 días: ' + #lists.size(avisosProximos)}">Por vencer</strong>
+        <span class="ms-2" th:each="aviso : ${avisosProximosPrimeros}">
+          <a th:href="@{/acciones/detalle/{id}(id=${aviso.id})}"
+             th:text="${aviso.descripcion + ' (' + #temporals.format(aviso.fechaLimite, 'dd/MM') + ')'}">Ver acción</a>
+        </span>
+        <span class="small" th:if="${#lists.size(avisosProximos) > 3}"
+              th:text="${'y ' + (#lists.size(avisosProximos) - 3) + ' más'}"></span>
+      </div>
+
+      <section th:if="${puedeGestionarSst}" aria-labelledby="bandeja-titulo" class="mb-3">
+        <form method="get" th:action="@{/acciones}" class="d-flex align-items-center flex-wrap gap-2">
+          <input th:if="${riesgoId != null}" type="hidden" name="riesgoId" th:value="${riesgoId}">
+          <input th:if="${incidenteId != null}" type="hidden" name="incidenteId" th:value="${incidenteId}">
+          <input th:if="${!#strings.isEmpty(buscar)}" type="hidden" name="buscar" th:value="${buscar}">
+          <span id="bandeja-titulo" class="small fw-semibold text-muted me-2">Filtrar acciones</span>
+          <button type="submit" name="vista" value="todas"
+                  class="btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill px-3"
+                  th:classappend="${vistaActiva == 'todas'} ? ' btn-primary' : ' btn-outline-secondary'"
+                  th:attr="aria-pressed=${vistaActiva == 'todas'}">
+            Todas <span class="badge rounded-pill text-bg-light border" th:text="${resumen.todas}">0</span>
+          </button>
+          <button type="submit" name="vista" value="revision" title="Pendientes de revisión"
+                  class="btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill px-3"
+                  th:classappend="${vistaActiva == 'revision'} ? ' btn-primary' : ' btn-outline-secondary'"
+                  th:attr="aria-pressed=${vistaActiva == 'revision'}">
+            Por revisar <span class="badge rounded-pill text-bg-light border" th:text="${resumen.revision}">0</span>
+          </button>
+          <button type="submit" name="vista" value="devueltas"
+                  class="btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill px-3"
+                  th:classappend="${vistaActiva == 'devueltas'} ? ' btn-primary' : ' btn-outline-secondary'"
+                  th:attr="aria-pressed=${vistaActiva == 'devueltas'}">
+            Devueltas <span class="badge rounded-pill text-bg-light border" th:text="${resumen.devueltas}">0</span>
+          </button>
+          <button type="submit" name="vista" value="vencidas"
+                  title="Fecha límite anterior a hoy y acción aún abierta"
+                  class="btn btn-sm d-inline-flex align-items-center gap-2 rounded-pill px-3"
+                  th:classappend="${vistaActiva == 'vencidas'} ? ' btn-primary' : ' btn-outline-secondary'"
+                  th:attr="aria-pressed=${vistaActiva == 'vencidas'}">
+            Vencidas <span class="badge rounded-pill text-bg-light border" th:text="${resumen.vencidas}">0</span>
+          </button>
+        </form>
+      </section>
+
+      <form method="get" th:action="@{/acciones}" class="d-flex gap-2 mb-3" role="search">
+        <input type="hidden" name="vista" th:value="${vistaActiva}">
+        <input th:if="${riesgoId != null}" type="hidden" name="riesgoId" th:value="${riesgoId}">
+        <input th:if="${incidenteId != null}" type="hidden" name="incidenteId" th:value="${incidenteId}">
+        <input type="search" name="buscar" maxlength="100" class="form-control" th:value="${buscar}"
+               placeholder="Buscar descripción, responsable o riesgo" aria-label="Buscar acciones correctivas">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </form>
+
+      <form th:if="${puedeGestionarSst}" method="get" th:action="@{/acciones/reporte.csv}"
+            class="d-flex align-items-end flex-wrap gap-2 mb-3" aria-label="Descargar reporte de acciones">
+        <input type="hidden" name="vista" th:value="${vistaActiva}">
+        <input th:if="${riesgoId != null}" type="hidden" name="riesgoId" th:value="${riesgoId}">
+        <input th:if="${incidenteId != null}" type="hidden" name="incidenteId" th:value="${incidenteId}">
+        <label class="small">Registro desde
+          <input type="date" name="fechaDesde" class="form-control form-control-sm">
+        </label>
+        <label class="small">Registro hasta
+          <input type="date" name="fechaHasta" class="form-control form-control-sm">
+        </label>
+        <button type="submit" class="btn btn-sm btn-outline-primary">Descargar CSV</button>
+        <button type="submit" th:formaction="@{/acciones/reporte.xlsx}" class="btn btn-sm btn-primary">Descargar Excel</button>
+        <span class="small text-muted">Usa el filtro de acciones seleccionado arriba.</span>
+      </form>
+
       <!-- ============================== -->
       <!-- TABLA -->
       <!-- ============================== -->
@@ -99,7 +169,7 @@
 
                   <th>Cierre</th>
 
-                  <th th:if="${puedeGestionarSst}">Acciones</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
 
@@ -109,12 +179,7 @@
 
                   <td>
                     <span th:text="${accion.descripcion}">Descripción</span>
-                    <details class="mt-1" th:if="${accion.evidenciaCierre != null and !accion.evidenciaCierre.isBlank()}">
-                      <summary class="small text-primary">Ver evidencia</summary>
-                      <p class="small text-muted mb-0" th:text="${accion.evidenciaCierre}"></p>
-                    </details>
-                    <a class="small d-block mt-1" th:if="${accion.archivoEvidencia != null}"
-                       th:href="@{/acciones/{id}/evidencia(id=${accion.id})}">Descargar evidencia</a>
+                    <a class="small d-block mt-1" th:href="@{/acciones/detalle/{id}(id=${accion.id})}">Ver detalle</a>
                   </td>
 
                   <!-- Responsable -->
@@ -168,6 +233,11 @@
                   <!-- Estado -->
 
                   <td>
+                    <span th:if="${accion.estado == 'En revisión'}" class="badge text-bg-info">En revisión</span>
+                    <span th:if="${accion.estado == 'Devuelta'}" class="badge text-bg-warning">Devuelta</span>
+                    <span th:if="${accion.estado == 'Cerrada'}" class="badge text-bg-success">Cerrada</span>
+                    <span th:if="${accionesVencidasIds.contains(accion.id)}" class="badge text-bg-danger ms-1">Vencida</span>
+                    <span th:if="${accionesProximasIds.contains(accion.id)}" class="badge text-bg-warning ms-1">Por vencer</span>
                     <span
                       th:if="${accion.estado == 'Pendiente'}"
                       class="badge text-bg-secondary"
@@ -199,16 +269,26 @@
 
                   <!-- Fecha límite -->
 
-                  <td th:text="${accion.fechaLimite}"></td>
+                  <td class="text-nowrap" th:text="${accion.fechaLimite}"></td>
 
-                  <td th:text="${accion.fechaCierre != null ? #temporals.format(accion.fechaCierre, 'dd/MM/yyyy') : '—'}"></td>
+                  <td class="text-nowrap" th:text="${accion.fechaCierre != null ? #temporals.format(accion.fechaCierre, 'dd/MM/yyyy') : '—'}"></td>
 
                   <!-- Acciones -->
 
-                  <td th:if="${puedeGestionarSst}">
+                  <td>
+                    <a th:if="${accion.responsable != null and accion.responsable.usuario != null
+                                and accion.responsable.usuario.username == usuarioActual
+                                and (accion.estado == 'Pendiente' or accion.estado == 'En proceso' or accion.estado == 'Devuelta')}"
+                       th:href="@{/acciones/{id}/entregar(id=${accion.id})}"
+                       class="btn btn-sm btn-primary">Entregar evidencia</a>
+                    <a th:if="${puedeGestionarSst and accion.estado == 'En revisión'
+                                and (accion.enviadaPor == null or accion.enviadaPor.username != usuarioActual)}"
+                       th:href="@{/acciones/{id}/revisar(id=${accion.id})}"
+                       class="btn btn-sm btn-success">Revisar</a>
                     <!-- Editar -->
 
                     <a
+                      th:if="${puedeGestionarSst and (accion.estado == 'Pendiente' or accion.estado == 'En proceso')}"
                       th:href="@{/acciones/editar/{id}(id=${accion.id})}"
                       class="btn btn-sm btn-outline-primary"
                     >
@@ -218,6 +298,7 @@
                     <!-- Eliminar -->
 
                     <form
+                      th:if="${puedeGestionarSst and (accion.estado == 'Pendiente' or accion.estado == 'En proceso' or accion.estado == 'Cancelada')}"
                       th:action="@{/acciones/eliminar/{id}(id=${accion.id})}"
                       method="post"
                       class="d-inline"
@@ -234,12 +315,21 @@
                     </form>
                   </td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(acciones)}"><td th:colspan="${puedeGestionarSst ? 8 : 7}" class="text-center text-muted py-4">No hay acciones correctivas para mostrar.</td></tr>
+                <tr th:if="${#lists.isEmpty(acciones)}"><td colspan="8" class="text-center text-muted py-4"
+                    th:text="${vistaActiva == 'todas' ? 'No hay acciones correctivas para mostrar.' : 'No hay acciones en esta vista.'}">No hay acciones correctivas para mostrar.</td></tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      <nav th:if="${resultados.totalPages > 1}" aria-label="Páginas de acciones" class="mt-3 d-flex justify-content-between align-items-center">
+        <a class="btn btn-outline-secondary" th:if="${resultados.hasPrevious()}"
+           th:href="@{/acciones(riesgoId=${riesgoId},incidenteId=${incidenteId},vista=${vistaActiva},buscar=${buscar},pagina=${resultados.number - 1})}">Anterior</a>
+        <span th:unless="${resultados.hasPrevious()}"></span>
+        <span th:text="${'Página ' + (resultados.number + 1) + ' de ' + resultados.totalPages}">Página</span>
+        <a class="btn btn-outline-secondary" th:if="${resultados.hasNext()}"
+           th:href="@{/acciones(riesgoId=${riesgoId},incidenteId=${incidenteId},vista=${vistaActiva},buscar=${buscar},pagina=${resultados.number + 1})}">Siguiente</a>
+      </nav>
     </div>
   </body>
 </html>

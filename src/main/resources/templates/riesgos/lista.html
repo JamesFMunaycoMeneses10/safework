@@ -37,6 +37,11 @@
 
       <!-- MENSAJE ERROR -->
 
+      <div class="alert alert-warning d-flex justify-content-between align-items-center" th:if="${soloCriticos}">
+        <span>Mostrando solo riesgos críticos.</span>
+        <a th:href="@{/riesgos}" class="btn btn-sm btn-outline-dark">Ver todos</a>
+      </div>
+
       <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
       <!-- MENSAJE ÉXITO -->

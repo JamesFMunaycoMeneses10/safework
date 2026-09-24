@@ -79,7 +79,7 @@
             <!-- Área -->
 
             <div class="mb-3">
-              <label class="form-label"> Área </label>
+              <label class="form-label"> Área donde ocurrió el evento </label>
 
               <select class="form-select" th:field="*{area}">
                 <option value="">Seleccione un área</option>
@@ -105,9 +105,11 @@
                 <option
                   th:each="trabajador : ${trabajadores}"
                   th:value="${trabajador.id}"
-                  th:text="${trabajador.nombres + ' ' + trabajador.apellidos}"
+                  th:text="${trabajador.nombres + ' ' + trabajador.apellidos + ' · Área habitual: ' + trabajador.area.nombre}"
                 ></option>
               </select>
+
+              <small class="form-text text-muted">El trabajador puede pertenecer a otra área; registre arriba el lugar donde ocurrió el evento.</small>
 
               <div class="text-danger" th:errors="*{trabajador}"></div>
             </div>

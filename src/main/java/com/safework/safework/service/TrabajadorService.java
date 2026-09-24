@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.safework.safework.model.Trabajador;
 import com.safework.safework.repository.TrabajadorRepository;
+import com.safework.safework.repository.UsuarioRepository;
 
 
 @Service
@@ -17,13 +18,15 @@ public class TrabajadorService {
 
 
     private final TrabajadorRepository trabajadorRepository;
+    private final UsuarioRepository usuarioRepository;
 
 
 
     public TrabajadorService(
-            TrabajadorRepository trabajadorRepository) {
+            TrabajadorRepository trabajadorRepository, UsuarioRepository usuarioRepository) {
 
         this.trabajadorRepository = trabajadorRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
 
@@ -44,6 +47,22 @@ public class TrabajadorService {
      * o actualiza uno existente.
      */
     public Trabajador guardar(Trabajador trabajador) {
+
+        if (trabajador.getUsuario() != null && trabajador.getUsuario().getId() != null) {
+            Long usuarioId = trabajador.getUsuario().getId();
+            var usuario = usuarioRepository.findById(usuarioId).orElseThrow(
+                    () -> new IllegalArgumentException("La cuenta seleccionada no existe"));
+            if (!"ACTIVO".equals(usuario.getEstado())) {
+                throw new IllegalArgumentException("La cuenta vinculada debe estar activa");
+            }
+            if (trabajadorRepository.existsByUsuarioIdAndIdNot(usuarioId,
+                    trabajador.getId() == null ? -1L : trabajador.getId())) {
+                throw new IllegalArgumentException("La cuenta ya está vinculada a otro trabajador");
+            }
+            trabajador.setUsuario(usuario);
+        } else {
+            trabajador.setUsuario(null);
+        }
 
         return trabajadorRepository.save(trabajador);
 

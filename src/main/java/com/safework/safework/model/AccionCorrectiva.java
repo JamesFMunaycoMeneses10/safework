@@ -1,6 +1,7 @@
     package com.safework.safework.model;
 
-    import java.time.LocalDate;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
     import jakarta.persistence.Column;
     import jakarta.persistence.Entity;
@@ -91,9 +92,26 @@
         @Column(name = "evidencia_cierre", length = 1000)
         private String evidenciaCierre;
 
-        /** Fecha asignada por el servidor al completar la acción. */
+        /** Fecha asignada por el servidor al validar y cerrar la acción. */
         @Column(name = "fecha_cierre")
         private LocalDate fechaCierre;
+
+        @ManyToOne
+        @JoinColumn(name = "enviada_por_id")
+        private Usuario enviadaPor;
+
+        @Column(name = "fecha_envio_revision")
+        private LocalDateTime fechaEnvioRevision;
+
+        @ManyToOne
+        @JoinColumn(name = "revisada_por_id")
+        private Usuario revisadaPor;
+
+        @Column(name = "fecha_revision")
+        private LocalDateTime fechaRevision;
+
+        @Column(name = "observacion_revision", length = 1000)
+        private String observacionRevision;
 
         @Column(name = "archivo_evidencia", length = 40)
         private String archivoEvidencia;
@@ -208,6 +226,17 @@
         public LocalDate getFechaCierre() {
             return fechaCierre;
         }
+
+        public Usuario getEnviadaPor() { return enviadaPor; }
+        public void setEnviadaPor(Usuario valor) { enviadaPor = valor; }
+        public LocalDateTime getFechaEnvioRevision() { return fechaEnvioRevision; }
+        public void setFechaEnvioRevision(LocalDateTime valor) { fechaEnvioRevision = valor; }
+        public Usuario getRevisadaPor() { return revisadaPor; }
+        public void setRevisadaPor(Usuario valor) { revisadaPor = valor; }
+        public LocalDateTime getFechaRevision() { return fechaRevision; }
+        public void setFechaRevision(LocalDateTime valor) { fechaRevision = valor; }
+        public String getObservacionRevision() { return observacionRevision; }
+        public void setObservacionRevision(String valor) { observacionRevision = valor; }
 
         public void setFechaCierre(LocalDate fechaCierre) {
             this.fechaCierre = fechaCierre;

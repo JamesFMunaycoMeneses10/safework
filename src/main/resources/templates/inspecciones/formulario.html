@@ -187,7 +187,7 @@
                             for="area"
                             class="form-label">
 
-                            Área
+                            Área que se inspecciona
 
                         </label>
 
@@ -261,11 +261,15 @@
                                 th:value="${trabajador.id}"
                                 th:text="${trabajador.nombres
                                     + ' '
-                                    + trabajador.apellidos}">
+                                    + trabajador.apellidos
+                                    + ' · Área habitual: '
+                                    + trabajador.area.nombre}">
                             </option>
 
 
                         </select>
+
+                        <small class="form-text text-muted">El responsable puede inspeccionar un área distinta de su área habitual.</small>
 
 
                         <div

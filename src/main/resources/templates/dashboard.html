@@ -12,14 +12,24 @@
         <span>SafeWork</span>
       </a>
       <nav class="dashboard-nav">
-        <a class="active" th:href="@{/dashboard}" aria-current="page"><span class="nav-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span> Dashboard</a>
-        <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
-        <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
-        <a th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
-        <a th:href="@{/riesgos}"><span class="nav-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span> Riesgos</a>
-        <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
-        <a th:href="@{/inspecciones}"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>
-        <a th:href="@{/acciones}"><span class="nav-icon"><i class="bi bi-tools" aria-hidden="true"></i></span> Acciones Correctivas</a>
+        <a class="dashboard-home-link active" th:href="@{/dashboard}" aria-current="page"><span class="nav-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span> Dashboard</a>
+        <div class="dashboard-nav-group">
+          <span class="dashboard-nav-label">ORGANIZACIÓN</span>
+          <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
+          <a th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
+          <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
+        </div>
+        <div class="dashboard-nav-group">
+          <span class="dashboard-nav-label">SEGURIDAD Y SALUD</span>
+          <a th:href="@{/riesgos}"><span class="nav-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span> Riesgos</a>
+          <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
+          <a th:href="@{/inspecciones}"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>
+          <a th:href="@{/acciones}"><span class="nav-icon"><i class="bi bi-tools" aria-hidden="true"></i></span> Acciones Correctivas</a>
+        </div>
+        <div class="dashboard-nav-group" th:if="${puedeGestionarSst}">
+          <span class="dashboard-nav-label">CONTROL</span>
+          <a th:href="@{/auditoria}"><span class="nav-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span> Bitácora</a>
+        </div>
       </nav>
     </aside>
     <button class="dashboard-scrim" id="dashboardScrim" type="button" aria-label="Cerrar menú"></button>
@@ -37,8 +47,16 @@
 
       <main class="dashboard-content">
         <div class="dashboard-heading">
-          <h1>Dashboard SafeWork</h1>
-          <p>Resumen general de Seguridad y Salud en el Trabajo.</p>
+          <div class="dashboard-heading-copy">
+            <span class="dashboard-eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> PANEL DE SEGURIDAD Y SALUD</span>
+            <h1>Hola, <span th:text="${nombreUsuario}">Usuario</span></h1>
+            <p>Este es el resumen de seguridad y salud en el trabajo de tu organización.</p>
+          </div>
+          <div class="dashboard-health" th:classappend="${estadoSST == 'SEGURO' ? ' is-safe' : (estadoSST == 'ATENCIÓN' ? ' is-warning' : ' is-critical')}" role="status">
+            <span class="health-indicator" aria-hidden="true"></span>
+            <span><small>ESTADO GENERAL</small><strong th:text="${estadoSST}">SEGURO</strong></span>
+            <i th:class="${estadoSST == 'SEGURO' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill'}" aria-hidden="true"></i>
+          </div>
         </div>
 
         <section class="dashboard-kpis" aria-label="Indicadores principales">
@@ -46,6 +64,18 @@
           <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon amber"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></span><div><h2>Riesgos</h2><strong th:text="${totalRiesgos}">0</strong><p>Riesgos identificados</p></div></article>
           <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon red"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i></span><div><h2>Incidentes</h2><strong th:text="${totalIncidentes}">0</strong><p>Incidentes reportados</p></div></article>
           <article class="dashboard-panel dashboard-kpi"><span class="kpi-icon green"><i class="bi bi-tools" aria-hidden="true"></i></span><div><h2>Acciones correctivas</h2><strong th:text="${totalAcciones}">0</strong><p>Medidas registradas</p></div></article>
+        </section>
+
+        <section class="dashboard-followup" aria-label="Indicadores de seguimiento">
+          <h2>Requieren atención</h2>
+          <div class="dashboard-followup-grid">
+            <a class="dashboard-panel followup-card" th:href="@{/riesgos(nivel='criticos')}"><span>Riesgos críticos</span><strong th:text="${riesgosCriticos}">0</strong><small>Ver riesgos →</small></a>
+            <a class="dashboard-panel followup-card" th:href="@{/incidentes}"><span>Incidentes registrados</span><strong th:text="${totalIncidentes}">0</strong><small>Ver incidentes →</small></a>
+            <a class="dashboard-panel followup-card" th:if="${puedeGestionarSst}" th:href="@{/acciones(vista='revision')}"><span>Por revisar</span><strong th:text="${accionesPorRevisar}">0</strong><small>Ver bandeja →</small></a>
+            <div class="dashboard-panel followup-card" th:unless="${puedeGestionarSst}"><span>Mis acciones por vencer</span><strong th:text="${accionesProximas}">0</strong><small>Próximos 7 días</small></div>
+            <a class="dashboard-panel followup-card" th:if="${puedeGestionarSst}" th:href="@{/acciones(vista='vencidas')}"><span>Acciones vencidas</span><strong th:text="${accionesVencidas}">0</strong><small>Ver bandeja →</small></a>
+            <div class="dashboard-panel followup-card" th:unless="${puedeGestionarSst}"><span>Mis acciones vencidas</span><strong th:text="${accionesVencidas}">0</strong><small>Asignadas a mi cuenta</small></div>
+          </div>
         </section>
 
         <section class="dashboard-charts" aria-label="Análisis de riesgos e incidentes">

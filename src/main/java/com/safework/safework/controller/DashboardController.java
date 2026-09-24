@@ -7,8 +7,8 @@ import com.safework.safework.service.AccionCorrectivaService;
 import com.safework.safework.service.IncidenteService;
 import com.safework.safework.service.RiesgoService;
 import com.safework.safework.service.TrabajadorService;
+import com.safework.safework.service.BandejaAcciones;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.security.core.Authentication;
@@ -35,21 +35,22 @@ public class DashboardController {
     public String dashboard(Model model, Authentication authentication) {
         List<Riesgo> riesgos = riesgoService.listarTodos();
         List<Incidente> incidentes = incidenteService.listarTodos();
-        List<AccionCorrectiva> acciones = accionService.listarTodas();
+        boolean gestionaSst = authentication == null || authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())
+                        || "ROLE_SUPERVISOR".equals(a.getAuthority()));
+        List<AccionCorrectiva> acciones = accionService.listarTodas().stream()
+                .filter(a -> gestionaSst || (a.getResponsable() != null
+                        && a.getResponsable().getUsuario() != null
+                        && authentication.getName().equals(a.getResponsable().getUsuario().getUsername())))
+                .toList();
         LocalDate hoy = LocalDate.now();
 
         long pendientes = acciones.stream().filter(a -> "Pendiente".equalsIgnoreCase(a.getEstado())).count();
         long proceso = acciones.stream().filter(a -> "En proceso".equalsIgnoreCase(a.getEstado())).count();
         long completadas = acciones.stream().filter(a -> "Completada".equalsIgnoreCase(a.getEstado())).count();
-        long vencidas = acciones.stream().filter(a -> a.getFechaLimite() != null
-                && a.getFechaLimite().isBefore(hoy)
-                && !"Completada".equalsIgnoreCase(a.getEstado())
-                && !"Cancelada".equalsIgnoreCase(a.getEstado())).count();
-        long proximas = acciones.stream().filter(a -> a.getFechaLimite() != null
-                && ChronoUnit.DAYS.between(hoy, a.getFechaLimite()) >= 0
-                && ChronoUnit.DAYS.between(hoy, a.getFechaLimite()) <= 7
-                && !"Completada".equalsIgnoreCase(a.getEstado())
-                && !"Cancelada".equalsIgnoreCase(a.getEstado())).count();
+        long vencidas = acciones.stream().filter(a -> BandejaAcciones.vencida(a, hoy)).count();
+        long proximas = acciones.stream().filter(a -> BandejaAcciones.proximaVencer(a, hoy)).count();
+        long porRevisar = acciones.stream().filter(a -> "En revisión".equals(a.getEstado())).count();
 
         // Las bandas coinciden con Riesgo.getClasificacionRiesgo().
         long riesgosBajos = riesgos.stream().filter(r -> r.getNivelRiesgo() != null
@@ -65,10 +66,12 @@ public class DashboardController {
                 && i.getFechaHora().getYear() == hoy.getYear())
                 .forEach(i -> incidentesPorMes[i.getFechaHora().getMonthValue() - 1]++);
 
-        String estadoSST = vencidas > 0 ? "CRÍTICO"
-                : pendientes > 0 || proceso > 0 ? "ATENCIÓN" : "SEGURO";
+        String estadoSST = vencidas > 0 || riesgosCriticos > 0 ? "CRÍTICO"
+                : porRevisar > 0 || pendientes > 0 || proceso > 0 || riesgosAltos > 0 ? "ATENCIÓN" : "SEGURO";
         String mensajeSST = vencidas > 0 ? "Existen acciones correctivas vencidas"
-                : pendientes > 0 || proceso > 0 ? "Existen acciones pendientes de seguimiento"
+                : riesgosCriticos > 0 ? "Existen riesgos críticos"
+                : porRevisar > 0 || pendientes > 0 || proceso > 0 ? "Existen acciones pendientes de seguimiento"
+                : riesgosAltos > 0 ? "Existen riesgos altos"
                 : "La gestión SST se encuentra controlada";
 
         model.addAttribute("nombreUsuario", authentication == null ? "Usuario" : authentication.getName());
@@ -80,6 +83,7 @@ public class DashboardController {
         model.addAttribute("accionesProceso", proceso);
         model.addAttribute("accionesCompletadas", completadas);
         model.addAttribute("accionesVencidas", vencidas);
+        model.addAttribute("accionesPorRevisar", porRevisar);
         model.addAttribute("accionesProximas", proximas);
         model.addAttribute("riesgosBajos", riesgosBajos);
         model.addAttribute("riesgosMedios", riesgosMedios);

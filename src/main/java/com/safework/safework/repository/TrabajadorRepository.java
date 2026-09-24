@@ -12,6 +12,10 @@ import com.safework.safework.model.Trabajador;
 public interface TrabajadorRepository
         extends JpaRepository<Trabajador, Long> {
 
+    java.util.Optional<Trabajador> findByUsuarioUsername(String username);
+
+    boolean existsByUsuarioIdAndIdNot(Long usuarioId, Long id);
+
 
     /*
      * Devuelve true si existe un trabajador

@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.safework.safework.model.Trabajador;
 import com.safework.safework.service.AreaService;
 import com.safework.safework.service.TrabajadorService;
+import com.safework.safework.repository.UsuarioRepository;
 
 import jakarta.validation.Valid;
 
@@ -24,15 +25,17 @@ public class TrabajadorController {
     private final TrabajadorService trabajadorService;
 
     private final AreaService areaService;
+    private final UsuarioRepository usuarioRepository;
 
 
 
     public TrabajadorController(
             TrabajadorService trabajadorService,
-            AreaService areaService) {
+            AreaService areaService, UsuarioRepository usuarioRepository) {
 
         this.trabajadorService = trabajadorService;
         this.areaService = areaService;
+        this.usuarioRepository = usuarioRepository;
 
     }
 
@@ -82,6 +85,7 @@ public class TrabajadorController {
                 "areas",
                 areaService.listarTodas()
         );
+        model.addAttribute("usuarios", usuarioRepository.findAll());
 
 
         return "trabajadores/formulario";
@@ -138,6 +142,7 @@ public class TrabajadorController {
                     "areas",
                     areaService.listarTodas()
             );
+            model.addAttribute("usuarios", usuarioRepository.findAll());
 
 
             return "trabajadores/formulario";
@@ -148,7 +153,14 @@ public class TrabajadorController {
 
 
 
-        trabajadorService.guardar(trabajador);
+        try {
+            trabajadorService.guardar(trabajador);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("areas", areaService.listarTodas());
+            model.addAttribute("usuarios", usuarioRepository.findAll());
+            return "trabajadores/formulario";
+        }
 
 
 
@@ -201,6 +213,7 @@ public class TrabajadorController {
                 "areas",
                 areaService.listarTodas()
         );
+        model.addAttribute("usuarios", usuarioRepository.findAll());
 
 
 

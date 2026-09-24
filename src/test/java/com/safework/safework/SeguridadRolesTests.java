@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -35,6 +37,7 @@ import com.safework.safework.service.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,6 +62,8 @@ class SeguridadRolesTests {
     @MockitoBean ArchivoAdjuntoService archivos;
     @MockitoBean AreaService areas;
     @MockitoBean UsuarioService usuarios;
+    @MockitoBean AuditoriaService auditoria;
+    @MockitoBean com.safework.safework.repository.UsuarioRepository usuarioRepository;
     @MockitoBean HallazgoInspeccionRepository hallazgos;
 
     @BeforeEach
@@ -85,6 +90,31 @@ class SeguridadRolesTests {
         when(incidentes.listarTodos()).thenReturn(List.of(incidente));
         when(inspecciones.listarTodas()).thenReturn(List.of(inspeccion));
         when(acciones.listarTodas()).thenReturn(List.of(accion));
+        when(acciones.buscar(nullable(Long.class), nullable(Long.class), anyString(), anyString(),
+                any(LocalDate.class), anyInt())).thenAnswer(invocation -> {
+                    Long riesgoId = invocation.getArgument(0);
+                    Long incidenteId = invocation.getArgument(1);
+                    String texto = invocation.getArgument(2);
+                    String vista = invocation.getArgument(3);
+                    LocalDate hoy = invocation.getArgument(4);
+                    int pagina = invocation.getArgument(5);
+                    var filtradas = BandejaAcciones.filtrar(acciones.listarTodas().stream()
+                            .filter(a -> riesgoId == null || a.getRiesgo() != null && riesgoId.equals(a.getRiesgo().getId()))
+                            .filter(a -> incidenteId == null || a.getIncidente() != null && incidenteId.equals(a.getIncidente().getId()))
+                            .filter(a -> a.getDescripcion().toLowerCase().contains(texto.toLowerCase()))
+                            .toList(), vista, hoy);
+                    int inicio = Math.min(pagina * 20, filtradas.size());
+                    return new PageImpl<>(filtradas.subList(inicio, Math.min(inicio + 20, filtradas.size())),
+                            PageRequest.of(pagina, 20), filtradas.size());
+                });
+        when(acciones.resumen(nullable(Long.class), nullable(Long.class), any(LocalDate.class)))
+                .thenAnswer(invocation -> BandejaAcciones.resumir(acciones.listarTodas(), invocation.getArgument(2)));
+        when(acciones.proximas(nullable(Long.class), nullable(Long.class), any(LocalDate.class)))
+                .thenAnswer(invocation -> acciones.listarTodas().stream()
+                        .filter(a -> BandejaAcciones.proximaVencer(a, invocation.getArgument(2)))
+                        .sorted(java.util.Comparator.comparing(AccionCorrectiva::getFechaLimite))
+                        .toList());
+        when(auditoria.buscar(anyString(), anyInt())).thenReturn(new PageImpl<>(List.of()));
         when(areas.buscarPorId(1L)).thenReturn(Optional.of(area));
         when(trabajadores.buscarPorId(1L)).thenReturn(Optional.of(trabajador));
         when(riesgos.buscarPorId(1L)).thenReturn(Optional.of(riesgo));
@@ -100,6 +130,53 @@ class SeguridadRolesTests {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 new SecurityContextImpl(auth));
         return session;
+    }
+
+    @Test
+    void reporteCsvRespetaVistaYPermisos() throws Exception {
+        AccionCorrectiva revision = acciones.buscarPorId(1L).orElseThrow();
+        revision.setEstado("En revisión");
+        revision.setDescripcion("Acción de revisión");
+        AccionCorrectiva devuelta = new AccionCorrectiva();
+        devuelta.setId(2L);
+        devuelta.setEstado("Devuelta");
+        devuelta.setDescripcion("Acción devuelta");
+        when(acciones.listarTodas()).thenReturn(List.of(revision, devuelta));
+
+        mvc.perform(get("/acciones/reporte.csv").param("vista", "revision")
+                .session(sesion("TRABAJADOR"))).andExpect(status().isForbidden());
+        String csv = mvc.perform(get("/acciones/reporte.csv").param("vista", "revision")
+                .session(sesion("SUPERVISOR")))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition",
+                        org.hamcrest.Matchers.containsString("attachment")))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(csv).contains("Acción de revisión").doesNotContain("Acción devuelta");
+    }
+
+    @Test
+    void reporteExcelRespetaVistaYPermisos() throws Exception {
+        AccionCorrectiva revision = acciones.buscarPorId(1L).orElseThrow();
+        revision.setEstado("En revisión");
+        AccionCorrectiva devuelta = new AccionCorrectiva();
+        devuelta.setId(2L);
+        devuelta.setEstado("Devuelta");
+        when(acciones.listarTodas()).thenReturn(List.of(revision, devuelta));
+
+        mvc.perform(get("/acciones/reporte.xlsx").session(sesion("TRABAJADOR")))
+                .andExpect(status().isForbidden());
+        byte[] contenido = mvc.perform(get("/acciones/reporte.xlsx")
+                .param("vista", "revision").session(sesion("SUPERVISOR")))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition",
+                        org.hamcrest.Matchers.containsString(".xlsx")))
+                .andReturn().getResponse().getContentAsByteArray();
+        try (var libro = new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(contenido))) {
+            var hoja = libro.getSheet("Acciones correctivas");
+            assertThat(hoja.getRow(4).getCell(5).getStringCellValue()).isEqualTo("En revisión");
+            assertThat((Object) hoja.getRow(5)).isNull();
+        }
     }
 
     private MockHttpServletRequestBuilder postConCsrf(String url, MockHttpSession session)
@@ -124,6 +201,52 @@ class SeguridadRolesTests {
                 .param("descripcion", "Prueba"))
                 .andExpect(status().isForbidden());
         verify(hallazgos, never()).save(any());
+    }
+
+    @Test
+    void trabajadorNoPuedeAprobarAcciones() throws Exception {
+        mvc.perform(postConCsrf("/acciones/1/revisar", sesion("TRABAJADOR"))
+                .param("decision", "aprobar"))
+                .andExpect(status().isForbidden());
+        verify(acciones, never()).revisar(any(), any(), anyBoolean(), any());
+    }
+
+    @Test
+    void trabajadorSinVinculoNoPuedeAbrirEntrega() throws Exception {
+        mvc.perform(get("/acciones/1/entregar").session(sesion("TRABAJADOR")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void responsablePuedeVerFormularioDeEntrega() throws Exception {
+        AccionCorrectiva accion = acciones.buscarPorId(1L).orElseThrow();
+        Usuario cuenta = new Usuario();
+        cuenta.setUsername("prueba");
+        accion.getResponsable().setUsuario(cuenta);
+        mvc.perform(get("/acciones/1/entregar").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Enviar a revisión")));
+    }
+
+    @Test
+    void supervisorPuedeVerFormularioDeRevision() throws Exception {
+        AccionCorrectiva accion = acciones.buscarPorId(1L).orElseThrow();
+        accion.setEstado("En revisión");
+        accion.setEvidenciaCierre("Trabajo realizado");
+        mvc.perform(get("/acciones/1/revisar").session(sesion("SUPERVISOR")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Aprobar y cerrar")));
+    }
+
+    @Test
+    void trabajadorPuedeVerHistorialDeAccion() throws Exception {
+        AccionCorrectiva accion = acciones.buscarPorId(1L).orElseThrow();
+        var evento = new AccionCorrectivaEvento(accion, "ENTREGA", "prueba",
+                LocalDateTime.now(), "Trabajo documentado", null, null, null);
+        when(acciones.historial(1L)).thenReturn(List.of(evento));
+        mvc.perform(get("/acciones/1/historial").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Trabajo documentado")));
     }
 
     static Stream<Arguments> rolesYModulos() {
@@ -157,6 +280,84 @@ class SeguridadRolesTests {
     }
 
     @Test
+    void bandejaFiltraPendientesDeRevisionSinOcultarContadores() throws Exception {
+        AccionCorrectiva revision = acciones.buscarPorId(1L).orElseThrow();
+        revision.setDescripcion("Acción que requiere revisión");
+        revision.setEstado("En revisión");
+        AccionCorrectiva devuelta = new AccionCorrectiva();
+        devuelta.setId(2L);
+        devuelta.setDescripcion("Acción que fue devuelta");
+        devuelta.setEstado("Devuelta");
+        devuelta.setFechaLimite(LocalDate.now().plusDays(10));
+        when(acciones.listarTodas()).thenReturn(List.of(revision, devuelta));
+
+        String html = mvc.perform(get("/acciones").param("vista", "revision")
+                .session(sesion("SUPERVISOR"))).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(html).contains("Filtrar acciones", "Por revisar",
+                "Acción que requiere revisión");
+        assertThat(html).doesNotContain("Acción que fue devuelta");
+    }
+
+    @Test
+    void bandejaRechazaFiltroDesconocido() throws Exception {
+        mvc.perform(get("/acciones").param("vista", "invalida").session(sesion("SUPERVISOR")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void trabajadorSoloRecibeAvisosDeSusAcciones() throws Exception {
+        AccionCorrectiva propia = acciones.buscarPorId(1L).orElseThrow();
+        propia.setFechaLimite(LocalDate.now().plusDays(2));
+        Usuario cuenta = new Usuario();
+        cuenta.setUsername("prueba");
+        propia.getResponsable().setUsuario(cuenta);
+        AccionCorrectiva ajena = new AccionCorrectiva();
+        ajena.setId(2L);
+        ajena.setDescripcion("Acción ajena");
+        ajena.setEstado("Pendiente");
+        ajena.setFechaLimite(LocalDate.now().plusDays(1));
+        Trabajador otro = new Trabajador();
+        otro.setId(2L);
+        Usuario otraCuenta = new Usuario();
+        otraCuenta.setUsername("otro");
+        otro.setUsuario(otraCuenta);
+        ajena.setResponsable(otro);
+        when(acciones.listarTodas()).thenReturn(List.of(propia, ajena));
+
+        var trabajador = mvc.perform(get("/acciones").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk()).andReturn();
+        var supervisor = mvc.perform(get("/acciones").session(sesion("SUPERVISOR")))
+                .andExpect(status().isOk()).andReturn();
+
+        @SuppressWarnings("unchecked")
+        List<AccionCorrectiva> avisosTrabajador = (List<AccionCorrectiva>)
+                trabajador.getModelAndView().getModel().get("avisosProximos");
+        @SuppressWarnings("unchecked")
+        List<AccionCorrectiva> avisosSupervisor = (List<AccionCorrectiva>)
+                supervisor.getModelAndView().getModel().get("avisosProximos");
+        assertThat(avisosTrabajador).containsExactly(propia);
+        assertThat(avisosSupervisor).containsExactly(ajena, propia);
+    }
+
+    @Test
+    void listadoCompactoRemiteAlDetalleConEvidencia() throws Exception {
+        AccionCorrectiva accion = acciones.buscarPorId(1L).orElseThrow();
+        accion.setEvidenciaCierre("Evidencia detallada de la prueba");
+        accion.setObservacionRevision("Observación detallada del supervisor");
+
+        String listado = mvc.perform(get("/acciones").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String detalle = mvc.perform(get("/acciones/detalle/1").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        assertThat(listado).contains("/acciones/detalle/1", "Ver detalle")
+                .doesNotContain("Evidencia detallada de la prueba", "Observación detallada del supervisor");
+        assertThat(detalle).contains("Evidencia detallada de la prueba", "Observación detallada del supervisor");
+    }
+
+    @Test
     void guardaAccionConRiesgoYSinIncidente() throws Exception {
         mvc.perform(postConCsrf("/acciones/guardar", sesion("ADMIN"))
                 .param("id", "1")
@@ -171,7 +372,7 @@ class SeguridadRolesTests {
                 .param("evidenciaCierre", "Se fijó el estante"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/acciones"));
-        verify(acciones).guardar(any(AccionCorrectiva.class), any());
+        verify(acciones).guardar(any(AccionCorrectiva.class), any(), org.mockito.ArgumentMatchers.eq("prueba"));
     }
 
     @ParameterizedTest

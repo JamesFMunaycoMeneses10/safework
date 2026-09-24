@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revisar acción - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head>
+<body class="bg-light">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5" style="max-width: 900px">
+    <h1 class="h3">Revisar acción correctiva</h1>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="card card-body shadow-sm mb-3">
+      <h2 class="h5" th:text="${accion.descripcion}"></h2>
+      <p><strong>Responsable:</strong> <span th:text="${accion.responsable.nombres + ' ' + accion.responsable.apellidos}"></span></p>
+      <p><strong>Entrega:</strong> <span th:text="${accion.evidenciaCierre}"></span></p>
+      <a th:if="${accion.archivoEvidencia != null}" th:href="@{/acciones/{id}/evidencia(id=${accion.id})}">Descargar foto o PDF</a>
+    </div>
+    <form th:action="@{/acciones/{id}/revisar(id=${accion.id})}" method="post" class="card card-body shadow-sm">
+      <label for="observacion" class="form-label">Observación del supervisor</label>
+      <textarea id="observacion" name="observacion" class="form-control mb-2" rows="4" maxlength="1000"
+                placeholder="Obligatoria si devuelves la acción"></textarea>
+      <p class="form-text">La aprobación cierra la acción. La devolución la envía al responsable para corregirla.</p>
+      <div class="d-flex gap-2">
+        <button class="btn btn-success" type="submit" name="decision" value="aprobar">Aprobar y cerrar</button>
+        <button class="btn btn-outline-warning" type="submit" name="decision" value="devolver">Devolver con observación</button>
+        <a th:href="@{/acciones}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial de acción - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head>
+<body class="bg-light">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5" style="max-width: 1000px">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+      <div>
+        <h1 class="h3 mb-1">Historial de la acción</h1>
+        <p class="text-muted mb-0" th:text="${accion.descripcion}"></p>
+      </div>
+      <a th:href="@{/acciones}" class="btn btn-outline-secondary">Volver</a>
+    </div>
+    <p class="alert alert-info" th:if="${#lists.isEmpty(eventos)}">
+      Esta acción no tiene entregas ni revisiones registradas en el nuevo flujo.
+    </p>
+    <ol class="list-unstyled" th:unless="${#lists.isEmpty(eventos)}">
+      <li class="card shadow-sm mb-3" th:each="evento : ${eventos}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between gap-3 flex-wrap">
+            <h2 class="h5 mb-1" th:text="${evento.tipo == 'ENTREGA' ? 'Evidencia entregada' :
+                (evento.tipo == 'APROBACION' ? 'Aprobada y cerrada' : 'Devuelta con observación')}"></h2>
+            <time class="text-muted" th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy HH:mm')}"></time>
+          </div>
+          <p class="text-muted mb-2" th:text="${'Usuario: ' + evento.usuario}"></p>
+          <p class="mb-2" th:if="${evento.detalle != null}" th:text="${evento.detalle}"></p>
+          <a th:if="${evento.archivoEvidencia != null}"
+             th:href="@{/acciones/{id}/historial/{eventoId}/archivo(id=${accion.id},eventoId=${evento.id})}"
+             th:text="${'Descargar: ' + evento.nombreEvidencia}">Descargar evidencia</a>
+        </div>
+      </li>
+    </ol>
+  </main>
+</body>
+</html>

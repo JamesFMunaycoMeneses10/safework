@@ -2,6 +2,7 @@ package com.safework.safework.controller;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -103,7 +104,7 @@ public class IncidenteController {
     public String guardar(
             @Valid @ModelAttribute("incidente") Incidente incidente,
             BindingResult resultado,
-            Model model) {
+            Model model, Authentication authentication) {
 
 
         if (resultado.hasErrors()) {
@@ -117,7 +118,7 @@ public class IncidenteController {
 
 
 
-        incidenteService.guardar(incidente);
+        incidenteService.guardar(incidente, authentication.getName());
 
 
 
@@ -172,13 +173,14 @@ public class IncidenteController {
     @PostMapping("/eliminar/{id}")
     public String eliminar(
             @PathVariable Long id,
+            Authentication authentication,
             RedirectAttributes redirectAttributes) {
 
 
         try {
 
 
-            incidenteService.eliminar(id);
+            incidenteService.eliminar(id, authentication.getName());
 
 
 

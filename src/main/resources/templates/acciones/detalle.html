@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle de acción correctiva - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head>
+<body class="bg-light">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5" style="max-width: 1000px">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div>
+        <h1 class="h3 mb-1">Detalle de acción correctiva</h1>
+        <p class="text-muted mb-0" th:text="${accion.descripcion}"></p>
+      </div>
+      <a th:href="@{/acciones}" class="btn btn-outline-secondary">Volver a acciones</a>
+    </div>
+
+    <div class="alert alert-danger" th:if="${vencida}">Esta acción está vencida y sigue abierta.</div>
+    <div class="alert alert-warning" th:if="${proximaVencer}">Esta acción vence dentro de los próximos 7 días.</div>
+
+    <section class="card shadow-sm mb-3" aria-labelledby="datos-titulo">
+      <div class="card-body">
+        <h2 id="datos-titulo" class="h5 mb-3">Datos de la acción</h2>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Estado</dt><dd class="col-sm-8" th:text="${accion.estado}"></dd>
+          <dt class="col-sm-4">Prioridad</dt><dd class="col-sm-8" th:text="${accion.prioridad}"></dd>
+          <dt class="col-sm-4">Responsable</dt>
+          <dd class="col-sm-8" th:text="${accion.responsable != null ? accion.responsable.nombres + ' ' + accion.responsable.apellidos : 'Sin asignar'}"></dd>
+          <dt class="col-sm-4">Riesgo asociado</dt>
+          <dd class="col-sm-8" th:text="${accion.riesgo != null ? accion.riesgo.peligro : 'Ninguno'}"></dd>
+          <dt class="col-sm-4">Incidente relacionado</dt>
+          <dd class="col-sm-8" th:text="${accion.incidente != null ? 'Incidente #' + accion.incidente.id : 'Ninguno'}"></dd>
+          <dt class="col-sm-4">Fecha de registro</dt><dd class="col-sm-8" th:text="${accion.fechaRegistro}"></dd>
+          <dt class="col-sm-4">Fecha límite</dt><dd class="col-sm-8" th:text="${accion.fechaLimite}"></dd>
+          <dt class="col-sm-4">Fecha de cierre</dt>
+          <dd class="col-sm-8" th:text="${accion.fechaCierre != null ? #temporals.format(accion.fechaCierre, 'dd/MM/yyyy') : 'Sin cierre'}"></dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card shadow-sm" aria-labelledby="evidencia-titulo">
+      <div class="card-body">
+        <h2 id="evidencia-titulo" class="h5 mb-3">Evidencia y revisión</h2>
+        <p th:if="${accion.evidenciaCierre != null}" th:text="${accion.evidenciaCierre}"></p>
+        <p class="text-muted" th:if="${accion.evidenciaCierre == null}">Todavía no se ha presentado evidencia.</p>
+        <a th:if="${accion.archivoEvidencia != null}"
+           th:href="@{/acciones/{id}/evidencia(id=${accion.id})}" class="d-block mb-2">Descargar evidencia actual</a>
+        <p class="mb-1" th:if="${accion.enviadaPor != null}"
+           th:text="${'Entregó: ' + accion.enviadaPor.username + ' · ' + #temporals.format(accion.fechaEnvioRevision, 'dd/MM/yyyy HH:mm')}"></p>
+        <p class="mb-1" th:if="${accion.revisadaPor != null}"
+           th:text="${'Revisó: ' + accion.revisadaPor.username + ' · ' + #temporals.format(accion.fechaRevision, 'dd/MM/yyyy HH:mm')}"></p>
+        <p class="text-warning-emphasis mb-2" th:if="${accion.observacionRevision != null}"
+           th:text="${'Observación: ' + accion.observacionRevision}"></p>
+        <a th:if="${accion.enviadaPor != null}"
+           th:href="@{/acciones/{id}/historial(id=${accion.id})}" class="btn btn-sm btn-outline-primary mt-2">Ver historial de entregas y revisiones</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

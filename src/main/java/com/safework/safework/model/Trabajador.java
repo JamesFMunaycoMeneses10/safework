@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import jakarta.validation.constraints.NotBlank;
@@ -79,6 +80,11 @@ public class Trabajador {
         nullable = false
     )
     private Area area;
+
+    /** Cuenta con la que el trabajador presenta sus propias evidencias. */
+    @OneToOne
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
 
 
 
@@ -210,6 +216,10 @@ public class Trabajador {
         this.area = area;
 
     }
+
+    public Usuario getUsuario() { return usuario; }
+
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
 
 

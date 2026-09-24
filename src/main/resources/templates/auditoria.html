@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bitácora de auditoría - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head>
+<body class="bg-light">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <h1 class="fw-bold">Bitácora de auditoría</h1>
+        <p class="text-muted mb-0">Cambios realizados en riesgos, incidentes y acciones correctivas.</p>
+      </div>
+      <a th:href="@{/riesgos}" class="btn btn-outline-secondary">Volver a riesgos</a>
+    </div>
+    <form method="get" th:action="@{/auditoria}" class="d-flex gap-2 mb-3" role="search">
+      <input type="search" name="buscar" maxlength="100" class="form-control" th:value="${buscar}"
+             placeholder="Buscar por usuario, módulo, operación o detalle" aria-label="Buscar en bitácora">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </form>
+    <div class="card shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light"><tr><th>Fecha y hora</th><th>Usuario</th><th>Operación</th><th>Registro</th><th>Detalle</th></tr></thead>
+          <tbody>
+            <tr th:each="item : ${eventos}" th:with="evento=${item.evento}">
+              <td class="text-nowrap" th:text="${#temporals.format(evento.fecha, 'dd/MM/yyyy HH:mm:ss')}">Fecha</td>
+              <td th:text="${evento.usuario}">Usuario</td>
+              <td><span class="badge text-bg-secondary" th:text="${evento.operacion}">ACTUALIZADO</span></td>
+              <td th:text="${evento.modulo + ' #' + evento.registroId}">RIESGOS #1</td>
+              <td class="text-break">
+                <details th:if="${item.estructurado}" class="small">
+                  <summary class="text-primary" style="cursor:pointer"
+                           th:text="${evento.operacion == 'ACTUALIZADO' ? 'Ver cambios (' + #lists.size(item.cambios) + ')' : 'Ver datos del registro'}">Ver detalle</summary>
+                  <div class="mt-2" th:if="${evento.operacion == 'ACTUALIZADO'}">
+                    <div th:each="cambio : ${item.cambios}" class="border-bottom py-1">
+                      <strong th:text="${cambio.campo}">Campo</strong>:
+                      <span th:text="${cambio.antes}">Anterior</span>
+                      <span aria-hidden="true"> → </span>
+                      <span th:text="${cambio.despues}">Nuevo</span>
+                    </div>
+                    <span th:if="${#lists.isEmpty(item.cambios)}" class="text-muted">No cambiaron los campos registrados.</span>
+                  </div>
+                  <dl th:unless="${evento.operacion == 'ACTUALIZADO'}" class="row mt-2 mb-0">
+                    <th:block th:each="dato : ${item.datos}">
+                      <dt class="col-sm-3" th:text="${dato.campo}">Campo</dt>
+                      <dd class="col-sm-9" th:text="${dato.valor}">Valor</dd>
+                    </th:block>
+                  </dl>
+                </details>
+                <span th:unless="${item.estructurado}" th:text="${evento.detalle}">Detalle</span>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(eventos)}"><td colspan="5" class="text-center text-muted py-4">Todavía no hay cambios auditados.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <nav th:if="${resultados.totalPages > 1}" aria-label="Páginas de la bitácora" class="mt-3 d-flex justify-content-between align-items-center">
+      <a class="btn btn-outline-secondary" th:if="${resultados.hasPrevious()}"
+         th:href="@{/auditoria(buscar=${buscar},pagina=${resultados.number - 1})}">Anterior</a>
+      <span th:unless="${resultados.hasPrevious()}"></span>
+      <span th:text="${'Página ' + (resultados.number + 1) + ' de ' + resultados.totalPages}">Página</span>
+      <a class="btn btn-outline-secondary" th:if="${resultados.hasNext()}"
+         th:href="@{/auditoria(buscar=${buscar},pagina=${resultados.number + 1})}">Siguiente</a>
+    </nav>
+  </main>
+</body>
+</html>
