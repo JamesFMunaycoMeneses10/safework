@@ -117,13 +117,22 @@ public class SecurityConfig {
                                                 )
                                                 .permitAll()
 
-                                                // Solo los listados GET son de consulta para TRABAJADOR.
+                                                // Los listados SST son de consulta para TRABAJADOR.
+                                                // El directorio de personal no es visible para este rol.
                                                 // Las rutas de formularios y escritura quedan bajo las
                                                 // reglas de gestión definidas después de esta excepción.
                                                 .requestMatchers(HttpMethod.GET,
-                                                                "/trabajadores", "/riesgos", "/incidentes",
+                                                                "/riesgos", "/incidentes",
                                                                 "/inspecciones", "/acciones")
                                                 .hasAnyRole("ADMIN", "SUPERVISOR", "TRABAJADOR")
+
+                                                .requestMatchers("/trabajadores", "/trabajadores/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
+
+                                                .requestMatchers(HttpMethod.GET, "/epp/mis-entregas")
+                                                .hasRole("TRABAJADOR")
+                                                .requestMatchers("/epp", "/epp/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
 
                                                 /**
                                                  * Gestión de usuarios y roles.
@@ -155,9 +164,6 @@ public class SecurityConfig {
                                                  * la información del personal.
                                                  *
                                                  */
-                                                .requestMatchers("/trabajadores/**")
-                                                .hasAnyRole("ADMIN", "SUPERVISOR")
-
                                                 /**
                                                  * Gestión de riesgos.
                                                  *

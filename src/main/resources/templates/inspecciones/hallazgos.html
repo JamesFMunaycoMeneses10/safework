@@ -15,7 +15,7 @@
         <a th:href="@{/dashboard}"><span class="nav-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span> Dashboard</a>
         <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
         <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
-        <a th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
+        <a th:if="${puedeGestionarSst}" th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
         <a th:href="@{/riesgos}"><span class="nav-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span> Riesgos</a>
         <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
         <a class="active" th:href="@{/inspecciones}" aria-current="page"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>

@@ -13,10 +13,10 @@
       </a>
       <nav class="dashboard-nav">
         <a class="dashboard-home-link active" th:href="@{/dashboard}" aria-current="page"><span class="nav-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span> Dashboard</a>
-        <div class="dashboard-nav-group">
+        <div class="dashboard-nav-group" th:if="${puedeGestionarSst}">
           <span class="dashboard-nav-label">ORGANIZACIÓN</span>
           <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
-          <a th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
+          <a th:if="${puedeGestionarSst}" th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
           <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
         </div>
         <div class="dashboard-nav-group">
@@ -25,6 +25,8 @@
           <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
           <a th:href="@{/inspecciones}"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>
           <a th:href="@{/acciones}"><span class="nav-icon"><i class="bi bi-tools" aria-hidden="true"></i></span> Acciones Correctivas</a>
+          <a th:if="${puedeGestionarSst}" th:href="@{/epp}"><span class="nav-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span> Entregas de EPP</a>
+          <a th:unless="${puedeGestionarSst}" th:href="@{/epp/mis-entregas}"><span class="nav-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span> Mis EPP</a>
         </div>
         <div class="dashboard-nav-group" th:if="${puedeGestionarSst}">
           <span class="dashboard-nav-label">CONTROL</span>

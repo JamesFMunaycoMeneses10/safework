@@ -40,6 +40,16 @@ public class TrabajadorService {
 
     }
 
+    public List<Trabajador> buscarConFiltros(Long areaId, String dni, String cargo) {
+        return trabajadorRepository.buscarConFiltros(areaId,
+                dni == null || dni.isBlank() ? null : dni.trim(),
+                cargo == null || cargo.isBlank() ? null : cargo.trim());
+    }
+
+    public List<String> listarCargos() {
+        return trabajadorRepository.listarCargos();
+    }
+
 
 
     /**

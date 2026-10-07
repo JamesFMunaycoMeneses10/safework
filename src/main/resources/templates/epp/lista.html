@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Entregas de EPP - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/internal-layout.css}" />
+</head>
+<body class="bg-light">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div>
+        <h1 class="mb-1" th:text="${propio} ? 'Mis entregas de EPP' : 'Entregas de EPP'">Entregas de EPP</h1>
+        <p class="text-secondary mb-0" th:text="${propio} ? 'Consulta los equipos de protección personal que recibiste.' : 'Historial de equipos de protección personal entregados a los trabajadores.'">Historial de entregas.</p>
+      </div>
+      <a th:if="${puedeGestionarSst}" th:href="@{/epp/nueva}" class="btn btn-primary">+ Registrar entrega</a>
+    </div>
+    <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
+    <div th:if="${aviso}" class="alert alert-info" role="status" th:text="${aviso}"></div>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light"><tr>
+              <th>Fecha</th><th th:unless="${propio}">Trabajador</th><th>Equipo de protección</th><th>Cantidad</th><th>Observaciones</th><th th:unless="${propio}">Registrado por</th>
+            </tr></thead>
+            <tbody>
+              <tr th:each="entrega : ${entregas}">
+                <td th:text="${#temporals.format(entrega.fechaEntrega, 'dd/MM/yyyy')}">07/10/2026</td>
+                <td th:unless="${propio}" th:text="${entrega.trabajador.nombres + ' ' + entrega.trabajador.apellidos}">Trabajador</td>
+                <td th:text="${entrega.tipoEpp}">Casco</td>
+                <td th:text="${entrega.cantidad}">1</td>
+                <td th:text="${entrega.observaciones ?: '—'}">—</td>
+                <td th:unless="${propio}" th:text="${entrega.registradoPor.username}">supervisor</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(entregas)}"><td th:colspan="${propio} ? 4 : 6" class="text-center text-secondary py-4">Todavía no hay entregas registradas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

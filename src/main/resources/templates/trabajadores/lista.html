@@ -84,6 +84,41 @@
 
 
 
+    <form method="get" th:action="@{/trabajadores}" class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label for="filtroArea" class="form-label">Área</label>
+                    <select id="filtroArea" name="areaId" class="form-select">
+                        <option value="">Todas las áreas</option>
+                        <option th:each="area : ${areas}" th:value="${area.id}"
+                                th:text="${area.nombre}"
+                                th:selected="${areaIdSeleccionada != null and areaIdSeleccionada == area.id}"></option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label for="filtroDni" class="form-label">DNI</label>
+                    <input id="filtroDni" name="dni" type="search" inputmode="numeric"
+                           maxlength="8" class="form-control" placeholder="DNI completo o parcial"
+                           th:value="${dniFiltro}" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label for="filtroCargo" class="form-label">Cargo</label>
+                    <select id="filtroCargo" name="cargo" class="form-select">
+                        <option value="">Todos los cargos</option>
+                        <option th:each="cargoOpcion : ${cargos}" th:value="${cargoOpcion}"
+                                th:text="${cargoOpcion}"
+                                th:selected="${cargoSeleccionado == cargoOpcion}"></option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a th:href="@{/trabajadores}" class="btn btn-outline-secondary">Limpiar</a>
+                </div>
+            </div>
+        </div>
+    </form>
+
     <!-- TABLA TRABAJADORES -->
 
 
@@ -127,6 +162,13 @@
 
 
                     <tbody>
+
+                        <tr th:if="${#lists.isEmpty(trabajadores)}">
+                            <td th:colspan="${puedeGestionarSst ? 6 : 5}"
+                                class="text-center text-secondary py-4">
+                                No se encontraron trabajadores con esos filtros.
+                            </td>
+                        </tr>
 
 
 

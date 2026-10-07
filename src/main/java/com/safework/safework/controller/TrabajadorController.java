@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.safework.safework.model.Trabajador;
 import com.safework.safework.service.AreaService;
@@ -48,13 +49,26 @@ public class TrabajadorController {
      */
     @GetMapping("/trabajadores")
 
-    public String listarTrabajadores(Model model) {
+    public String listarTrabajadores(
+            @RequestParam(required = false) Long areaId,
+            @RequestParam(required = false) String dni,
+            @RequestParam(required = false) String cargo,
+            Model model) {
+
+        String dniFiltro = dni == null ? "" : dni.trim();
+        String cargoFiltro = cargo == null ? "" : cargo.trim();
 
 
         model.addAttribute(
                 "trabajadores",
-                trabajadorService.listarTodos()
+                trabajadorService.buscarConFiltros(areaId, dniFiltro, cargoFiltro)
         );
+
+        model.addAttribute("areas", areaService.listarTodas());
+        model.addAttribute("cargos", trabajadorService.listarCargos());
+        model.addAttribute("areaIdSeleccionada", areaId);
+        model.addAttribute("dniFiltro", dniFiltro);
+        model.addAttribute("cargoSeleccionado", cargoFiltro);
 
 
         return "trabajadores/lista";

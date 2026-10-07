@@ -59,6 +59,7 @@ class SeguridadRolesTests {
     @MockitoBean IncidenteService incidentes;
     @MockitoBean InspeccionService inspecciones;
     @MockitoBean AccionCorrectivaService acciones;
+    @MockitoBean EntregaEppService entregasEpp;
     @MockitoBean ArchivoAdjuntoService archivos;
     @MockitoBean AreaService areas;
     @MockitoBean UsuarioService usuarios;
@@ -86,6 +87,9 @@ class SeguridadRolesTests {
         accion.setId(1L);
         when(areas.listarTodas()).thenReturn(List.of(area));
         when(trabajadores.listarTodos()).thenReturn(List.of(trabajador));
+        when(trabajadores.buscarConFiltros(nullable(Long.class), anyString(), anyString()))
+                .thenReturn(List.of(trabajador));
+        when(trabajadores.listarCargos()).thenReturn(List.of(trabajador.getCargo()));
         when(riesgos.listarTodos()).thenReturn(List.of(riesgo));
         when(incidentes.listarTodos()).thenReturn(List.of(incidente));
         when(inspecciones.listarTodas()).thenReturn(List.of(inspeccion));
@@ -257,14 +261,34 @@ class SeguridadRolesTests {
     @ParameterizedTest
     @MethodSource("rolesYModulos")
     void listadosYBotonesSegunRol(String rol, String modulo) throws Exception {
-        String html = mvc.perform(get("/" + modulo).session(sesion(rol)))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        var resultado = mvc.perform(get("/" + modulo).session(sesion(rol)))
+                .andExpect(status().is(rol.equals("TRABAJADOR") && modulo.equals("trabajadores") ? 403 : 200))
+                .andReturn();
+        if (rol.equals("TRABAJADOR") && modulo.equals("trabajadores")) {
+            verify(trabajadores, never()).listarTodos();
+            verify(trabajadores, never()).buscarConFiltros(nullable(Long.class), anyString(), anyString());
+            return;
+        }
+        String html = resultado.getResponse().getContentAsString();
         boolean gestiona = !rol.equals("TRABAJADOR");
         assertThat(html.contains("/" + modulo + "/editar/1")).isEqualTo(gestiona);
         assertThat(html.contains("/" + modulo + "/eliminar/1")).isEqualTo(gestiona);
         assertThat(html.contains("/" + modulo + "/nuev")).isEqualTo(gestiona);
         assertThat(html.contains("href=\"/areas\"")).isEqualTo(rol.equals("ADMIN"));
         assertThat(html.contains("href=\"/usuarios\"")).isEqualTo(rol.equals("ADMIN"));
+    }
+
+    @Test
+    void trabajadorNoVeDirectorioEnLosMenus() throws Exception {
+        String dashboard = mvc.perform(get("/dashboard").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String acciones = mvc.perform(get("/acciones").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String hallazgos = mvc.perform(get("/inspecciones/1/hallazgos").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(dashboard).doesNotContain("href=\"/trabajadores\"");
+        assertThat(acciones).doesNotContain("href=\"/trabajadores\"");
+        assertThat(hallazgos).doesNotContain("href=\"/trabajadores\"");
     }
 
     @Test
@@ -443,6 +467,42 @@ class SeguridadRolesTests {
         mvc.perform(post("/acciones/eliminar/1").session(sesion("ADMIN")))
                 .andExpect(status().isForbidden());
         verify(acciones, never()).eliminarPorId(anyLong());
+    }
+
+    @Test
+    void eppRespetaPermisosYPrivacidad() throws Exception {
+        mvc.perform(get("/epp").session(sesion("TRABAJADOR")))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/epp/nueva").session(sesion("TRABAJADOR")))
+                .andExpect(status().isForbidden());
+        mvc.perform(postConCsrf("/epp/guardar", sesion("TRABAJADOR")))
+                .andExpect(status().isForbidden());
+        verify(entregasEpp, never()).listarTodas();
+        verify(entregasEpp, never()).registrar(any(), anyString());
+
+        mvc.perform(get("/epp/mis-entregas").session(sesion("TRABAJADOR")))
+                .andExpect(status().isOk());
+        verify(entregasEpp).listarPropias("prueba");
+        mvc.perform(get("/epp/mis-entregas").session(sesion("SUPERVISOR")))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/epp").session(sesion("SUPERVISOR")))
+                .andExpect(status().isOk());
+        mvc.perform(get("/epp/nueva").session(sesion("ADMIN")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void supervisorRegistraEppConCsrfYTrabajadorNo() throws Exception {
+        mvc.perform(post("/epp/guardar").session(sesion("SUPERVISOR")))
+                .andExpect(status().isForbidden());
+        mvc.perform(postConCsrf("/epp/guardar", sesion("SUPERVISOR"))
+                .param("trabajadorId", "1")
+                .param("tipoEpp", "Casco")
+                .param("fechaEntrega", LocalDate.now().toString())
+                .param("cantidad", "1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/epp"));
+        verify(entregasEpp).registrar(any(EntregaEppFormulario.class), eq("prueba"));
     }
 
     @Test
