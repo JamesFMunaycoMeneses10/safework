@@ -47,7 +47,7 @@ public class DashboardController {
 
         long pendientes = acciones.stream().filter(a -> "Pendiente".equalsIgnoreCase(a.getEstado())).count();
         long proceso = acciones.stream().filter(a -> "En proceso".equalsIgnoreCase(a.getEstado())).count();
-        long completadas = acciones.stream().filter(a -> "Completada".equalsIgnoreCase(a.getEstado())).count();
+        long completadas = acciones.stream().filter(a -> BandejaAcciones.completada(a)).count();
         long vencidas = acciones.stream().filter(a -> BandejaAcciones.vencida(a, hoy)).count();
         long proximas = acciones.stream().filter(a -> BandejaAcciones.proximaVencer(a, hoy)).count();
         long porRevisar = acciones.stream().filter(a -> "En revisión".equals(a.getEstado())).count();
@@ -67,12 +67,14 @@ public class DashboardController {
                 .forEach(i -> incidentesPorMes[i.getFechaHora().getMonthValue() - 1]++);
 
         String estadoSST = vencidas > 0 || riesgosCriticos > 0 ? "CRÍTICO"
-                : porRevisar > 0 || pendientes > 0 || proceso > 0 || riesgosAltos > 0 ? "ATENCIÓN" : "SEGURO";
+                : porRevisar > 0 || pendientes > 0 || proceso > 0 || riesgosAltos > 0 ? "ATENCIÓN"
+                : riesgos.isEmpty() && incidentes.isEmpty() ? "SIN DATOS SUFICIENTES" : "SEGURO";
         String mensajeSST = vencidas > 0 ? "Existen acciones correctivas vencidas"
                 : riesgosCriticos > 0 ? "Existen riesgos críticos"
                 : porRevisar > 0 || pendientes > 0 || proceso > 0 ? "Existen acciones pendientes de seguimiento"
                 : riesgosAltos > 0 ? "Existen riesgos altos"
-                : "La gestión SST se encuentra controlada";
+                : riesgos.isEmpty() && incidentes.isEmpty() ? "Registra evaluaciones SST para interpretar los indicadores"
+                : "No se detectaron alertas según los registros disponibles";
 
         model.addAttribute("nombreUsuario", authentication == null ? "Usuario" : authentication.getName());
         model.addAttribute("totalTrabajadores", trabajadorService.listarTodos().size());

@@ -55,6 +55,7 @@ class SeguridadRolesTests {
     private static final String[] MODULOS = {
         "trabajadores", "riesgos", "incidentes", "inspecciones", "acciones"
     };
+    @MockitoBean com.safework.safework.security.LimiteAcceso limite;
     @Autowired MockMvc mvc;
     @MockitoBean TrabajadorService trabajadores;
     @MockitoBean RiesgoService riesgos;
@@ -66,6 +67,10 @@ class SeguridadRolesTests {
     @MockitoBean AreaService areas;
     @MockitoBean UsuarioService usuarios;
     @MockitoBean AuditoriaService auditoria;
+    @MockitoBean CapacitacionService capacitaciones;
+    @MockitoBean MembresiaService membresias;
+    @MockitoBean com.safework.safework.security.RecuperacionService recuperacion;
+    @MockitoBean com.safework.safework.security.FirmaMercadoPago firmaPagos;
     @MockitoBean com.safework.safework.repository.UsuarioRepository usuarioRepository;
     @MockitoBean HallazgoInspeccionRepository hallazgos;
 

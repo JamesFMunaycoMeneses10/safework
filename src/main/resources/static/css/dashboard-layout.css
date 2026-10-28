@@ -110,3 +110,5 @@
 .dashboard-logout:hover{border-color:#c7d7eb}
 @media(max-width:700px){.dashboard-content{padding-top:18px}.dashboard-heading{align-items:flex-start;flex-direction:column;padding:20px}.dashboard-health{width:100%}}
 @media(prefers-reduced-motion:reduce){.dashboard-panel,.dashboard-nav a,.dashboard-logout{transition:none}}
+
+.dashboard-health.is-unknown{color:#526579;border-color:#d6e1ec;background:#f6f9fc}

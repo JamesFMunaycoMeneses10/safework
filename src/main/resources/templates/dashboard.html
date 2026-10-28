@@ -17,6 +17,7 @@
           <span class="dashboard-nav-label">ORGANIZACIÓN</span>
           <a th:if="${esAdministrador}" th:href="@{/areas}"><span class="nav-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> Áreas</a>
           <a th:if="${puedeGestionarSst}" th:href="@{/trabajadores}"><span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span> Trabajadores</a>
+          <a th:if="${esAdministrador}" th:href="@{/membresia}"><span class="nav-icon"><i class="bi bi-credit-card" aria-hidden="true"></i></span> Membresía</a>
           <a th:if="${esAdministrador}" th:href="@{/usuarios}"><span class="nav-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span> Usuarios</a>
         </div>
         <div class="dashboard-nav-group">
@@ -25,6 +26,8 @@
           <a th:href="@{/incidentes}"><span class="nav-icon"><i class="bi bi-activity" aria-hidden="true"></i></span> Incidentes</a>
           <a th:href="@{/inspecciones}"><span class="nav-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></span> Inspecciones</a>
           <a th:href="@{/acciones}"><span class="nav-icon"><i class="bi bi-tools" aria-hidden="true"></i></span> Acciones Correctivas</a>
+          <a th:if="${puedeGestionarSst}" th:href="@{/capacitaciones}"><span class="nav-icon"><i class="bi bi-mortarboard" aria-hidden="true"></i></span> Capacitaciones</a>
+          <a th:unless="${puedeGestionarSst}" th:href="@{/capacitaciones/mis-capacitaciones}"><span class="nav-icon"><i class="bi bi-mortarboard" aria-hidden="true"></i></span> Mis capacitaciones</a>
           <a th:if="${puedeGestionarSst}" th:href="@{/epp}"><span class="nav-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span> Entregas de EPP</a>
           <a th:unless="${puedeGestionarSst}" th:href="@{/epp/mis-entregas}"><span class="nav-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span> Mis EPP</a>
         </div>
@@ -54,10 +57,10 @@
             <h1>Hola, <span th:text="${nombreUsuario}">Usuario</span></h1>
             <p>Este es el resumen de seguridad y salud en el trabajo de tu organización.</p>
           </div>
-          <div class="dashboard-health" th:classappend="${estadoSST == 'SEGURO' ? ' is-safe' : (estadoSST == 'ATENCIÓN' ? ' is-warning' : ' is-critical')}" role="status">
+          <div class="dashboard-health" th:classappend="${estadoSST == 'SIN DATOS SUFICIENTES' ? ' is-unknown' : (estadoSST == 'SEGURO' ? ' is-safe' : (estadoSST == 'ATENCIÓN' ? ' is-warning' : ' is-critical'))}" role="status">
             <span class="health-indicator" aria-hidden="true"></span>
             <span><small>ESTADO GENERAL</small><strong th:text="${estadoSST}">SEGURO</strong></span>
-            <i th:class="${estadoSST == 'SEGURO' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill'}" aria-hidden="true"></i>
+            <i th:class="${estadoSST == 'SIN DATOS SUFICIENTES' ? 'bi bi-info-circle' : (estadoSST == 'SEGURO' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill')}" aria-hidden="true"></i>
           </div>
         </div>
 
@@ -110,7 +113,7 @@
                 <tr th:each="accion : ${ultimasAcciones}">
                   <td th:text="${accion.descripcion}">Acción</td>
                   <td th:text="${accion.responsable != null ? accion.responsable.nombres + ' ' + accion.responsable.apellidos : 'Sin asignar'}">Responsable</td>
-                  <td><span class="status-pill" th:classappend="${accion.estado == 'Completada' ? ' done' : (accion.estado == 'En proceso' ? ' progress' : ' pending')}" th:text="${accion.estado}">Pendiente</span></td>
+                  <td><span class="status-pill" th:classappend="${(accion.estado == 'Completada' or accion.estado == 'Cerrada') ? ' done' : (accion.estado == 'En proceso' ? ' progress' : ' pending')}" th:text="${accion.estado}">Pendiente</span></td>
                   <td><span class="priority-pill" th:classappend="${accion.prioridad == 'Alta' ? ' high' : (accion.prioridad == 'Media' ? ' medium' : ' low')}" th:text="${accion.prioridad}">Media</span></td>
                   <td th:text="${accion.fechaLimite != null ? #temporals.format(accion.fechaLimite, 'dd/MM/yyyy') : '—'}">—</td>
                 </tr>
@@ -120,7 +123,7 @@
           </article>
           <article class="dashboard-panel summary-panel">
             <h2>Resumen de estado</h2>
-            <div class="summary-item"><span class="summary-icon" th:classappend="${estadoSST == 'SEGURO' ? ' green' : (estadoSST == 'ATENCIÓN' ? ' amber' : ' red')}"><i th:class="${estadoSST == 'SEGURO' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill'}" aria-hidden="true"></i></span><p><strong th:text="${estadoSST}">SEGURO</strong> · <span th:text="${mensajeSST}">Estado SST</span></p></div>
+            <div class="summary-item"><span class="summary-icon" th:classappend="${estadoSST == 'SIN DATOS SUFICIENTES' ? ' blue' : (estadoSST == 'SEGURO' ? ' green' : (estadoSST == 'ATENCIÓN' ? ' amber' : ' red'))}"><i th:class="${estadoSST == 'SIN DATOS SUFICIENTES' ? 'bi bi-info-circle' : (estadoSST == 'SEGURO' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill')}" aria-hidden="true"></i></span><p><strong th:text="${estadoSST}">SEGURO</strong> · <span th:text="${mensajeSST}">Estado SST</span></p></div>
             <div class="summary-item"><span class="summary-icon amber"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></span><p><strong th:text="${riesgosAltos + riesgosCriticos}">0</strong> riesgos altos o críticos requieren atención.</p></div>
             <div class="summary-item"><span class="summary-icon red"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i></span><p><strong th:text="${accionesVencidas}">0</strong> acciones vencidas y <strong th:text="${accionesProximas}">0</strong> próximas a vencer.</p></div>
             <div class="summary-item"><span class="summary-icon blue"><i class="bi bi-info-circle-fill" aria-hidden="true"></i></span><p><strong th:text="${accionesPendientes}">0</strong> pendientes, <strong th:text="${accionesProceso}">0</strong> en proceso y <strong th:text="${accionesCompletadas}">0</strong> completadas.</p></div>

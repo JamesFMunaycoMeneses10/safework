@@ -1,0 +1,17 @@
+{
+    email {$SAFEWORK_TLS_EMAIL}
+    admin off
+}
+{$SAFEWORK_DOMAIN} {
+    encode zstd gzip
+    request_body {
+        max_size 8MB
+    }
+    header {
+        -Server
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "no-referrer"
+    }
+    reverse_proxy app:8080
+}

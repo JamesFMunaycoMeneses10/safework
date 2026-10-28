@@ -51,6 +51,7 @@ class LoginAutenticacionTests {
     @EnableWebSecurity
     static class SeguridadDePrueba { }
 
+    @MockitoBean com.safework.safework.security.LimiteAcceso limite;
     @Autowired MockMvc mvc;
     @Autowired PasswordEncoder encoder;
     @MockitoBean UsuarioAccesoRepository usuarios;

@@ -22,6 +22,7 @@ public class EmpresaSesionFilter extends OncePerRequestFilter {
             var actual = accesos.buscar(principal.getUsername());
             boolean valido = actual.filter(u -> u.habilitado() && u.id().equals(principal.getUsuarioId())
                     && u.empresaId().equals(principal.getEmpresaId())
+                    && u.versionAcceso() == principal.getVersionAcceso()
                     && principal.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_" + u.rol())))
                     .isPresent();
             if (!valido) {

@@ -38,9 +38,9 @@
       <div class="mb-3">
         <label class="form-label fw-semibold" for="password">Contraseña</label>
         <input id="password" type="password" class="form-control" th:field="*{password}" autocomplete="new-password"
-               th:required="${usuario.id == null}" minlength="8">
+               th:required="${usuario.id == null}" minlength="12">
         <div class="form-text" th:if="${usuario.id != null}">Déjela vacía para conservar la contraseña actual.</div>
-        <div class="form-text" th:if="${usuario.id == null}">Mínimo 8 caracteres.</div>
+        <div class="form-text" th:if="${usuario.id == null}">Mínimo 12 caracteres y máximo 72 bytes UTF-8.</div>
         <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
       </div>
       <div class="mb-3">

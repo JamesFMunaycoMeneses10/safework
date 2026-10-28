@@ -9,6 +9,12 @@ import jakarta.persistence.*;
 // Las cuentas globales se consultan únicamente por el acceso JDBC de plataforma/autenticación.
 @org.hibernate.annotations.SQLRestriction("rol <> 'SUPERADMIN'")
 public class Usuario extends EmpresaEntidad {
+    @Column(nullable = false)
+    @org.hibernate.annotations.ColumnDefault("0")
+    private long versionAcceso;
+    public long getVersionAcceso() { return versionAcceso; }
+    public void setVersionAcceso(long valor) { versionAcceso = valor; }
+
 
 
     @Id

@@ -13,7 +13,7 @@
       <div><h1 class="mb-1">Empresas de la plataforma</h1><p class="text-secondary mb-0">Administra el acceso de las empresas sin consultar su información SST.</p></div>
       <a class="btn btn-primary" th:href="@{/plataforma/empresas/nueva}">+ Nueva empresa</a>
     </div>
-    <div class="alert alert-info">Piloto multiempresa. Los planes y pagos todavía no están habilitados. Cada empresa administra sus propios usuarios y registros.</div>
+    <div class="alert alert-info">Piloto multiempresa. Los pagos están en etapa de integración y no realizan cobros reales. Cada empresa administra sus propios usuarios y registros.</div>
     <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
     <div class="card shadow-sm"><div class="card-body table-responsive">
       <table class="table table-hover align-middle mb-0">

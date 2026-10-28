@@ -40,7 +40,7 @@ jobs:
       # Do not set SPRING_DATASOURCE_URL / SPRING_JPA_HIBERNATE_DDL_AUTO here:
       # those high-priority overrides would break the isolated H2 test profile.
       SPRING_JPA_SHOW_SQL: "false"
-      SAFEWORK_UPLOAD_DIR: ${{ runner.temp }}/safework-no-legacy-files
+      SAFEWORK_UPLOAD_DIR: ${{ github.workspace }}/_ci/safework-no-legacy-files
       SAFEWORK_MYSQL_PASSWORD: ci-only-not-a-production-secret
       SAFEWORK_MYSQL_ROOT_PASSWORD: ci-only-root-not-a-production-secret
     steps:

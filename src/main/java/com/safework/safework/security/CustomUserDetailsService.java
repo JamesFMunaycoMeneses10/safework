@@ -42,7 +42,7 @@ public class CustomUserDetailsService
 
 
         return new EmpresaPrincipal(usuario.id(), usuario.username(), usuario.password(), usuario.rol(),
-                usuario.habilitado(), usuario.empresaId(), usuario.empresaNombre());
+                usuario.habilitado(), usuario.empresaId(), usuario.empresaNombre(), usuario.versionAcceso());
 
     }
 

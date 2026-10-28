@@ -129,9 +129,7 @@ public class EmpresaAdministracionService {
     }
 
     public static void validarClave(String clave) {
-        if (clave == null || clave.isBlank() || clave.length() < 12
-                || clave.getBytes(StandardCharsets.UTF_8).length > 72)
-            throw new IllegalArgumentException("La contraseña debe tener al menos 12 caracteres y como máximo 72 bytes UTF-8.");
+        com.safework.safework.security.PoliticaContrasena.validar(clave);
     }
 
     private void exigirPlataforma() {

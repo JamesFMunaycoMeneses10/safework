@@ -25,6 +25,10 @@ public final class BandejaAcciones {
         return seleccionada;
     }
 
+    public static boolean completada(AccionCorrectiva accion) {
+        return "Cerrada".equalsIgnoreCase(accion.getEstado()) || "Completada".equalsIgnoreCase(accion.getEstado());
+    }
+
     public static boolean vencida(AccionCorrectiva accion, LocalDate hoy) {
         return accion.getFechaLimite() != null
                 && accion.getFechaLimite().isBefore(hoy)

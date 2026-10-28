@@ -51,7 +51,7 @@ class MigracionMySqlTests {
                 while (rs.next()) {
                     count++;
                     for (int column=1; column<=metadata.getColumnCount(); column++) {
-                        if ("empresa_id".equalsIgnoreCase(metadata.getColumnName(column))) continue;
+                        if ("empresa_id".equalsIgnoreCase(metadata.getColumnName(column)) || "version_acceso".equalsIgnoreCase(metadata.getColumnName(column))) continue;
                         byte[] value = rs.getBytes(column);
                         hash.update((byte)(value == null ? 0 : 1));
                         if (value != null) { hash.update(java.nio.ByteBuffer.allocate(4).putInt(value.length).array()); hash.update(value); }

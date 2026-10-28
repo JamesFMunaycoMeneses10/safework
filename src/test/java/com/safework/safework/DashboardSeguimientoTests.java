@@ -75,6 +75,26 @@ class DashboardSeguimientoTests {
         new DashboardController(trabajadores, riesgos, incidentes, acciones).dashboard(modelo, null);
 
         assertEquals(0L, modelo.get("accionesVencidas"));
-        assertEquals("SEGURO", modelo.get("estadoSST"));
+        assertEquals("SIN DATOS SUFICIENTES", modelo.get("estadoSST"));
+    }
+
+    @Test
+    void cuentaCerradasYCompletadasSinConsiderarlasVencidas() {
+        TrabajadorService trabajadores = mock(TrabajadorService.class);
+        RiesgoService riesgos = mock(RiesgoService.class);
+        IncidenteService incidentes = mock(IncidenteService.class);
+        AccionCorrectivaService acciones = mock(AccionCorrectivaService.class);
+        AccionCorrectiva cerrada = new AccionCorrectiva(); cerrada.setEstado("Cerrada");
+        cerrada.setFechaLimite(LocalDate.now().minusDays(2));
+        AccionCorrectiva previa = new AccionCorrectiva(); previa.setEstado("Completada");
+        when(trabajadores.listarTodos()).thenReturn(List.of());
+        when(riesgos.listarTodos()).thenReturn(List.of());
+        when(incidentes.listarTodos()).thenReturn(List.of());
+        when(acciones.listarTodas()).thenReturn(List.of(cerrada, previa));
+        ExtendedModelMap modelo = new ExtendedModelMap();
+        new DashboardController(trabajadores, riesgos, incidentes, acciones).dashboard(modelo, null);
+        assertEquals(2L, modelo.get("accionesCompletadas"));
+        assertEquals(0L, modelo.get("accionesVencidas"));
+        assertEquals("SIN DATOS SUFICIENTES", modelo.get("estadoSST"));
     }
 }

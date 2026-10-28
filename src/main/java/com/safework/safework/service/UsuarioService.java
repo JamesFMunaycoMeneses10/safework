@@ -75,10 +75,9 @@ public class UsuarioService {
             throw new IllegalArgumentException("La contraseña es obligatoria");
         }
         if (nuevaPassword != null && !nuevaPassword.isBlank()) {
-            if (nuevaPassword.length() < 8) {
-                throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres");
-            }
+            com.safework.safework.security.PoliticaContrasena.validar(nuevaPassword);
             usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+            usuario.setVersionAcceso(usuario.getVersionAcceso() + 1);
         }
 
         usuario.setUsername(username);

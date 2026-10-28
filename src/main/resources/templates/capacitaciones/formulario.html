@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capacitaciones - SafeWork</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head><body class="bg-light"><div th:replace="~{fragments/navbar :: navbar}"></div>
+<main class="container py-5">
+<h1 th:text="${capacitacion.id == null ? 'Programar capacitación' : 'Editar capacitación'}"></h1>
+<p class="text-secondary">El área indica el lugar de la actividad. Puedes convocar trabajadores de distintas áreas de tu empresa.</p>
+<form th:action="@{/capacitaciones/guardar}" th:object="${capacitacion}" method="post" class="card shadow-sm"><div class="card-body p-4">
+<input type="hidden" th:field="*{id}"><div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+<div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}"><p>Revisa los campos del formulario:</p><ul class="mb-0"><li th:each="e:${#fields.allErrors()}" th:text="${e}"></li></ul></div>
+<div class="mb-3"><label for="tema" class="form-label">Tema</label><input class="form-control" th:field="*{tema}" id="tema" maxlength="150" required></div>
+<div class="mb-3"><label for="objetivo" class="form-label">Objetivo</label><textarea class="form-control" th:field="*{objetivo}" id="objetivo" maxlength="1000" rows="3" required></textarea></div>
+<div class="row g-3 mb-3"><div class="col-md-6"><label for="instructor" class="form-label">Instructor</label><input class="form-control" th:field="*{instructor}" id="instructor" maxlength="150" required></div><div class="col-md-6"><label for="areaId" class="form-label">Área de realización</label><select class="form-select" th:field="*{areaId}" id="areaId" required><option value="">Seleccione un área</option><option th:each="a:${areas}" th:value="${a.id}" th:text="${a.nombre}"></option></select></div></div>
+<div class="row g-3 mb-4"><div class="col-md-6"><label for="fechaHora" class="form-label">Fecha y hora</label><input type="datetime-local" class="form-control" th:field="*{fechaHora}" id="fechaHora" required></div><div class="col-md-6"><label for="duracionMinutos" class="form-label">Duración en minutos</label><input type="number" class="form-control" th:field="*{duracionMinutos}" id="duracionMinutos" min="5" max="1440" required></div></div>
+<fieldset class="border rounded p-3 mb-4"><legend class="float-none w-auto px-2 fs-6">Participantes</legend><p class="small text-secondary">Selecciona al menos un trabajador. Máximo 500 participantes por actividad.</p>
+<p th:if="${#lists.isEmpty(trabajadores)}" class="text-secondary">Primero registra los trabajadores de tu empresa.</p>
+<div class="row g-2"><div class="col-md-6" th:each="t:${trabajadores}"><label class="form-check"><input class="form-check-input" type="checkbox" th:field="*{trabajadorIds}" th:value="${t.id}"><span class="form-check-label" th:text="${t.nombres + ' ' + t.apellidos + ' · ' + t.dni}"></span></label></div></div></fieldset>
+<div class="d-flex gap-2"><button class="btn btn-primary">Guardar capacitación</button><a th:href="@{/capacitaciones}" class="btn btn-outline-secondary">Volver</a></div></div></form>
+</main></body></html>

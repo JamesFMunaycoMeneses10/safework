@@ -1,0 +1,57 @@
+# Solo usar en un servidor con dominio y DNS propios. No altera el piloto 8081.
+services:
+  app:
+    image: safework:${SAFEWORK_RELEASE:?Define la etiqueta de version de esta liberacion}
+    ports: !reset []
+    environment:
+      SAFEWORK_HTTPS: "true"
+      SAFEWORK_PUBLIC_URL: https://${SAFEWORK_DOMAIN:?Define un dominio con DNS apuntando al servidor}
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+    networks:
+      - proxy
+    mem_limit: 1024m
+    cpus: 1.0
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+  mysql:
+    mem_limit: 1024m
+    cpus: 1.0
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      SAFEWORK_DOMAIN: ${SAFEWORK_DOMAIN:?Define un dominio}
+      SAFEWORK_TLS_EMAIL: ${SAFEWORK_TLS_EMAIL:?Define un correo para gestionar los certificados}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - proxy
+      - outbound
+    depends_on:
+      - app
+    restart: unless-stopped
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  proxy:
+    internal: true
+volumes:
+  caddy_data:
+  caddy_config:

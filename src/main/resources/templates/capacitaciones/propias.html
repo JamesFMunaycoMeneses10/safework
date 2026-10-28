@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capacitaciones - SafeWork</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head><body class="bg-light"><div th:replace="~{fragments/navbar :: navbar}"></div>
+<main class="container py-5">
+<h1>Mis capacitaciones</h1><p class="text-secondary mb-4">Consulta tus actividades programadas y tu historial de asistencia.</p>
+<div class="card shadow-sm"><div class="card-body"><div class="table-responsive"><table class="table align-middle mb-0"><thead class="table-light"><tr><th>Tema</th><th>Fecha y hora</th><th>Área</th><th>Instructor</th><th>Estado</th><th>Mi asistencia</th></tr></thead><tbody><tr th:each="p:${participaciones}"><td th:text="${p.capacitacion.tema}"></td><td th:text="${#temporals.format(p.capacitacion.fechaHora,'dd/MM/yyyy HH:mm')}"></td><td th:text="${p.capacitacion.area.nombre}"></td><td th:text="${p.capacitacion.instructor}"></td><td th:text="${p.capacitacion.estado}"></td><td th:text="${p.asistencia}"></td></tr><tr th:if="${#lists.isEmpty(participaciones)}"><td colspan="6" class="text-center text-secondary py-4">Todavía no tienes capacitaciones asignadas. Tu cuenta debe estar vinculada a tu ficha de trabajador.</td></tr></tbody></table></div></div></div>
+</main></body></html>

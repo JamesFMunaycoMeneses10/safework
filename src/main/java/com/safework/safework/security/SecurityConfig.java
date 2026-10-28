@@ -67,7 +67,7 @@ public class SecurityConfig {
          */
         @Bean
         public SecurityFilterChain securityFilterChain(
-                        HttpSecurity http, UsuarioAccesoRepository accesos) throws Exception {
+                        HttpSecurity http, UsuarioAccesoRepository accesos, LimiteAcceso limite) throws Exception {
 
                 http
 
@@ -78,6 +78,8 @@ public class SecurityConfig {
                                  */
                                 .authorizeHttpRequests(auth -> auth
 
+                                                .requestMatchers(HttpMethod.POST, "/webhooks/mercadopago").permitAll()
+                                                .requestMatchers("/membresia", "/membresia/**").hasRole("ADMIN")
                                                 .requestMatchers("/plataforma/**")
                                                 .hasRole("SUPERADMIN")
 
@@ -118,7 +120,7 @@ public class SecurityConfig {
                                                  */
                                                 .requestMatchers(
 
-                                                                "/login",
+                                                                "/login", "/recuperar", "/restablecer",
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/images/**"
@@ -138,6 +140,10 @@ public class SecurityConfig {
                                                 .requestMatchers("/trabajadores", "/trabajadores/**")
                                                 .hasAnyRole("ADMIN", "SUPERVISOR")
 
+                                                .requestMatchers(HttpMethod.GET, "/capacitaciones/mis-capacitaciones")
+                                                .hasRole("TRABAJADOR")
+                                                .requestMatchers("/capacitaciones", "/capacitaciones/**")
+                                                .hasAnyRole("ADMIN", "SUPERVISOR")
                                                 .requestMatchers(HttpMethod.GET, "/epp/mis-entregas")
                                                 .hasRole("TRABAJADOR")
                                                 .requestMatchers("/epp", "/epp/**")
@@ -284,6 +290,7 @@ public class SecurityConfig {
                                                  *
                                                  */
                                                 .successHandler((request, response, authentication) -> {
+                                                        limite.exito(request.getRemoteAddr(), authentication.getName());
                                                         boolean plataforma = authentication.getAuthorities().stream()
                                                                         .anyMatch(a -> "ROLE_SUPERADMIN".equals(a.getAuthority()));
                                                         var session = request.getSession(false);
@@ -300,6 +307,12 @@ public class SecurityConfig {
                                                  * sin estar autenticado.
                                                  *
                                                  */
+                                                .failureHandler((request, response, exception) -> {
+                                                        String username = request.getParameter("username");
+                                                        limite.fallo(request.getRemoteAddr(), username == null ? "" : username);
+                                                        request.getSession(true).setAttribute(org.springframework.security.web.WebAttributes.AUTHENTICATION_EXCEPTION, exception);
+                                                        response.sendRedirect(request.getContextPath() + "/login?error");
+                                                })
                                                 .permitAll()
 
                                 )
@@ -325,7 +338,10 @@ public class SecurityConfig {
                  * de seguridad.
                  *
                  */
+                // Solo el callback autenticado por firma HMAC carece de token de navegador.
+                http.csrf(csrf -> csrf.ignoringRequestMatchers("/webhooks/mercadopago"));
                 http.addFilterAfter(new EmpresaSesionFilter(accesos), SecurityContextHolderFilter.class);
+                http.addFilterBefore(new LimiteAccesoFilter(limite), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
                 return http.build();
 
         }
