@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.safework.safework.model.Area;
 import com.safework.safework.repository.AreaRepository;
@@ -49,7 +50,13 @@ public class AreaService {
      *
      * save() es proporcionado por JpaRepository.
      */
-    public Area guardar(Area area) {
+    @Transactional
+    public Area guardar(Area datos) {
+        Area area = datos.getId() == null ? new Area() : areaRepository.findById(datos.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Área no encontrada"));
+        // No hacemos merge de una entidad recibida del formulario: la empresa no se reasigna.
+        area.setNombre(datos.getNombre());
+        area.setDescripcion(datos.getDescripcion());
         return areaRepository.save(area);
     }
 
@@ -75,8 +82,11 @@ public class AreaService {
      *
      * deleteById() es proporcionado por JpaRepository.
      */
+    @Transactional
     public void eliminarPorId(Long id) {
-        areaRepository.deleteById(id);
+        Area area = areaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Área no encontrada"));
+        areaRepository.delete(area);
     }
 
 }

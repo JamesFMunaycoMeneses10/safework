@@ -1,11 +1,8 @@
 package com.safework.safework.security;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.safework.safework.model.Usuario;
-import com.safework.safework.repository.UsuarioRepository;
 
 
 
@@ -15,12 +12,12 @@ public class CustomUserDetailsService
 
 
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioAccesoRepository usuarioRepository;
 
 
 
     public CustomUserDetailsService(
-            UsuarioRepository usuarioRepository){
+            UsuarioAccesoRepository usuarioRepository){
 
         this.usuarioRepository = usuarioRepository;
 
@@ -34,8 +31,8 @@ public class CustomUserDetailsService
 
 
 
-        Usuario usuario = usuarioRepository
-                .findByUsername(username)
+        var usuario = usuarioRepository
+                .buscar(username)
                 .orElseThrow(() ->
                     new UsernameNotFoundException(
                         "Usuario no encontrado"
@@ -44,12 +41,8 @@ public class CustomUserDetailsService
 
 
 
-        return User.builder()
-                .username(usuario.getUsername())
-                .password(usuario.getPassword())
-                .roles(usuario.getRol())
-                .disabled(!"ACTIVO".equals(usuario.getEstado()))
-                .build();
+        return new EmpresaPrincipal(usuario.id(), usuario.username(), usuario.password(), usuario.rol(),
+                usuario.habilitado(), usuario.empresaId(), usuario.empresaNombre());
 
     }
 

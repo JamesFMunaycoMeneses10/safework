@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 // Representa la cadena de filtros de seguridad de Spring
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 // Permite cifrar contraseñas usando BCrypt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -66,7 +67,7 @@ public class SecurityConfig {
          */
         @Bean
         public SecurityFilterChain securityFilterChain(
-                        HttpSecurity http) throws Exception {
+                        HttpSecurity http, UsuarioAccesoRepository accesos) throws Exception {
 
                 http
 
@@ -76,6 +77,14 @@ public class SecurityConfig {
                                  *
                                  */
                                 .authorizeHttpRequests(auth -> auth
+
+                                                .requestMatchers("/plataforma/**")
+                                                .hasRole("SUPERADMIN")
+
+                                                .requestMatchers("/actuator/health")
+                                                .permitAll()
+                                                .requestMatchers("/actuator/**")
+                                                .hasRole("SUPERADMIN")
 
                                                 .requestMatchers("/auditoria/**")
                                                 .hasAnyRole("ADMIN", "SUPERVISOR")
@@ -274,13 +283,17 @@ public class SecurityConfig {
                                                  * será enviado al dashboard.
                                                  *
                                                  */
-                                                .defaultSuccessUrl(
-
-                                                                "/dashboard",
-
-                                                                true
-
-                                                )
+                                                .successHandler((request, response, authentication) -> {
+                                                        boolean plataforma = authentication.getAuthorities().stream()
+                                                                        .anyMatch(a -> "ROLE_SUPERADMIN".equals(a.getAuthority()));
+                                                        var session = request.getSession(false);
+                                                        if (session != null) {
+                                                                session.removeAttribute(org.springframework.security.web.WebAttributes.AUTHENTICATION_EXCEPTION);
+                                                                session.removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
+                                                        }
+                                                        response.sendRedirect(request.getContextPath()
+                                                                        + (plataforma ? "/plataforma/empresas" : "/dashboard"));
+                                                })
 
                                                 /**
                                                  * Permite acceder al login
@@ -312,6 +325,7 @@ public class SecurityConfig {
                  * de seguridad.
                  *
                  */
+                http.addFilterAfter(new EmpresaSesionFilter(accesos), SecurityContextHolderFilter.class);
                 return http.build();
 
         }

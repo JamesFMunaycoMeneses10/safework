@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,9 +23,9 @@ import jakarta.validation.constraints.Size;
 
 
 @Entity
-@Table(name = "trabajadores")
+@Table(name = "trabajadores", uniqueConstraints = @UniqueConstraint(name = "uq_trabajador_empresa_dni", columnNames = {"empresa_id", "dni"}))
 
-public class Trabajador {
+public class Trabajador extends EmpresaEntidad {
 
 
     @Id
@@ -38,7 +39,7 @@ public class Trabajador {
         regexp = "\\d{8}",
         message = "El DNI debe contener exactamente 8 números"
     )
-    @Column(nullable = false, unique = true, length = 8)
+    @Column(nullable = false, length = 8)
     private String dni;
 
 

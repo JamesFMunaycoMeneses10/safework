@@ -50,6 +50,8 @@ class SeguridadRolesTests {
     static class SeguridadDePrueba { }
 
     @MockitoBean UserDetailsService userDetailsService;
+    @MockitoBean com.safework.safework.security.UsuarioAccesoRepository accesos;
+    @MockitoBean com.safework.safework.service.EmpresaAdministracionService empresas;
     private static final String[] MODULOS = {
         "trabajadores", "riesgos", "incidentes", "inspecciones", "acciones"
     };

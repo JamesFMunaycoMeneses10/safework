@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Secretos y respaldos: nunca versionarlos.
+.env
+.env.*
+!.env.example
+respaldos/
+*.sql.gz
+*.partial.sql

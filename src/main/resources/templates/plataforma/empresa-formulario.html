@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empresa - SafeWork</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/forms.css}"><link rel="stylesheet" th:href="@{/css/internal-layout.css}">
+</head>
+<body class="bg-light sw-form-page">
+  <div th:replace="~{fragments/navbar :: navbar}"></div>
+  <main class="container py-5 sw-form-container">
+    <h1 th:text="${esAlta ? 'Registrar empresa' : 'Editar empresa'}">Empresa</h1>
+    <p class="text-secondary">El administrador de plataforma no ingresa a los datos SST de las empresas.</p>
+    <div class="card shadow-sm"><div class="card-body">
+      <form th:if="${esAlta}" th:action="@{/plataforma/empresas/guardar}" th:object="${alta}" method="post" class="sw-editor-form">
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}"><p>Revisa los datos indicados. Vuelve a escribir la contraseña.</p><ul class="mb-0"><li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li></ul></div>
+        <h2 class="h5">Datos de la empresa</h2>
+        <div class="mb-3"><label class="form-label" for="nombre">Nombre</label><input id="nombre" class="form-control" th:field="*{nombre}" maxlength="150" required></div>
+        <div class="mb-4"><label class="form-label" for="codigo">Código único</label><input id="codigo" class="form-control" th:field="*{codigo}" minlength="3" maxlength="50" pattern="[A-Za-z0-9][A-Za-z0-9-]{2,49}" required><div class="form-text">Entre 3 y 50 letras, números o guiones. No es una contraseña.</div></div>
+        <h2 class="h5">Cuenta administradora inicial</h2>
+        <p class="small text-secondary">Será una cuenta nueva con rol Administrador, vinculada únicamente a esta empresa.</p>
+        <div class="mb-3"><label class="form-label" for="adminUsername">Usuario único de acceso</label><input id="adminUsername" class="form-control" th:field="*{adminUsername}" minlength="3" maxlength="50" autocomplete="off" required></div>
+        <div class="row"><div class="col-md-6 mb-3"><label class="form-label" for="adminNombre">Nombres</label><input id="adminNombre" class="form-control" th:field="*{adminNombre}" maxlength="100" required></div><div class="col-md-6 mb-3"><label class="form-label" for="adminApellido">Apellidos</label><input id="adminApellido" class="form-control" th:field="*{adminApellido}" maxlength="100" required></div></div>
+        <div class="mb-3"><label class="form-label" for="adminCorreo">Correo</label><input id="adminCorreo" type="email" class="form-control" th:field="*{adminCorreo}" maxlength="255" required></div>
+        <div class="mb-4"><label class="form-label" for="adminPassword">Contraseña inicial</label><input id="adminPassword" name="adminPassword" type="password" class="form-control" minlength="12" maxlength="72" autocomplete="new-password" required><div class="form-text">Al menos 12 caracteres y como máximo 72 bytes UTF-8. Se guarda mediante BCrypt; compártela por un canal seguro.</div></div>
+        <button class="btn btn-primary" type="submit">Crear empresa y administrador</button><a class="btn btn-outline-secondary ms-2" th:href="@{/plataforma/empresas}">Cancelar</a>
+      </form>
+      <form th:unless="${esAlta}" th:action="@{/plataforma/empresas/actualizar/{id}(id=${empresaId})}" th:object="${edicion}" method="post" class="sw-editor-form">
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}"><ul class="mb-0"><li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li></ul></div>
+        <div class="mb-3"><label class="form-label" for="nombreEditar">Nombre</label><input id="nombreEditar" class="form-control" th:field="*{nombre}" maxlength="150" required></div>
+        <div class="mb-3"><label class="form-label" for="codigoEditar">Código único</label><input id="codigoEditar" class="form-control" th:field="*{codigo}" minlength="3" maxlength="50" required></div>
+        <div class="mb-3"><label class="form-label" for="estado">Acceso de la empresa</label><select id="estado" class="form-select" th:field="*{estado}"><option value="ACTIVO">Activo</option><option value="INACTIVO">Inactivo</option></select></div>
+        <div class="alert alert-warning">Deshabilitar una empresa bloquea el acceso de sus usuarios, pero no elimina sus registros. Las credenciales y roles no se cambian desde este formulario.</div>
+        <button class="btn btn-primary" type="submit">Guardar cambios</button><a class="btn btn-outline-secondary ms-2" th:href="@{/plataforma/empresas}">Cancelar</a>
+      </form>
+    </div></div>
+  </main>
+</body>
+</html>

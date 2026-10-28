@@ -1,0 +1,107 @@
+name: SafeWork - compilar, probar y empaquetar
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: safework_ci
+          MYSQL_USER: safework_ci
+          # Disposable CI-only credentials; they grant no access to any real environment.
+          MYSQL_PASSWORD: ci-only-not-a-production-secret
+          MYSQL_ROOT_PASSWORD: ci-only-root-not-a-production-secret
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=18
+    env:
+      SAFEWORK_DB_USER: safework_ci
+      SAFEWORK_DB_PASSWORD: ci-only-not-a-production-secret
+      SAFEWORK_DB_URL: jdbc:mysql://127.0.0.1:3306/safework_ci?allowPublicKeyRetrieval=true&useSSL=false&connectionTimeZone=UTC
+      # Do not set SPRING_DATASOURCE_URL / SPRING_JPA_HIBERNATE_DDL_AUTO here:
+      # those high-priority overrides would break the isolated H2 test profile.
+      SPRING_JPA_SHOW_SQL: "false"
+      SAFEWORK_UPLOAD_DIR: ${{ runner.temp }}/safework-no-legacy-files
+      SAFEWORK_MYSQL_PASSWORD: ci-only-not-a-production-secret
+      SAFEWORK_MYSQL_ROOT_PASSWORD: ci-only-root-not-a-production-secret
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Configurar Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Preparar wrapper y carpeta aislada
+        shell: bash
+        run: |
+          sed -i 's/\r$//' mvnw
+          chmod +x mvnw
+          mkdir -p "$SAFEWORK_UPLOAD_DIR"
+      - name: Ejecutar TODAS las pruebas aisladas (H2) y generar JAR
+        run: ./mvnw --batch-mode --no-transfer-progress clean verify
+      - name: Conservar resultados de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-pruebas
+          path: target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Conservar ejecutable validado
+        uses: actions/upload-artifact@v4
+        with:
+          name: safework-jar
+          path: target/safework-*.jar
+          if-no-files-found: error
+          retention-days: 7
+      - name: Comprobar construcción de la imagen (sin publicar)
+        run: docker build --target runtime --tag safework:ci .
+      - name: Validar configuración de Compose
+        run: docker compose config --quiet
+      - name: Probar arranque de la imagen y página de login
+        shell: bash
+        run: |
+          trap 'docker logs safework-smoke; docker stop safework-smoke >/dev/null 2>&1 || true' EXIT
+          docker run --detach --rm --name safework-smoke \
+            --network host --memory 512m --read-only \
+            --tmpfs /tmp:rw,size=128m,mode=1777 \
+            --cap-drop ALL --security-opt no-new-privileges:true \
+            --env PORT=18080 \
+            --env SAFEWORK_DB_URL \
+            --env SAFEWORK_DB_USER \
+            --env SAFEWORK_DB_PASSWORD \
+            --env SAFEWORK_UPLOAD_DIR=/app/legacy-uploads \
+            safework:ci
+          for attempt in $(seq 1 60); do
+            if curl --silent --fail http://127.0.0.1:18080/login > "$RUNNER_TEMP/safework-login.html"; then
+              grep --quiet 'name="username"' "$RUNNER_TEMP/safework-login.html"
+              grep --quiet 'name="_csrf"' "$RUNNER_TEMP/safework-login.html"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "La imagen no respondió con el formulario de login dentro del tiempo previsto."
+          exit 1

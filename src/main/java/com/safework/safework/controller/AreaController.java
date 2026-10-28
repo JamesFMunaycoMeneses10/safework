@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.safework.safework.model.Area;
 import com.safework.safework.service.AreaService;
 import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 /*
  * Controller encargado de gestionar las solicitudes web
@@ -91,8 +93,8 @@ public class AreaController {
          * que no se encontró el registro.
          */
         Area area = areaService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Área no encontrada con id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Área no encontrada"));
 
         // Enviamos el área encontrada al formulario.
         model.addAttribute("area", area);
@@ -165,7 +167,13 @@ public String guardarArea(
     }
 
     // Si no existen errores, guardamos el área.
-    areaService.guardar(area);
+    try {
+        areaService.guardar(area);
+    } catch (IllegalArgumentException e) {
+        resultado.rejectValue("nombre", "area.noDisponible",
+                "No se pudo guardar el área. Revisa los datos de tu empresa e inténtalo nuevamente.");
+        return "areas/formulario";
+    }
 
     // Después regresamos al listado.
     return "redirect:/areas";

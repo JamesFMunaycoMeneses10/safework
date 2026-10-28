@@ -8,6 +8,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 public class PermisosVistaAdvice {
 
+    @ModelAttribute("esAdministradorPlataforma")
+    public boolean esAdministradorPlataforma(Authentication authentication) {
+        return tieneRol(authentication, "ROLE_SUPERADMIN");
+    }
+
+    @ModelAttribute("empresaActualNombre")
+    public String empresaActualNombre(Authentication authentication) {
+        return authentication != null && authentication.getPrincipal()
+                instanceof com.safework.safework.security.EmpresaPrincipal principal
+                ? principal.getEmpresaNombre() : "";
+    }
+
     @ModelAttribute("esAdministrador")
     public boolean esAdministrador(Authentication authentication) {
         return tieneRol(authentication, "ROLE_ADMIN");

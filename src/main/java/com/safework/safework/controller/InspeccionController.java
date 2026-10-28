@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.safework.safework.model.Inspeccion;
 import com.safework.safework.service.AreaService;
@@ -190,7 +192,15 @@ public class InspeccionController {
          * Si todos los datos son correctos,
          * guardamos mediante la capa Service.
          */
-        inspeccionService.guardar(inspeccion);
+        try {
+            inspeccionService.guardar(inspeccion);
+        } catch (IllegalArgumentException e) {
+            resultado.rejectValue("area", "inspeccion.relacionesNoDisponibles",
+                    "No se pudo guardar. Revisa los datos y selecciona un área y un responsable disponibles en tu empresa.");
+            model.addAttribute("areas", areaService.listarTodas());
+            model.addAttribute("trabajadores", trabajadorService.listarTodos());
+            return "inspecciones/formulario";
+        }
 
 
         /*
@@ -217,8 +227,8 @@ public class InspeccionController {
         Inspeccion inspeccion =
                 inspeccionService.buscarPorId(id)
                         .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Inspección no encontrada con id: " + id
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND, "Inspección no encontrada"
                                 )
                         );
 

@@ -3,7 +3,7 @@
 <body>
   <div class="sw-app-nav" th:fragment="navbar">
     <aside class="sw-app-sidebar" id="swAppSidebar" aria-label="Navegación principal">
-      <a class="sw-app-brand" th:href="@{/dashboard}">
+      <a class="sw-app-brand" th:href="${esAdministradorPlataforma} ? @{/plataforma/empresas} : @{/dashboard}">
         <svg class="brand-mark" viewBox="0 0 32 36" aria-hidden="true" focusable="false">
           <path d="M16 2 29 6v10c0 8.4-5.1 14.5-13 18C8.1 30.5 3 24.4 3 16V6L16 2Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
           <path d="m16 8-6 12h5l-1 8 8-13h-5l2-7h-3Z" fill="currentColor"/>
@@ -11,14 +11,15 @@
         <span>SafeWork</span>
       </a>
       <nav class="sw-app-links">
-        <a class="sw-nav-home" th:href="@{/dashboard}"><i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span></a>
+        <a th:if="${esAdministradorPlataforma}" th:href="@{/plataforma/empresas}"><i class="bi bi-buildings" aria-hidden="true"></i><span>Empresas cliente</span></a>
+        <a th:unless="${esAdministradorPlataforma}" class="sw-nav-home" th:href="@{/dashboard}"><i class="bi bi-grid-1x2" aria-hidden="true"></i><span>Dashboard</span></a>
         <div class="sw-nav-group" th:if="${puedeGestionarSst}">
           <span class="sw-nav-label">ORGANIZACIÓN</span>
           <a th:if="${esAdministrador}" th:href="@{/areas}"><i class="bi bi-diagram-3" aria-hidden="true"></i><span>Áreas</span></a>
           <a th:if="${puedeGestionarSst}" th:href="@{/trabajadores}"><i class="bi bi-people" aria-hidden="true"></i><span>Trabajadores</span></a>
           <a th:if="${esAdministrador}" th:href="@{/usuarios}"><i class="bi bi-person-gear" aria-hidden="true"></i><span>Usuarios</span></a>
         </div>
-        <div class="sw-nav-group">
+        <div class="sw-nav-group" th:unless="${esAdministradorPlataforma}">
           <span class="sw-nav-label">SEGURIDAD Y SALUD</span>
           <a th:href="@{/riesgos}"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><span>Riesgos</span></a>
           <a th:href="@{/incidentes}"><i class="bi bi-activity" aria-hidden="true"></i><span>Incidentes</span></a>
@@ -38,7 +39,8 @@
       <button class="sw-app-toggle" type="button" aria-label="Mostrar u ocultar menú" aria-controls="swAppSidebar" aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i></button>
       <div class="sw-app-account">
         <i class="bi bi-person-circle" aria-hidden="true"></i>
-        <span class="sw-app-role" th:text="${esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador')}">Usuario</span>
+        <span th:if="${!esAdministradorPlataforma and empresaActualNombre != null}" class="text-secondary small" th:text="${empresaActualNombre}"></span>
+        <span class="sw-app-role" th:text="${esAdministradorPlataforma ? 'Administrador de plataforma' : (esAdministrador ? 'Administrador' : (puedeGestionarSst ? 'Supervisor' : 'Trabajador'))}">Usuario</span>
         <form th:action="@{/logout}" method="post"><button type="submit" class="sw-app-logout">Salir</button></form>
       </div>
     </header>

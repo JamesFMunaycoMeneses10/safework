@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.safework.safework.model.Incidente;
 import com.safework.safework.repository.IncidenteRepository;
+import com.safework.safework.repository.AreaRepository;
+import com.safework.safework.repository.TrabajadorRepository;
 import java.time.format.DateTimeFormatter;
 
 
@@ -29,6 +31,8 @@ public class IncidenteService {
      */
     private final IncidenteRepository incidenteRepository;
     private final AuditoriaService auditoria;
+    private final AreaRepository areaRepository;
+    private final TrabajadorRepository trabajadorRepository;
 
 
 
@@ -37,15 +41,22 @@ public class IncidenteService {
      * mediante constructor.
      */
     @Autowired
-    public IncidenteService(IncidenteRepository incidenteRepository, AuditoriaService auditoria) {
+    public IncidenteService(IncidenteRepository incidenteRepository, AuditoriaService auditoria,
+            AreaRepository areaRepository, TrabajadorRepository trabajadorRepository) {
 
         this.incidenteRepository = incidenteRepository;
         this.auditoria = auditoria;
+        this.areaRepository = areaRepository;
+        this.trabajadorRepository = trabajadorRepository;
     }
 
     /** Constructor de compatibilidad para pruebas unitarias existentes. */
     public IncidenteService(IncidenteRepository incidenteRepository) {
-        this(incidenteRepository, null);
+        this(incidenteRepository, null, null, null);
+    }
+
+    public IncidenteService(IncidenteRepository incidenteRepository, AuditoriaService auditoria) {
+        this(incidenteRepository, auditoria, null, null);
     }
 
 
@@ -66,10 +77,29 @@ public class IncidenteService {
      * o actualiza uno existente.
      */
     @Transactional
-    public Incidente guardar(Incidente incidente, String usuario) {
-        Incidente anterior = incidente.getId() == null ? null : incidenteRepository.findById(incidente.getId())
+    public Incidente guardar(Incidente datos, String usuario) {
+        if (areaRepository == null || trabajadorRepository == null) {
+            throw new IllegalStateException("La validación de relaciones de la empresa no está configurada");
+        }
+        Incidente anterior = datos.getId() == null ? null : incidenteRepository.findById(datos.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Incidente no encontrado"));
         String resumenAnterior = anterior == null ? null : resumenAuditoria(anterior);
+        if (datos.getArea() == null || datos.getArea().getId() == null
+                || datos.getTrabajador() == null || datos.getTrabajador().getId() == null) {
+            throw new IllegalArgumentException("Seleccione un área y un trabajador de su empresa");
+        }
+        var area = areaRepository.findById(datos.getArea().getId()).orElseThrow(
+                () -> new IllegalArgumentException("El área seleccionada no está disponible"));
+        var trabajador = trabajadorRepository.findById(datos.getTrabajador().getId()).orElseThrow(
+                () -> new IllegalArgumentException("El trabajador seleccionado no está disponible"));
+        Incidente incidente = anterior == null ? new Incidente() : anterior;
+        incidente.setFechaHora(datos.getFechaHora());
+        incidente.setTipo(datos.getTipo());
+        incidente.setArea(area);
+        incidente.setTrabajador(trabajador);
+        incidente.setDescripcion(datos.getDescripcion());
+        incidente.setGravedad(datos.getGravedad());
+        incidente.setEstado(datos.getEstado());
         Incidente guardado = incidenteRepository.save(incidente);
         if (auditoria != null) {
             String detalle = anterior == null ? resumenAuditoria(guardado)

@@ -27,7 +27,7 @@ import jakarta.validation.constraints.Size;
  */
 @Entity
 @Table(name = "incidentes")
-public class Incidente {
+public class Incidente extends EmpresaEntidad {
 
 
     /**

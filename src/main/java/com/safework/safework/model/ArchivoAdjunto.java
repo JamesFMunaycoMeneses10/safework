@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 /** Contenido binario de una foto o evidencia, separado de las tablas de listado. */
 @Entity
 @Table(name = "archivos_adjuntos")
-public class ArchivoAdjunto {
+public class ArchivoAdjunto extends EmpresaEntidad {
     @Id
     @Column(length = 40)
     private String nombre;

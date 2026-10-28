@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 /** Instantánea de una entrega o decisión; no se modifica al reenviar evidencia. */
 @Entity
 @Table(name = "acciones_correctivas_historial")
-public class AccionCorrectivaEvento {
+public class AccionCorrectivaEvento extends EmpresaEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -7,10 +7,12 @@ import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.safework.safework.model.Trabajador;
 import com.safework.safework.repository.TrabajadorRepository;
 import com.safework.safework.repository.UsuarioRepository;
+import com.safework.safework.repository.AreaRepository;
 
 
 @Service
@@ -19,14 +21,18 @@ public class TrabajadorService {
 
     private final TrabajadorRepository trabajadorRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AreaRepository areaRepository;
 
 
 
+    @Autowired
     public TrabajadorService(
-            TrabajadorRepository trabajadorRepository, UsuarioRepository usuarioRepository) {
+            TrabajadorRepository trabajadorRepository, UsuarioRepository usuarioRepository,
+            AreaRepository areaRepository) {
 
         this.trabajadorRepository = trabajadorRepository;
         this.usuarioRepository = usuarioRepository;
+        this.areaRepository = areaRepository;
     }
 
 
@@ -56,12 +62,24 @@ public class TrabajadorService {
      * Guarda un trabajador nuevo
      * o actualiza uno existente.
      */
-    public Trabajador guardar(Trabajador trabajador) {
+    @Transactional
+    public Trabajador guardar(Trabajador datos) {
+        Trabajador trabajador = datos.getId() == null ? new Trabajador()
+                : trabajadorRepository.findById(datos.getId()).orElseThrow(
+                        () -> new IllegalArgumentException("Trabajador no encontrado"));
+        if (datos.getArea() == null || datos.getArea().getId() == null) {
+            throw new IllegalArgumentException("Seleccione un área de su empresa");
+        }
+        var area = areaRepository.findById(datos.getArea().getId()).orElseThrow(
+                () -> new IllegalArgumentException("El área seleccionada no está disponible"));
 
-        if (trabajador.getUsuario() != null && trabajador.getUsuario().getId() != null) {
-            Long usuarioId = trabajador.getUsuario().getId();
+        if (datos.getUsuario() != null && datos.getUsuario().getId() != null) {
+            Long usuarioId = datos.getUsuario().getId();
             var usuario = usuarioRepository.findById(usuarioId).orElseThrow(
                     () -> new IllegalArgumentException("La cuenta seleccionada no existe"));
+            if ("SUPERADMIN".equals(usuario.getRol())) {
+                throw new IllegalArgumentException("La cuenta seleccionada no está disponible");
+            }
             if (!"ACTIVO".equals(usuario.getEstado())) {
                 throw new IllegalArgumentException("La cuenta vinculada debe estar activa");
             }
@@ -73,6 +91,12 @@ public class TrabajadorService {
         } else {
             trabajador.setUsuario(null);
         }
+
+        trabajador.setDni(datos.getDni());
+        trabajador.setNombres(datos.getNombres());
+        trabajador.setApellidos(datos.getApellidos());
+        trabajador.setCargo(datos.getCargo());
+        trabajador.setArea(area);
 
         return trabajadorRepository.save(trabajador);
 

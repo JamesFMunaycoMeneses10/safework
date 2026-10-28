@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.safework.safework.repository.AccionCorrectivaRepository;
@@ -11,6 +12,7 @@ import com.safework.safework.repository.RiesgoRepository;
 
 /** Migración idempotente: conserva los archivos antiguos como respaldo. */
 @Component
+@ConditionalOnProperty(name = "safework.migrar-adjuntos-antiguos", havingValue = "true")
 public class MigracionAdjuntos implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(MigracionAdjuntos.class);
     private final RiesgoRepository riesgos;

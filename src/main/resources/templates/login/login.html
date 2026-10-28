@@ -25,7 +25,12 @@
 
       <!-- Mensaje error -->
 
-      <div class="alert alert-danger" th:if="${param.error}">
+      <div
+        class="alert alert-danger"
+        role="alert"
+        th:if="${errorLogin != null}"
+        th:text="${errorLogin}"
+      >
         Usuario o contraseña incorrectos.
       </div>
 

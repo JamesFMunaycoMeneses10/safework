@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -118,7 +120,14 @@ public class IncidenteController {
 
 
 
-        incidenteService.guardar(incidente, authentication.getName());
+        try {
+            incidenteService.guardar(incidente, authentication.getName());
+        } catch (IllegalArgumentException e) {
+            resultado.rejectValue("area", "incidente.relacionesNoDisponibles",
+                    "No se pudo guardar. Revisa los datos y selecciona un área y un trabajador disponibles en tu empresa.");
+            cargarDatosFormulario(model);
+            return "incidentes/formulario";
+        }
 
 
 
@@ -140,7 +149,8 @@ public class IncidenteController {
 
         Incidente incidente =
                 incidenteService.buscarPorId(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Incidente no encontrado"));
 
 
 

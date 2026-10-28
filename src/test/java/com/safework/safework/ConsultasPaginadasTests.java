@@ -15,6 +15,7 @@ import com.safework.safework.service.TrabajadorService;
 
 /** Ejecuta las consultas paginadas reales contra la base configurada, sin modificar registros. */
 @SpringBootTest
+@org.springframework.test.context.ActiveProfiles("test")
 class ConsultasPaginadasTests {
     @Autowired private AccionCorrectivaService acciones;
     @Autowired private AuditoriaService auditoria;

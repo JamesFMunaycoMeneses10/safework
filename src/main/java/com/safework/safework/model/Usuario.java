@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuario {
+// Las cuentas globales se consultan únicamente por el acceso JDBC de plataforma/autenticación.
+@org.hibernate.annotations.SQLRestriction("rol <> 'SUPERADMIN'")
+public class Usuario extends EmpresaEntidad {
 
 
     @Id

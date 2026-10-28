@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
      */
     @Entity
     @Table(name = "acciones_correctivas")
-    public class AccionCorrectiva {
+    public class AccionCorrectiva extends EmpresaEntidad {
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,11 +25,12 @@ public class UsuarioService {
     }
 
     public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+        return usuarioRepository.findAll().stream()
+                .filter(usuario -> !esCuentaPlataforma(usuario)).toList();
     }
 
     public Usuario buscarPorId(Long id) {
-        return usuarioRepository.findById(id).orElse(null);
+        return usuarioRepository.findById(id).filter(usuario -> !esCuentaPlataforma(usuario)).orElse(null);
     }
 
     @Transactional
@@ -37,6 +38,9 @@ public class UsuarioService {
         boolean nuevo = formulario.getId() == null;
         Usuario usuario = nuevo ? new Usuario() : usuarioRepository.findById(formulario.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        if (esCuentaPlataforma(usuario)) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
 
         String username = limpiar(formulario.getUsername());
         String correo = limpiar(formulario.getCorreo());
@@ -94,6 +98,9 @@ public class UsuarioService {
     public void eliminarUsuario(Long id, String administradorActual) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        if (esCuentaPlataforma(usuario)) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
         if (usuario.getUsername().equals(administradorActual)) {
             throw new IllegalArgumentException("No puede eliminar su propia cuenta");
         }
@@ -112,6 +119,10 @@ public class UsuarioService {
         if (usuarioRepository.countByRolAndEstado("ADMIN", "ACTIVO") <= 1) {
             throw new IllegalArgumentException("Debe permanecer al menos un administrador activo");
         }
+    }
+
+    private boolean esCuentaPlataforma(Usuario usuario) {
+        return "SUPERADMIN".equals(usuario.getRol());
     }
 
     private String limpiar(String valor) {

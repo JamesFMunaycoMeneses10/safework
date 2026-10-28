@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.safework.safework.model.Riesgo;
 import com.safework.safework.repository.HallazgoInspeccionRepository;
 import com.safework.safework.repository.RiesgoRepository;
+import com.safework.safework.repository.AreaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
@@ -20,23 +21,30 @@ public class RiesgoService {
     private final HallazgoInspeccionRepository hallazgoRepository;
     private final ArchivoAdjuntoService archivos;
     private final AuditoriaService auditoria;
+    private final AreaRepository areaRepository;
 
     @Autowired
     public RiesgoService(
             RiesgoRepository riesgoRepository,
             HallazgoInspeccionRepository hallazgoRepository, ArchivoAdjuntoService archivos,
-            AuditoriaService auditoria) {
+            AuditoriaService auditoria, AreaRepository areaRepository) {
 
         this.riesgoRepository = riesgoRepository;
         this.hallazgoRepository = hallazgoRepository;
         this.archivos = archivos;
         this.auditoria = auditoria;
+        this.areaRepository = areaRepository;
     }
 
     /** Constructor de compatibilidad para pruebas unitarias antiguas. */
     public RiesgoService(RiesgoRepository riesgoRepository,
             HallazgoInspeccionRepository hallazgoRepository, ArchivoAdjuntoService archivos) {
-        this(riesgoRepository, hallazgoRepository, archivos, null);
+        this(riesgoRepository, hallazgoRepository, archivos, null, null);
+    }
+
+    public RiesgoService(RiesgoRepository riesgos, HallazgoInspeccionRepository hallazgos,
+            ArchivoAdjuntoService archivos, AuditoriaService auditoria) {
+        this(riesgos, hallazgos, archivos, auditoria, null);
     }
 
     public List<Riesgo> listarTodos() {
@@ -57,10 +65,25 @@ public class RiesgoService {
     }
 
     @Transactional
-    public Riesgo guardar(Riesgo riesgo, MultipartFile foto, String usuario) {
-        Riesgo anterior = riesgo.getId() == null ? null : riesgoRepository.findById(riesgo.getId())
+    public Riesgo guardar(Riesgo datos, MultipartFile foto, String usuario) {
+        if (areaRepository == null) {
+            throw new IllegalStateException("La validación del área de la empresa no está configurada");
+        }
+        Riesgo anterior = datos.getId() == null ? null : riesgoRepository.findById(datos.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Riesgo no encontrado"));
         String resumenAnterior = anterior == null ? null : resumenAuditoria(anterior);
+        if (datos.getArea() == null || datos.getArea().getId() == null) {
+            throw new IllegalArgumentException("Seleccione un área de su empresa");
+        }
+        var area = areaRepository.findById(datos.getArea().getId()).orElseThrow(
+                () -> new IllegalArgumentException("El área seleccionada no está disponible"));
+        Riesgo riesgo = anterior == null ? new Riesgo() : anterior;
+        riesgo.setPeligro(datos.getPeligro());
+        riesgo.setDescripcion(datos.getDescripcion());
+        riesgo.setProbabilidad(datos.getProbabilidad());
+        riesgo.setSeveridad(datos.getSeveridad());
+        riesgo.setMedidaControl(datos.getMedidaControl());
+        riesgo.setArea(area);
         // Con JPA save() puede hacer merge sobre la entidad administrada "anterior".
         // Conservar el nombre previo antes de guardar evita borrar la foto recién subida.
         String fotoAnterior = anterior == null ? null : anterior.getFotoArchivo();

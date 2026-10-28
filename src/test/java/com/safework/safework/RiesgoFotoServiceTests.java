@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.safework.safework.model.Riesgo;
+import com.safework.safework.model.Area;
+import com.safework.safework.repository.AreaRepository;
 import com.safework.safework.repository.HallazgoInspeccionRepository;
 import com.safework.safework.repository.RiesgoRepository;
 import com.safework.safework.service.ArchivoAdjuntoService;
@@ -22,7 +24,12 @@ class RiesgoFotoServiceTests {
     void alReemplazarFotoBorraLaAnteriorYConservaLaNueva() {
         RiesgoRepository repositorio = mock(RiesgoRepository.class);
         ArchivoAdjuntoService archivos = mock(ArchivoAdjuntoService.class);
-        RiesgoService servicio = new RiesgoService(repositorio, mock(HallazgoInspeccionRepository.class), archivos);
+        AreaRepository areas = mock(AreaRepository.class);
+        Area area = new Area("Almacén", "Área de prueba");
+        area.setId(1L);
+        when(areas.findById(1L)).thenReturn(Optional.of(area));
+        RiesgoService servicio = new RiesgoService(repositorio,
+                mock(HallazgoInspeccionRepository.class), archivos, null, areas);
         Riesgo anterior = new Riesgo();
         anterior.setId(7L);
         anterior.setFotoArchivo("foto-vieja.jpg");
@@ -38,6 +45,7 @@ class RiesgoFotoServiceTests {
         });
         Riesgo datos = new Riesgo();
         datos.setId(7L);
+        datos.setArea(area);
 
         Riesgo guardado = servicio.guardar(datos, foto);
 

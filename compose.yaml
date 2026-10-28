@@ -1,0 +1,64 @@
+name: safework-piloto
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: safework_piloto
+      MYSQL_USER: safework
+      MYSQL_PASSWORD: ${SAFEWORK_MYSQL_PASSWORD:?Define SAFEWORK_MYSQL_PASSWORD en .env}
+      MYSQL_ROOT_PASSWORD: ${SAFEWORK_MYSQL_ROOT_PASSWORD:?Define SAFEWORK_MYSQL_ROOT_PASSWORD en .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql --protocol=TCP -h 127.0.0.1 -u\"$$MYSQL_USER\" -D \"$$MYSQL_DATABASE\" -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 40s
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      target: runtime
+    image: safework:piloto-local
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SAFEWORK_DB_URL: jdbc:mysql://mysql:3306/safework_piloto?allowPublicKeyRetrieval=true&useSSL=false&connectionTimeZone=UTC
+      SAFEWORK_DB_USER: safework
+      SAFEWORK_DB_PASSWORD: ${SAFEWORK_MYSQL_PASSWORD:?Define SAFEWORK_MYSQL_PASSWORD en .env}
+      SAFEWORK_UPLOAD_DIR: /app/legacy-uploads
+      SAFEWORK_CREAR_ADMIN_PLATAFORMA: ${SAFEWORK_CREAR_ADMIN_PLATAFORMA:-false}
+      SAFEWORK_PLATFORM_USERNAME: ${SAFEWORK_PLATFORM_USERNAME:-}
+      SAFEWORK_PLATFORM_PASSWORD: ${SAFEWORK_PLATFORM_PASSWORD:-}
+      SAFEWORK_PLATFORM_NOMBRE: ${SAFEWORK_PLATFORM_NOMBRE:-}
+      SAFEWORK_PLATFORM_APELLIDO: ${SAFEWORK_PLATFORM_APELLIDO:-}
+      SAFEWORK_PLATFORM_CORREO: ${SAFEWORK_PLATFORM_CORREO:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${SAFEWORK_HTTP_PORT:-8081}:8080"
+    networks:
+      - database
+      - outbound
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true
+    restart: unless-stopped
+
+networks:
+  database:
+    internal: true
+  outbound:
+
+volumes:
+  mysql_data:

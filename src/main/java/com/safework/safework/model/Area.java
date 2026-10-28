@@ -18,7 +18,7 @@ import jakarta.validation.constraints.Size;
 
 // Define que la entidad Area se relaciona con la tabla "areas" en MySQL.
 @Table(name = "areas")
-public class Area {
+public class Area extends EmpresaEntidad {
 
     // Clave primaria de la tabla.
     @Id

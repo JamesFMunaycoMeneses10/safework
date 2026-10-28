@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 /** Registro inmutable de operaciones relevantes para seguimiento de SST. */
 @Entity
 @Table(name = "auditoria_eventos")
-public class AuditoriaEvento {
+public class AuditoriaEvento extends EmpresaEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

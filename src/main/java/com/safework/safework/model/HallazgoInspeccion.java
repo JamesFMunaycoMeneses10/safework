@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "hallazgos_inspeccion")
-public class HallazgoInspeccion {
+public class HallazgoInspeccion extends EmpresaEntidad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
