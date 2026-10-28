@@ -16,9 +16,13 @@ RUN groupadd --gid 10001 safework \
     && useradd --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin safework
 WORKDIR /app
 COPY --from=build --chown=10001:10001 /build/app.jar /app/app.jar
-RUN mkdir /app/legacy-uploads && chown 10001:10001 /app/legacy-uploads
+COPY --chown=10001:10001 docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh \
+    && chmod 0555 /app/docker-entrypoint.sh \
+    && mkdir /app/legacy-uploads && chown 10001:10001 /app/legacy-uploads
 ENV SPRING_PROFILES_ACTIVE=prod \
     JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70.0 -XX:+ExitOnOutOfMemoryError"
 USER 10001:10001
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["java", "-jar", "/app/app.jar"]
