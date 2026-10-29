@@ -30,7 +30,7 @@ import com.safework.safework.service.*;
 import com.safework.safework.tenancy.EmpresaContexto;
 
 @SpringBootTest(properties={"spring.datasource.url=jdbc:h2:mem:membresias;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
-        "safework.pagos.vendedor-id=12345","safework.pagos.webhook-secret=secreto-hmac-de-pruebas-2026"})
+        "safework.pagos.vendedor-id=12345","safework.pagos.comprador-id=67890","safework.pagos.webhook-secret=secreto-hmac-de-pruebas-2026"})
 @AutoConfigureMockMvc @ActiveProfiles("test") @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MembresiaIntegracionTests {
     @Autowired JdbcTemplate jdbc; @Autowired MembresiaService service; @Autowired MockMvc mvc;
@@ -47,7 +47,7 @@ class MembresiaIntegracionTests {
     }
     Long empresa(){String code=UUID.randomUUID().toString();jdbc.update("INSERT INTO empresas(nombre,codigo,estado,fecha_registro) VALUES('Cliente',?,'ACTIVO',CURRENT_TIMESTAMP)",code);return jdbc.queryForObject("SELECT id FROM empresas WHERE codigo=?",Long.class,code);}
     String iniciar(long empresa){en(empresa,()->service.iniciar("SST_MENSUAL",UUID.randomUUID().toString()));return en(empresa,()->service.pagos().getFirst().referencia());}
-    PasarelaPago.PagoExterno pago(String ref,String estado){return new PasarelaPago.PagoExterno(paymentId,ref,new BigDecimal("49.00"),"PEN",estado,false,12345,LocalDateTime.now(ZoneId.of("America/Lima")).minusHours(1),estado+"-actualizacion");}
+    PasarelaPago.PagoExterno pago(String ref,String estado){return new PasarelaPago.PagoExterno(paymentId,ref,new BigDecimal("49.00"),"PEN",estado,false,12345,LocalDateTime.now(ZoneId.of("America/Lima")).minusHours(1).withNano(0),estado+"-actualizacion");}
     MockHttpSession login(String user)throws Exception{
         var f=mvc.perform(get("/login")).andReturn();var s=(MockHttpSession)f.getRequest().getSession();CsrfToken c=(CsrfToken)f.getRequest().getAttribute("_csrf");
         return (MockHttpSession)mvc.perform(post("/login").session(s).param("username",user).param("password","ClaveIntegracion2026!").param(c.getParameterName(),c.getToken())).andExpect(redirectedUrl("/dashboard")).andReturn().getRequest().getSession();
@@ -74,6 +74,30 @@ class MembresiaIntegracionTests {
             when(pasarela.consultar(p.id())).thenReturn(invalido);assertThatThrownBy(()->service.notificacion(p.id())).isInstanceOf(IllegalArgumentException.class);
         }
         assertThat(en(a,()->service.vigenteHasta())).isNull();
+    }
+    @Test void simulacionConCompradorConfiguradoConservaLiveModeYNoDuplicaVigencia(){
+        String ref=iniciar(a);var p=pago(ref,"approved");
+        when(pasarela.consultar(paymentId)).thenReturn(new PasarelaPago.PagoExterno(p.id(),ref,p.importe(),p.moneda(),p.estado(),true,p.vendedor(),p.aprobadoEn(),p.actualizado(),67890));
+        en(a,()->{service.conciliarPropio(paymentId);return null;});
+        var hasta=en(a,()->service.vigenteHasta());
+        service.notificacion(paymentId);
+        assertThat(hasta).isEqualTo(p.aprobadoEn().plusDays(30));
+        assertThat(en(a,()->service.vigenteHasta())).isEqualTo(hasta);
+        assertThat(en(a,()->service.pagos().getFirst().estado())).isEqualTo("APROBADA");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM eventos_pago WHERE referencia=?",Integer.class,ref)).isEqualTo(1);
+    }
+    @Test void simulacionControladaNoOmiteControlesDeCompradorImporteMonedaNiVendedor(){
+        String ref=iniciar(a);var p=pago(ref,"approved");
+        for(var invalido:List.of(
+                new PasarelaPago.PagoExterno(p.id(),ref,p.importe(),p.moneda(),p.estado(),true,p.vendedor(),p.aprobadoEn(),"comprador",99999),
+                new PasarelaPago.PagoExterno(p.id(),ref,BigDecimal.ONE,p.moneda(),p.estado(),true,p.vendedor(),p.aprobadoEn(),"importe",67890),
+                new PasarelaPago.PagoExterno(p.id(),ref,p.importe(),"USD",p.estado(),true,p.vendedor(),p.aprobadoEn(),"moneda",67890),
+                new PasarelaPago.PagoExterno(p.id(),ref,p.importe(),p.moneda(),p.estado(),true,99999,p.aprobadoEn(),"vendedor",67890))) {
+            when(pasarela.consultar(paymentId)).thenReturn(invalido);
+            assertThatThrownBy(()->service.notificacion(paymentId)).isInstanceOf(IllegalArgumentException.class);
+        }
+        assertThat(en(a,()->service.vigenteHasta())).isNull();
+        assertThat(en(a,()->service.pagos().getFirst().estado())).isEqualTo("CREADA");
     }
     @Test void conciliacionDeClienteNoPuedeAfectarOtraEmpresa(){
         String ref=iniciar(b);when(pasarela.consultar(paymentId)).thenReturn(pago(ref,"approved"));

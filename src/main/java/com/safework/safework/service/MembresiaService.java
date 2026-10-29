@@ -22,10 +22,12 @@ public class MembresiaService {
     public record Plan(String codigo,String nombre,BigDecimal precio,String moneda,int dias) {}
     public record Pago(String referencia,Long empresa,String plan,BigDecimal importe,String moneda,int dias,
             String estado,String checkout,String externo,LocalDateTime creado,LocalDateTime aprobado) {}
-    private final JdbcTemplate jdbc; private final PasarelaPago pasarela; private final TransactionTemplate tx; private final long vendedor;
+    private final JdbcTemplate jdbc; private final PasarelaPago pasarela; private final TransactionTemplate tx; private final long vendedor,compradorPrueba;
     public MembresiaService(JdbcTemplate jdbc,PasarelaPago pasarela,PlatformTransactionManager manager,
-            @Value("${safework.pagos.vendedor-id:0}") long vendedor) {
+            @Value("${safework.pagos.vendedor-id:0}") long vendedor,
+            @Value("${safework.pagos.comprador-id:0}") long compradorPrueba) {
         this.jdbc=jdbc;this.pasarela=pasarela;this.tx=new TransactionTemplate(manager);this.vendedor=vendedor;
+        this.compradorPrueba=compradorPrueba;
     }
     public boolean disponible() {return pasarela.disponible();}
     public List<Plan> planes() {return jdbc.query("SELECT codigo,nombre,precio,moneda,dias FROM planes_membresia WHERE activo=TRUE ORDER BY precio",(rs,n)->new Plan(rs.getString(1),rs.getString(2),rs.getBigDecimal(3),rs.getString(4),rs.getInt(5)));}
@@ -70,7 +72,8 @@ public class MembresiaService {
             Pago pago=buscar(externo.referencia());
             if(pago==null)throw new IllegalArgumentException("Pago no reconocido.");
             bloquearEmpresa(pago.empresa()); pago=buscar(externo.referencia());
-            if(externo.real() || externo.vendedor()!=vendedor || externo.importe().compareTo(pago.importe())!=0
+            if((externo.real() && (compradorPrueba<=0 || externo.comprador()!=compradorPrueba || compradorPrueba==vendedor))
+                    || externo.vendedor()!=vendedor || externo.importe().compareTo(pago.importe())!=0
                     || !externo.moneda().equals(pago.moneda()) || externo.id()==null || !externo.id().matches("[0-9]{1,30}"))
                 throw new IllegalArgumentException("La confirmación no coincide con la operación de prueba.");
             String estado=switch(externo.estado()) {
